@@ -1,0 +1,1846 @@
+[
+  {
+    "tokens": ["Show", "me", "sales", "by", "region", "in", "a", "bar", "chart"],
+    "labels": ["O", "O", "B-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "graph", "showing", "revenue", "trends", "over", "the", "last", "12", "months"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "O", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "top", "10", "products", "by", "profit", "margin", "in", "a", "table"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Filter", "the", "dashboard", "to", "show", "only", "Q1", "2024", "data"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER", "O"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "as", "a", "pie", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["What", "are", "the", "total", "sales", "figures", "for", "the", "North", "region", "?"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "O", "O", "B-FILTER", "B-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "comparing", "marketing", "spend", "vs", "revenue", "by", "quarter"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "me", "a", "heatmap", "of", "sales", "performance", "by", "state", "and", "month"],
+    "labels": ["O", "O", "O", "B-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "only", "products", "with", "sales", "above", "$", "50", "000"],
+    "labels": ["O", "O", "O", "O", "B-DIMENSION", "O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "in", "a", "column", "chart", "grouped", "by", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "year-over-year", "growth", "rates", "for", "each", "business", "unit"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "breakdown", "by", "cost", "components"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "the", "data", "to", "show", "only", "active", "customers", "from", "2023"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["What’s", "the", "average", "order", "value", "by", "customer", "tier", "?"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "trend", "in", "a", "line", "chart", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O"]
+  },
+  {
+    "tokens": ["Show", "me", "sales", "by", "region", "in", "a", "bar", "chart"],
+    "labels": ["O", "O", "B-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "graph", "showing", "revenue", "trends", "over", "the", "last", "12", "months"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "O", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "top", "10", "products", "by", "profit", "margin", "in", "a", "table"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Filter", "the", "dashboard", "to", "show", "only", "Q1", "2024", "data"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER", "O"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "as", "a", "pie", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["What", "are", "the", "total", "sales", "figures", "for", "the", "North", "region", "?"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "O", "O", "B-FILTER", "B-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "comparing", "marketing", "spend", "vs", "revenue", "by", "quarter"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "me", "a", "heatmap", "of", "sales", "performance", "by", "state", "and", "month"],
+    "labels": ["O", "O", "O", "B-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "only", "products", "with", "sales", "above", "$", "50", "000"],
+    "labels": ["O", "O", "O", "O", "B-DIMENSION", "O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "in", "a", "column", "chart", "grouped", "by", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "year-over-year", "growth", "rates", "for", "each", "business", "unit"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "breakdown", "by", "cost", "components"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "the", "data", "to", "show", "only", "active", "customers", "from", "2023"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["What’s", "the", "average", "order", "value", "by", "customer", "tier", "?"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "trend", "in", "a", "line", "chart", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O"]
+  },
+  {
+    "tokens": ["Show", "me", "monthly", "sales", "by", "region", "in", "a", "bar", "chart"],
+    "labels": ["O", "O", "B-FILTER", "B-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Create", "a", "pie", "chart", "showing", "customer", "count", "by", "region", "for", "active", "customers"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "profit", "by", "product", "category", "for", "last", "year"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["What", "is", "the", "average", "revenue", "by", "month", "in", "2025", "?"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "O"]
+  },
+  {
+    "tokens": ["List", "the", "top", "10", "products", "by", "sales", "in", "a", "bar", "chart"],
+    "labels": ["O", "O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "me", "profit", "margin", "by", "business", "unit", "in", "a", "table"],
+    "labels": ["O", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["How", "many", "new", "customers", "joined", "last", "quarter", "?"],
+    "labels": ["O", "O", "O", "B-METRIC", "O", "B-FILTER", "I-FILTER", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "heatmap", "of", "inventory", "levels", "by", "category", "and", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "above", "$", "100,000", "for", "North", "region", "in", "a", "card"],
+    "labels": ["O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER", "O", "B-FILTER", "B-DIMENSION", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Display", "order", "quantity", "by", "month", "for", "2024", "in", "a", "line", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "discount", "amount", "by", "region", "for", "electronics", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "freight", "by", "shipping", "date", "?"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Display", "revenue", "by", "quarter", "in", "a", "bar", "chart"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "profit", "breakdown", "by", "cost", "component", "in", "a", "waterfall", "chart"],
+    "labels": ["O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Filter", "the", "dashboard", "to", "active", "customers", "from", "France", "in", "2024"],
+    "labels": ["O", "O", "O", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "tier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "for", "monthly", "recurring", "revenue", "trend", "with", "forecasting"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "O"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "in", "a", "column", "chart", "grouped", "by", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "year-over-year", "growth", "rates", "for", "each", "business", "unit"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "breakdown", "by", "cost", "components"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "the", "data", "to", "show", "only", "active", "customers", "from", "2023"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["What’s", "the", "average", "order", "value", "by", "customer", "tier", "?"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "trend", "in", "a", "line", "chart", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "products", "with", "sales", "greater", "than", "1000"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "Q1", "2023"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "a", "line", "chart", "of", "profit", "by", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "5", "products", "by", "revenue"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "discount", "percentage", "per", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "for", "customer", "age", "groups"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-DIMENSION", "I-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "average", "temperature", "by", "city"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "trends", "over", "the", "last", "six", "months"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "data", "for", "electronic", "devices"],
+    "labels": ["O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "a", "pie", "chart", "of", "customer", "distribution"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "sales", "vs", "profit"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Display", "monthly", "sales", "by", "region"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "new", "customers", "this", "year"],
+    "labels": ["O", "B-METRIC", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "profit", "for", "all", "products"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "sales", "between", "January", "and", "June"],
+    "labels": ["O", "B-METRIC", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "revenue", "growth", "over", "five", "years"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["List", "top", "ten", "products", "by", "sales"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "customer", "lifetime", "value"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "daily", "sales", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "products", "sold", "in", "2020"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "profit", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "showing", "average", "sales", "per", "region"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "top", "five", "customers", "by", "total", "spending"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "orders", "placed", "last", "month"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "revenue", "for", "Q4", "2019"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "vs", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "average", "temperature", "per", "city"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "sales", "growth", "trend", "over", "the", "past", "year"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "out", "products", "with", "low", "inventory"],
+    "labels": ["O", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "the", "total", "number", "of", "customers", "in", "New", "York"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "profit", "by", "region", "and", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "annual", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["List", "the", "top", "ten", "best-selling", "products"],
+    "labels": ["O", "O", "B-FILTER", "I-FILTER", "I-FILTER", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "in", "a", "column", "chart", "grouped", "by", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "year-over-year", "growth", "rates", "for", "each", "business", "unit"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "breakdown", "by", "cost", "components"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "the", "data", "to", "show", "only", "active", "customers", "from", "2023"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["What’s", "the", "average", "order", "value", "by", "customer", "tier", "?"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "trend", "in", "a", "line", "chart", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "products", "with", "sales", "greater", "than", "1000"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "Q1", "2023"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "a", "line", "chart", "of", "profit", "by", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "5", "products", "by", "revenue"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "discount", "percentage", "per", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "for", "customer", "age", "groups"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-DIMENSION", "I-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "average", "temperature", "by", "city"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "trends", "over", "the", "last", "six", "months"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "data", "for", "electronic", "devices"],
+    "labels": ["O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "a", "pie", "chart", "of", "customer", "distribution"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "sales", "vs", "profit"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Display", "monthly", "sales", "by", "region"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "new", "customers", "this", "year"],
+    "labels": ["O", "B-METRIC", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "profit", "for", "all", "products"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "sales", "between", "January", "and", "June"],
+    "labels": ["O", "B-METRIC", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "revenue", "growth", "over", "five", "years"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["List", "top", "ten", "products", "by", "sales"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "customer", "lifetime", "value"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "daily", "sales", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "products", "sold", "in", "2020"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "profit", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "showing", "average", "sales", "per", "region"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "top", "five", "customers", "by", "total", "spending"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "orders", "placed", "last", "month"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "revenue", "for", "Q4", "2019"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "vs", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "average", "temperature", "per", "city"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "sales", "growth", "trend", "over", "the", "past", "year"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "out", "products", "with", "low", "inventory"],
+    "labels": ["O", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "the", "total", "number", "of", "customers", "in", "New", "York"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "profit", "by", "region", "and", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "annual", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["List", "the", "top", "ten", "best-selling", "products"],
+    "labels": ["O", "O", "B-FILTER", "I-FILTER", "I-FILTER", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "in", "a", "column", "chart", "grouped", "by", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "year-over-year", "growth", "rates", "for", "each", "business", "unit"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "breakdown", "by", "cost", "components"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "the", "data", "to", "show", "only", "active", "customers", "from", "2023"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["What’s", "the", "average", "order", "value", "by", "customer", "tier", "?"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "trend", "in", "a", "line", "chart", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "products", "with", "sales", "greater", "than", "1000"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "Q1", "2023"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "a", "line", "chart", "of", "profit", "by", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "5", "products", "by", "revenue"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "discount", "percentage", "per", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "for", "customer", "age", "groups"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-DIMENSION", "I-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "average", "temperature", "by", "city"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "trends", "over", "the", "last", "six", "months"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "data", "for", "electronic", "devices"],
+    "labels": ["O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "a", "pie", "chart", "of", "customer", "distribution"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "sales", "vs", "profit"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Display", "monthly", "sales", "by", "region"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "new", "customers", "this", "year"],
+    "labels": ["O", "B-METRIC", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "profit", "for", "all", "products"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "sales", "between", "January", "and", "June"],
+    "labels": ["O", "B-METRIC", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "revenue", "growth", "over", "five", "years"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["List", "top", "ten", "products", "by", "sales"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "customer", "lifetime", "value"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "daily", "sales", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Filter", "to", "show", "products", "sold", "in", "2020"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "profit", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "showing", "average", "sales", "per", "region"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "top", "five", "customers", "by", "total", "spending"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "orders", "placed", "last", "month"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "revenue", "for", "Q4", "2019"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "vs", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "average", "temperature", "per", "city"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "sales", "growth", "trend", "over", "the", "past", "year"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "out", "products", "with", "low", "inventory"],
+    "labels": ["O", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "the", "total", "number", "of", "customers", "in", "New", "York"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "profit", "by", "region", "and", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "annual", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["List", "the", "top", "ten", "best-selling", "products"],
+    "labels": ["O", "O", "B-FILTER", "I-FILTER", "I-FILTER", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "in", "a", "column", "chart", "grouped", "by", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "breakdown", "by", "cost", "components"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "the", "data", "to", "show", "only", "active", "customers"],
+    "labels": ["O", "O", "O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "tier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "of", "monthly", "recurring", "revenue", "with", "forecasting"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O"]
+  },
+  {
+    "tokens": ["Show", "sales", "by", "region", "and", "month"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "customer", "count", "for", "North", "region"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-FILTER", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "comparing", "marketing", "spend", "and", "revenue", "by", "quarter"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "products", "with", "sales", "greater", "than", "10000"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "total", "profit", "for", "last", "year"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "average", "revenue", "per", "product", "category"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "10", "products", "by", "profit"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "inventory", "levels", "in", "each", "warehouse"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "pie", "chart", "of", "customer", "segments"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "discount", "amount", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "sales", "growth", "trend", "by", "month"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "customers", "from", "California"],
+    "labels": ["O", "B-DIMENSION", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "profit", "margin", "for", "each", "product"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "for", "monthly", "orders"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["Display", "average", "sales", "by", "region"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "orders", "in", "Q1", "2020"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["List", "top", "five", "customers", "by", "purchase", "amount"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "total", "revenue", "for", "last", "month"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "orders", "placed", "between", "January", "and", "March"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "average", "unit", "cost", "for", "each", "product"],
+    "labels": ["O", "B-AGGREGATION", "I-METRIC", "I-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "by", "channel", "and", "region"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "expenses", "and", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Filter", "products", "with", "stock", "less", "than", "50"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "customer", "retention", "rate", "per", "region"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "monthly", "sales", "trend", "in", "a", "line", "chart"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["List", "products", "sold", "in", "2019"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "percentage", "of", "discounts", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "showing", "customer", "distribution"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "average", "order", "value", "for", "new", "customers"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "total", "sales", "for", "Q2", "2021"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "in", "each", "warehouse"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "average", "profit", "margin", "by", "business", "unit"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "line", "chart", "of", "monthly", "sales", "trend"],
+    "labels": ["O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["List", "top", "ten", "products", "by", "profit"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "in", "a", "pie", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "Q1", "2023"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "orders", "placed", "last", "month"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "products", "with", "stock", "less", "than", "100"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "sales", "by", "region", "and", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "scatter", "plot", "for", "marketing", "expenses", "vs", "revenue"],
+    "labels": ["O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Display", "average", "order", "value", "for", "new", "customers"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["List", "all", "orders", "above", "1000", "units"],
+    "labels": ["O", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "trend", "of", "customer", "growth"],
+    "labels": ["O", "B-FILTER", "O", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "for", "total", "profit", "by", "product"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "performance", "by", "region"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "percentage", "of", "discount", "per", "product"],
+    "labels": ["O", "B-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "customers", "from", "California"],
+    "labels": ["O", "B-DIMENSION", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "monthly", "sales"],
+    "labels": ["O", "B-AGGREGATION", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["Create", "line", "chart", "showing", "yearly", "revenue"],
+    "labels": ["O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["List", "top", "five", "customers", "by", "purchase", "amount"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "total", "sales", "for", "Q4", "2019"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "average", "price", "per", "unit"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "customer", "purchase", "history"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "for", "each", "product", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "average", "profit", "margin", "across", "business", "units"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "depicting", "monthly", "sales", "trend"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["List", "top", "ten", "products", "by", "sales"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "in", "a", "pie", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "data", "to", "include", "only", "active", "customers"],
+    "labels": ["O", "O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "the", "total", "sales", "for", "2023"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "average", "order", "value", "by", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "vs", "revenue"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "profit", "breakdown", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "orders", "placed", "in", "Q4", "2020"],
+    "labels": ["O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "discount", "amount", "for", "electronics"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "sales", "trend", "in", "a", "line", "chart"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "customers", "with", "orders", "above", "100"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "customer", "lifetime", "value"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Present", "a", "bar", "chart", "with", "sales", "by", "region"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "the", "number", "of", "products", "sold", "last", "month"],
+    "labels": ["O", "O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "data", "for", "products", "with", "stock", "less", "than", "50"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "sales", "growth", "rate", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "pie", "chart", "of", "customer", "distribution"],
+    "labels": ["O", "B-CHART_TYPE", "I-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "marketing", "spend", "and", "sales", "for", "Q1", "2021"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "orders", "for", "each", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "average", "discount", "percentage", "by", "product"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "five", "customers", "by", "purchase", "value"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "complete", "list", "of", "products"],
+    "labels": ["O", "O", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "customers", "from", "New", "York"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "the", "average", "profit", "margin", "per", "quarter"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "trend", "over", "the", "last", "six", "months"],
+    "labels": ["O", "B-METRIC", "O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "heatmap", "of", "inventory", "levels", "by", "warehouse", "and", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "products", "sold", "in", "January", "2021"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "total", "sales", "per", "channel"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "customer", "segmentation", "for", "all", "regions"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "percentage", "of", "customer", "retention"],
+    "labels": ["O", "B-METRIC", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "yearly", "revenue", "growth"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-DIMENSION", "O", "B-FILTER", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "for", "each", "product", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "average", "profit", "margin", "across", "business", "units"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "depicting", "monthly", "sales", "trend"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["List", "top", "ten", "products", "by", "sales"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "in", "a", "pie", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Filter", "data", "to", "include", "only", "active", "customers"],
+    "labels": ["O", "O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "the", "total", "sales", "for", "2023"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "average", "order", "value", "by", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "vs", "revenue"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "profit", "breakdown", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "orders", "placed", "in", "Q4", "2020"],
+    "labels": ["O", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "discount", "amount", "for", "electronics"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "sales", "trend", "in", "a", "line", "chart"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["List", "products", "with", "orders", "over", "100"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "sales", "by", "region", "for", "the", "last", "quarter"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "total", "revenue", "for", "Q4", "2023"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "graph", "of", "monthly", "orders"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["List", "top", "5", "products", "by", "profit", "margin"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "average", "discount", "amount", "by", "category"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "sales", "above", "$", "100", "000"],
+    "labels": ["O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "by", "warehouse"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "monthly", "sales", "trend", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "O", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "pie", "chart", "for", "customer", "segments"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "profit", "for", "last", "year"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "tier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "products", "with", "sales", "below", "5000"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "sales", "by", "country", "and", "region"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "by", "cost", "component"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "customers", "who", "joined", "last", "month"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "trend"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Display", "top", "10", "products", "by", "sales"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "total", "freight", "by", "shipping", "method"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "orders", "placed", "in", "2023"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "vs", "revenue", "per", "quarter"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "average", "customer", "lifetime", "value"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "sales", "above", "100", "000", "by", "region"],
+    "labels": ["O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "customers", "by", "segment", "and", "year"],
+    "labels": ["O", "B-DIMENSION", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "year-over-year", "growth", "rate", "by", "business", "unit"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "products", "with", "order", "quantity", "over", "100", "units"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "I-METRIC", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "profit", "margin", "by", "product", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "electronics"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "type"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "with", "monthly", "recurring", "revenue", "forecast"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "I-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Filter", "active", "customers", "from", "France"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "top", "five", "customers", "by", "total", "profit"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Display", "average", "freight", "cost", "for", "expedited", "shipping"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "sales", "by", "city"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "showing", "total", "tax", "amount", "by", "product"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "the", "maximum", "discount", "for", "electronics"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "sales", "trends", "by", "week"],
+    "labels": ["O", "B-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "the", "count", "of", "orders", "by", "month"],
+    "labels": ["O", "O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "sales", "by", "region", "for", "the", "last", "quarter"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "total", "revenue", "for", "Q4", "2023"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "of", "monthly", "orders"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-FILTER", "B-METRIC"]
+  },
+  {
+    "tokens": ["List", "top", "5", "products", "by", "profit"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "average", "discount", "percentage"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Filter", "sales", "above", "10000"],
+    "labels": ["O", "B-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "inventory", "levels", "by", "warehouse"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "monthly", "sales", "trend", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "O", "O"]
+  },
+  {
+    "tokens": ["Create", "pie", "chart", "of", "customer", "segments"],
+    "labels": ["O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "profit", "for", "last", "year"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "tier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "products", "with", "sales", "below", "5000"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "sales", "by", "region"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "waterfall", "chart", "showing", "profit", "by", "cost", "component"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "customers", "who", "joined", "last", "month"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "trend"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Display", "top", "10", "products", "by", "sales"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "total", "freight", "by", "shipping", "method"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "orders", "placed", "in", "2023"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "vs", "revenue", "per", "quarter"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "sales", "by", "region", "for", "last", "year"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "revenue", "per", "month"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "10", "products", "by", "profit"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "order", "volume", "trend"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "for", "active", "users"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "orders", "from", "January", "to", "March"],
+    "labels": ["O", "B-DIMENSION", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "North", "region"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "revenue", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "pie", "chart", "of", "customer", "segments"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "profit", "for", "2020"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "products", "with", "sales", "greater", "than", "1000"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "sales", "by", "country", "and", "city"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "showing", "expense", "breakdown"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["List", "customers", "who", "made", "purchases", "last", "month"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "yearly", "sales", "growth"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Display", "top", "5", "products", "by", "revenue"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "total", "freight", "cost", "by", "carrier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "orders", "from", "January", "2021"],
+    "labels": ["O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "marketing", "spend", "and", "sales"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Show", "average", "customer", "lifetime", "value"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["Show", "sales", "above", "100000", "dollars"],
+    "labels": ["O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "customers", "from", "California"],
+    "labels": ["O", "B-DIMENSION", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "product", "sales", "by", "category"],
+    "labels": ["O", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "profit", "margin", "for", "each", "region"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "products", "with", "stock", "level", "below", "10"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "I-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "sales", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "heatmap", "of", "inventory", "levels", "by", "warehouse", "and", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "number", "of", "orders", "in", "December"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "sales", "per", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "revenue", "trend"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Filter", "data", "for", "active", "customers"],
+    "labels": ["O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "tier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+
+  {
+    "tokens": ["Display", "sales", "by", "region", "for", "last", "year"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "revenue", "per", "month"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "10", "products", "by", "profit"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "order", "volume", "trend"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "for", "active", "users"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "orders", "from", "January", "to", "March"],
+    "labels": ["O", "B-DIMENSION", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "North", "region"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "revenue", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "pie", "chart", "of", "customer", "segments"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "profit", "for", "2020"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "segment"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "products", "with", "sales", "greater", "than", "1000"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "sales", "by", "country", "and", "city"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "bar", "chart", "showing", "expense", "breakdown"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["List", "customers", "who", "made", "purchases", "last", "month"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "yearly", "sales", "growth"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Show", "monthly", "sales", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "heatmap", "of", "inventory", "levels", "by", "warehouse", "and", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "number", "of", "orders", "in", "December"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "sales", "per", "product", "category"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "revenue", "trend"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Filter", "data", "for", "active", "customers"],
+    "labels": ["O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "tier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+
+  {
+    "tokens": ["Display", "sales", "by", "region", "for", "last", "year"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "revenue", "per", "month"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["List", "top", "10", "products", "by", "profit"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC"]
+  },
+  {
+    "tokens": ["Create", "a", "line", "chart", "showing", "order", "volume", "trend"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O"]
+  },
+  {
+    "tokens": ["Show", "customer", "segmentation", "for", "active", "users"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Filter", "orders", "from", "January", "to", "March"],
+    "labels": ["O", "B-DIMENSION", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "sales", "for", "North", "region"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "revenue", "trend"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O"]
+  },
+  {
+    "tokens": ["Create", "a", "pie", "chart", "of", "customer", "segments"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "profit", "for", "2020"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER"]
+  },
+
+  {
+    "tokens": ["Show", "me", "monthly", "sales", "by", "region", "in", "a", "bar", "chart"],
+    "labels": ["O", "O", "B-FILTER", "B-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Display", "total", "profit", "by", "product", "category", "for", "last", "year"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "pie", "chart", "showing", "customer", "count", "by", "region", "for", "active", "customers"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["What", "is", "the", "average", "revenue", "by", "month", "in", "2025"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["List", "the", "top", "10", "products", "by", "sales", "in", "a", "bar", "chart"],
+    "labels": ["O", "O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "me", "profit", "margin", "by", "business", "unit", "in", "a", "table"],
+    "labels": ["O", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["How", "many", "new", "customers", "joined", "last", "quarter"],
+    "labels": ["O", "O", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Create", "a", "heatmap", "of", "inventory", "levels", "by", "category", "and", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "above", "$100,000", "for", "North", "region", "in", "a", "card"],
+    "labels": ["O", "B-METRIC", "B-FILTER", "I-FILTER", "O", "B-FILTER", "I-FILTER", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Display", "order", "quantity", "by", "month", "for", "2024", "in", "a", "line", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "discount", "amount", "by", "region", "for", "electronics", "category"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "freight", "by", "shipping", "date"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "revenue", "by", "quarter", "in", "a", "bar", "chart"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "profit", "breakdown", "by", "cost", "component", "in", "a", "waterfall", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Filter", "the", "dashboard", "to", "active", "customers", "from", "France", "in", "2024"],
+    "labels": ["O", "O", "O", "O", "B-FILTER", "I-FILTER", "O", "B-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "order", "value", "by", "customer", "tier"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "comparing", "marketing", "spend", "versus", "revenue", "by", "quarter"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["What", "was", "the", "maximum", "sales", "by", "category", "last", "year"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-DIMENSION", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "average", "profit", "margin", "by", "product", "in", "Q2", "2025"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "in", "a", "line", "chart", "with", "forecasting"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O"]
+  },
+  {
+    "tokens": ["List", "products", "with", "order", "quantity", "over", "100", "units", "in", "2023"],
+    "labels": ["O", "B-DIMENSION", "O", "B-METRIC", "I-METRIC", "B-FILTER", "I-FILTER", "I-FILTER", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "me", "year-over-year", "revenue", "trend", "for", "each", "sales", "territory"],
+    "labels": ["O", "O", "B-FILTER", "B-METRIC", "O", "O", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "tax", "amount", "by", "product", "in", "a", "bar", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "the", "count", "of", "orders", "by", "month", "this", "year"],
+    "labels": ["O", "O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Which", "product", "drove", "the", "highest", "revenue", "in", "Q3", "2024"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Present", "a", "table", "of", "inventory", "levels", "over", "all", "categories"],
+    "labels": ["O", "O", "B-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Filter", "dashboard", "for", "electronics", "sales", "in", "North", "America"],
+    "labels": ["O", "O", "O", "B-FILTER", "B-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "average", "customer", "lifetime", "value", "by", "region", "in", "a", "bar", "chart"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["How", "many", "units", "were", "shipped", "in", "December"],
+    "labels": ["O", "O", "B-METRIC", "O", "O", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "the", "sum", "of", "discounts", "by", "territory", "this", "year"],
+    "labels": ["O", "O", "B-AGGREGATION", "O", "B-METRIC", "O", "B-DIMENSION", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "number", "of", "returned", "items", "by", "month"],
+    "labels": ["O", "B-METRIC", "O", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Provide", "a", "pie", "chart", "for", "customer", "segmentation", "in", "2025"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["How", "much", "profit", "was", "generated", "by", "top", "10", "products"],
+    "labels": ["O", "O", "B-METRIC", "O", "O", "O", "B-FILTER", "I-FILTER", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Display", "year-over-year", "growth", "rate", "for", "each", "business", "unit", "in", "a", "table"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "I-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "shipping", "cost", "by", "carrier", "in", "a", "bar", "chart"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "sales", "by", "city", "for", "active", "customers"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "total", "revenue", "for", "all", "business", "units", "this", "quarter"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "O", "B-DIMENSION", "I-DIMENSION", "B-FILTER", "O"]
+  },
+
+  {
+    "tokens": ["Create", "a", "scatter", "plot", "of", "order", "quantity", "versus", "profit", "by", "product"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "sales", "trends", "by", "week", "in", "a", "line", "chart"],
+    "labels": ["O", "B-METRIC", "O", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Display", "the", "best-selling", "product", "by", "region"],
+    "labels": ["O", "O", "B-FILTER", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Show", "table", "of", "customer", "count", "by", "year", "for", "all", "segments"],
+    "labels": ["O", "O", "O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["What", "is", "the", "average", "order", "value", "for", "repeat", "customers", "this", "year"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "inventory", "level", "by", "product", "for", "over", "100", "units"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "monthly", "recurring", "revenue", "forecast", "for", "the", "next", "6", "months"],
+    "labels": ["O", "B-FILTER", "I-FILTER", "B-METRIC", "O", "O", "O", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Present", "a", "bar", "chart", "for", "the", "count", "of", "sales", "order", "lines", "by", "order", "status"],
+    "labels": ["O", "O", "B-CHART_TYPE", "I-CHART_TYPE", "O", "O", "B-METRIC", "O", "B-METRIC", "I-METRIC", "I-METRIC", "O", "B-DIMENSION", "I-DIMENSION"]
+  },
+  {
+    "tokens": ["How", "much", "freight", "was", "paid", "for", "expedited", "shipping"],
+    "labels": ["O", "O", "B-METRIC", "O", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "product", "standard", "cost", "by", "category", "for", "2023"],
+    "labels": ["O", "O", "O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER"]
+  },
+  {
+    "tokens": ["Show", "extended", "amount", "by", "month", "in", "a", "heatmap"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["What", "is", "the", "total", "sales", "value", "for", "canceled", "orders", "this", "year"],
+    "labels": ["O", "O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER", "B-DIMENSION", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Which", "customers", "had", "the", "highest", "order", "quantity", "last", "quarter"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "the", "average", "discount", "by", "sales", "territory", "for", "last", "year"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "O", "B-METRIC", "B-DIMENSION", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "profit", "by", "month", "for", "2024", "in", "a", "line", "chart"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-FILTER", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "number", "of", "orders", "by", "day", "in", "a", "table"],
+    "labels": ["O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Which", "product", "had", "the", "biggest", "increase", "in", "sales", "this", "year"],
+    "labels": ["O", "B-DIMENSION", "O", "O", "B-FILTER", "I-FILTER", "O", "B-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "total", "revenue", "for", "electronics", "category", "over", "the", "last", "6", "months"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "O", "B-FILTER", "I-FILTER", "O", "O", "B-FILTER", "I-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "the", "minimum", "shipping", "cost", "by", "region", "in", "a", "card"],
+    "labels": ["O", "O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "a", "heatmap", "of", "sales", "by", "state", "and", "month"],
+    "labels": ["O", "O", "B-CHART_TYPE", "O", "B-METRIC", "O", "B-DIMENSION", "O", "B-DIMENSION"]
+  },
+  {
+    "tokens": ["Who", "were", "the", "top", "5", "customers", "by", "total", "profit", "last", "year"],
+    "labels": ["O", "O", "O", "B-FILTER", "I-FILTER", "B-DIMENSION", "O", "B-METRIC", "I-METRIC", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "YoY", "growth", "for", "revenue", "in", "a", "line", "chart"],
+    "labels": ["O", "B-FILTER", "B-METRIC", "O", "B-METRIC", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "total", "order", "quantity", "for", "shoes", "in", "Q2", "2025"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["How", "many", "products", "were", "returned", "last", "December"],
+    "labels": ["O", "O", "B-DIMENSION", "O", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Display", "average", "freight", "cost", "for", "expedited", "orders"],
+    "labels": ["O", "B-AGGREGATION", "B-METRIC", "I-METRIC", "O", "B-FILTER", "I-FILTER"]
+  },
+  {
+    "tokens": ["Show", "marketing", "spend", "versus", "revenue", "by", "region", "in", "a", "scatter", "plot"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-METRIC", "O", "B-DIMENSION", "O", "O", "B-CHART_TYPE", "I-CHART_TYPE"]
+  },
+  {
+    "tokens": ["Show", "order", "quantity", "by", "week", "for", "2023"],
+    "labels": ["O", "B-METRIC", "I-METRIC", "O", "B-DIMENSION", "O", "B-FILTER"]
+  }
+]

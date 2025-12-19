@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Analytics Demo - Dashboard Creation Guide</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .demo-container {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .demo-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .demo-header h1 {
+      color: #667eea;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .demo-header p {
+      color: #666;
+      font-size: 1.1em;
+    }
+    
+    .step-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .step-card h2 {
+      font-size: 1.5em;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .step-number {
+      background: rgba(255, 255, 255, 0.2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    
+    .step-card p {
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+    
+    .step-card ul {
+      margin-left: 20px;
+      line-height: 2;
+    }
+    
+    .step-card ul li {
+      margin-bottom: 8px;
+    }
+    
+    .feature-highlight {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      border-left: 4px solid white;
+    }
+    
+    .back-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      text-decoration: none;
+      margin-top: 30px;
+      transition: transform 0.3s;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .tip-box {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    
+    .tip-box strong {
+      color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-banner">
+    <div class="fancy-title">📊 Analytics Demo</div>
+    <p>Step-by-step guide to creating your dashboard</p>
+  </div>
+
+  <div class="demo-container">
+    <div class="demo-header">
+      <h1>🚀 How to Create Your Dashboard</h1>
+      <p>Follow these simple steps to build powerful analytics dashboards</p>
+    </div>
+
+    <div class="step-card">
+      <h2>
+        <span class="step-number">1</span>
+        Login to Your Account
+      </h2>
+      <p>
+        Start by logging in with your credentials. Your role determines what features you can access:
+      </p>
+      <ul>
+        <li><strong>Admin:</strong> Full access to all features, user management, and system settings</li>
+        <li><strong>Analyst:</strong> Create and share dashboards, advanced analytics features</li>
+        <li><strong>Departmental:</strong> View and create department-specific dashboards</li>
+        <li><strong>Viewer:</strong> View shared dashboards and reports</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <h2>
+        <span class="step-number">2</span>
+        Access the Dashboard Builder
+      </h2>
+      <p>
+        Once logged in, you'll be redirected to your role-specific dashboard. Navigate to:
+      </p>
+      <div class="feature-highlight">
+        <strong>📊 Interactive Dashboard Builder</strong> - Create custom dashboards with natural language
+      </div>
+      <p style="margin-top: 15px;">
+        Or use the <strong>Chart Creator</strong> for quick single-chart generation.
+      </p>
+    </div>
+
+    <div class="step-card">
+      <h2>
+        <span class="step-number">3</span>
+        Create Charts Using Natural Language
+      </h2>
+      <p>
+        Our AI-powered system understands natural language queries. Simply type what you want to see:
+      </p>
+      <div class="feature-highlight">
+        <strong>Example Queries:</strong>
+        <ul style="margin-top: 10px;">
+          <li>"Show me sales trends over time"</li>
+          <li>"Create a bar chart of revenue by department"</li>
+          <li>"Display top 10 customers by purchase amount"</li>
+          <li>"Show employee distribution across departments"</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <h2>
+        <span class="step-number">4</span>
+        Customize Your Charts
+      </h2>
+      <p>
+        Each chart can be customized with:
+      </p>
+      <ul>
+        <li>Different chart types (bar, line, pie, scatter, etc.)</li>
+        <li>Custom titles and labels</li>
+        <li>Color schemes and themes</li>
+        <li>Data filters and aggregations</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <h2>
+        <span class="step-number">5</span>
+        Build Your Complete Dashboard
+      </h2>
+      <p>
+        Add multiple charts to create a comprehensive dashboard:
+      </p>
+      <ul>
+        <li>Add charts one by one using natural language queries</li>
+        <li>Preview your dashboard in real-time</li>
+        <li>Rearrange charts by dragging and dropping</li>
+        <li>Delete charts you don't need</li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <h2>
+        <span class="step-number">6</span>
+        Save and Share Your Dashboard
+      </h2>
+      <p>
+        Once you're happy with your dashboard:
+      </p>
+      <div class="feature-highlight">
+        <ul>
+          <li>💾 <strong>Save:</strong> Give your dashboard a name and description</li>
+          <li>📥 <strong>Export:</strong> Download as HTML, Excel, CSV, or JSON</li>
+          <li>👥 <strong>Share:</strong> Share with team members (based on permissions)</li>
+          <li>📊 <strong>Integrate:</strong> Export data for Tableau or other BI tools</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>💡 Pro Tip:</strong> Start with simple queries and gradually add more complex visualizations. 
+      The system learns from your queries and provides better suggestions over time!
+    </div>
+
+    <div style="text-align: center;">
+      <a href="page.html" class="back-button">← Back to Login</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .query-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .query-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .query-input-section {
+            margin-bottom: 20px;
+        }
+
+        .query-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Segoe UI', sans-serif;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s;
+        }
+
+        .query-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .examples-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .examples-section h3 {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .example-query {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid #667eea;
+        }
+
+        .example-query:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .example-query small {
+            color: #666;
+            display: block;
+            font-size: 13px;
+        }
+
+        .charts-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .charts-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .chart-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .chart-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .chart-item h4 {
+            color: #333;
+            font-size: 16px;
+        }
+
+        .chart-item p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .delete-chart {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-chart:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .status-success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .dashboard-preview {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        .dashboard-preview h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Scrollbar styling */
+        .charts-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .charts-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .charts-panel::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .charts-panel::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            color: #856404;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .info-box li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        /* Dataset Info Panel Styles */
+        .dataset-info-panel {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dataset-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .dataset-info-header:hover {
+            background: #f8f9fa;
+        }
+
+        .dataset-info-header h3 {
+            margin: 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+            font-size: 20px;
+        }
+
+        .toggle-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .dataset-info-content {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .dataset-info-content.hidden {
+            display: none;
+        }
+
+        .table-section {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .table-section h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-info {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .columns-group {
+            margin-bottom: 15px;
+        }
+
+        .columns-group h5 {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .column-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .column-tag {
+            background: #f0f0f0;
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .column-tag:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .column-tag.numeric {
+            border-left: 3px solid #28a745;
+        }
+
+        .column-tag.text {
+            border-left: 3px solid #17a2b8;
+        }
+
+        .column-tag.date {
+            border-left: 3px solid #ffc107;
+        }
+
+        .sample-data {
+            margin-top: 15px;
+        }
+
+        .sample-data h5 {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .sample-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .sample-table th {
+            background: #667eea;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .sample-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sample-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sample-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .type-icon {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span>📊</span> Interactive Dashboard Builder
+            </h1>
+            <div class="user-info">
+                <span id="userName">Loading...</span>
+                <a href="/home" class="btn">← Back to Home</a>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3>💡 How to Use</h3>
+            <ul>
+                <li>Enter natural language queries about your data in the text box</li>
+                <li>Click "Add Chart" to generate and add visualizations</li>
+                <li>Use example queries below for inspiration</li>
+                <li>Click "Generate Dashboard" when ready to view all charts together</li>
+                <li>Clear all charts to start fresh</li>
+            </ul>
+        </div>
+
+        <!-- Dataset Information Panel -->
+        <div class="dataset-info-panel" id="datasetInfoPanel">
+            <div class="dataset-info-header" onclick="toggleDatasetInfo()">
+                <h3>
+                    <span>📋</span> Available Dataset Schema
+                </h3>
+                <span class="toggle-icon" id="datasetToggleIcon">▼</span>
+            </div>
+            <div class="dataset-info-content" id="datasetInfoContent">
+                <div id="datasetInfoData">
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        <div class="spinner"></div>
+                        <p>Loading dataset information...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RAG Upload Panel -->
+        <div class="dataset-info-panel" id="ragUploadPanel" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+            <div class="dataset-info-header" onclick="toggleRagPanel()">
+                <h3>
+                    <span>📤</span> Upload Documents for AI Explainability (RAG)
+                </h3>
+                <span class="toggle-icon collapsed" id="ragToggleIcon">▼</span>
+            </div>
+            <div class="dataset-info-content hidden" id="ragPanelContent">
+                <div style="background: white; border-radius: 10px; padding: 20px;">
+                    <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                        Upload company documents, datasets, or reports to get detailed AI-powered explanations about your dashboards.
+                    </p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #333;">
+                            📁 Select File (PDF, DOCX, TXT, CSV, Excel)
+                        </label>
+                        <input type="file" id="ragFileInput" accept=".pdf,.docx,.txt,.csv,.xlsx,.xls" 
+                               style="width: 100%; padding: 10px; border: 2px dashed #667eea; border-radius: 8px; background: #f8f9fa;">
+                    </div>
+                    
+                    <div class="button-group" style="margin-bottom: 15px;">
+                        <button class="btn btn-success" onclick="uploadRagFile()">
+                            ⬆️ Upload File
+                        </button>
+                        <button class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onclick="processRagDocument()">
+                            🤖 Process with AI
+                        </button>
+                    </div>
+                    
+                    <div id="ragUploadStatus" style="margin-top: 15px;"></div>
+                    
+                    <div id="ragResults" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                        <h4 style="color: #667eea; margin-bottom: 15px;">🔍 AI-Generated Insights</h4>
+                        <div id="ragQAContent"></div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
+                        <h5 style="color: #1565c0; margin-bottom: 10px;">💡 How it works:</h5>
+                        <ul style="margin-left: 20px; color: #666; font-size: 13px;">
+                            <li>Upload your company documents or datasets</li>
+                            <li>Our RAG (Retrieval-Augmented Generation) system analyzes the content</li>
+                            <li>Get intelligent explanations and insights about your data</li>
+                            <li>Ask custom questions about the uploaded documents</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="ragQuerySection" style="display: none; margin-top: 20px;">
+                        <h4 style="color: #333; margin-bottom: 10px;">💬 Ask Questions About Your Document</h4>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="ragQuestion" placeholder="Ask a question about the document..." 
+                                   style="flex: 1; padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
+                            <button class="btn" onclick="queryRagDocument()">Ask</button>
+                        </div>
+                        <div id="ragQueryResult" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusContainer"></div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContentSection">
+            <!-- Query Panel -->
+            <div class="query-panel" id="queryPanel">
+                <h2>🔍 Query Builder</h2>
+                
+                <!-- Dataset Selector Section -->
+                <div style="background: #e7f3ff; border-radius: 10px; padding: 15px; margin-bottom: 20px; border-left: 4px solid #2196f3;">
+                    <label style="display: block; font-weight: 600; color: #1565c0; margin-bottom: 10px;">
+                        📁 Select Dataset:
+                    </label>
+                    <select id="datasetSelector" onchange="handleDatasetChange()" 
+                            style="width: 100%; padding: 12px; border: 2px solid #2196f3; border-radius: 8px; font-size: 14px; background: white;">
+                        <option value="">Loading datasets...</option>
+                    </select>
+                    <div id="datasetInfo" style="margin-top: 10px; display: none;">
+                        <p id="datasetDetails" style="color: #1565c0; margin: 0; font-size: 13px;"></p>
+                    </div>
+                </div>
+                
+                <div class="query-input-section">
+                    <textarea 
+                        id="queryInput" 
+                        class="query-textarea" 
+                        placeholder="Enter your data query here...&#10;&#10;Example: Show ExtendedAmount by SalesTerritoryKey"
+                    ></textarea>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="addChart()">
+                            ➕ Add Chart
+                        </button>
+                        <button class="btn btn-danger" onclick="clearInput()">
+                            🗑️ Clear Input
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Examples Section -->
+                <div class="examples-section">
+                    <h3>📝 Example Queries (Click to Use)</h3>
+                    
+                    <div class="example-query" onclick="useExample('Show ExtendedAmount by SalesTerritoryKey')">
+                        <strong>Show ExtendedAmount by SalesTerritoryKey</strong>
+                        <small>Bar chart showing extended amounts across territories</small>
+                    </div>
+                    
+                    <div class="example-query" onclick="useExample('Display OrderQuantity by ProductKey')">
+                        <strong>Display OrderQuantity by ProductKey</strong>
+                        <small>Visualize order quantities for products</small>
+                    </div>
+                    
+                    <div class="example-query" onclick="useExample('Show UnitPrice by ProductKey as bar chart')">
+                        <strong>Show UnitPrice by ProductKey as bar chart</strong>
+                        <small>Bar chart of unit prices by product</small>
+                    </div>
+                    
+                    <div class="example-query" onclick="useExample('Display Freight by SalesTerritoryKey as pie chart')">
+                        <strong>Display Freight by SalesTerritoryKey as pie chart</strong>
+                        <small>Pie chart showing freight distribution</small>
+                    </div>
+                    
+                    <div class="example-query" onclick="useExample('Show TaxAmt by CustomerKey top 10')">
+                        <strong>Show TaxAmt by CustomerKey top 10</strong>
+                        <small>Top 10 customers by tax amount</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts List Panel -->
+            <div class="charts-panel" id="chartsPanel">
+                <h2>
+                    <span>📈 Added Charts</span>
+                    <span class="chart-count" id="chartCount">0 charts</span>
+                </h2>
+                
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p>Processing your query...</p>
+                </div>
+                
+                <div id="chartsList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        <h3>No Charts Yet</h3>
+                        <p>Add your first chart by entering a query above</p>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="generateDashboard()">
+                        🎨 Generate Dashboard
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAllCharts()">
+                        🗑️ Clear All
+                    </button>
+                    <button id="explainDashboardBtn" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: none;" onclick="explainDashboard()">
+                        🔍 Explain with AI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Preview -->
+        <div class="dashboard-preview" id="dashboardPreview" style="display: none;">
+            <h2 id="dashboardPreviewTitle">🎨 Dashboard Preview</h2>
+            <iframe id="previewFrame" class="preview-iframe"></iframe>
+            
+            <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3 style="margin-bottom: 15px;">💾 Save Dashboard</h3>
+                <div style="display: grid; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Dashboard Title *</label>
+                        <input type="text" id="dashboardTitle" placeholder="Enter dashboard title..." style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description (Optional)</label>
+                        <textarea id="dashboardDescription" placeholder="Enter dashboard description..." style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; min-height: 80px;"></textarea>
+                    </div>
+                    
+                    <!-- Visibility Settings (RBAC) -->
+                    <div id="visibilitySettings" style="padding: 15px; background: white; border-radius: 8px; border: 2px solid #667eea;">
+                        <h4 style="margin: 0 0 10px 0; color: #667eea;">🔐 Visibility Settings</h4>
+                        
+                        <!-- Viewer Visibility (for Admin, Analyst, Departmental) -->
+                        <div id="viewerVisibilityOption" style="display: none; margin-bottom: 10px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="visibleToViewer" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                                <span style="font-weight: 500;">📊 Make visible to Viewers</span>
+                            </label>
+                            <p style="margin: 5px 0 0 26px; font-size: 12px; color: #666;">Allow users with Viewer role to see this dashboard</p>
+                        </div>
+                        
+                        <!-- Department Selection (for Departmental role) -->
+                        <div id="departmentSelectionOption" style="display: none;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">🏢 Share with Departments:</label>
+                            <div id="departmentCheckboxes" style="margin-left: 10px;">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
+                        
+                        <!-- Info message based on role -->
+                        <div id="visibilityInfo" style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 5px; font-size: 13px; color: #1565c0;">
+                            <!-- Dynamically populated based on role -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="saveDashboard()">
+                        💾 Save to History
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Explanation Section (appears below dashboard preview) -->
+        <div class="ai-explanation-section" id="aiExplanationSection" style="display: none; margin-top: 30px; padding: 25px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); border-left: 5px solid #667eea;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #667eea; margin: 0;">🤖 AI Dashboard Explanation</h2>
+                <button onclick="document.getElementById('aiExplanationSection').style.display='none'" 
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0 10px;">×</button>
+            </div>
+            
+            <div id="aiExplanationContent" style="line-height: 1.6;">
+                <!-- Explanation content will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Viewer-specific AI Explanation Button (shown when dashboard is loaded) -->
+        <div id="viewerExplainSection" style="display: none; margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+                <div>
+                    <h2 style="margin: 0 0 10px 0; color: white;">🤖 AI Dashboard Analysis</h2>
+                    <p style="margin: 0; opacity: 0.9;">Get intelligent insights and explanations about the loaded dashboard</p>
+                </div>
+                <button class="btn" style="background: white; color: #f5576c; font-weight: 600; font-size: 16px;" onclick="explainDashboard()">
+                    🔍 Explain with AI
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard History -->
+        <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">📚 Dashboard History</h2>
+                <button class="btn btn-secondary" onclick="loadDashboardHistory()">
+                    🔄 Refresh
+                </button>
+            </div>
+            
+            <div id="dashboardHistoryList">
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    <p>Loading dashboard history...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store charts data
+        let charts = [];
+        let chartIdCounter = 0;
+        
+        // Store current user session info
+        let currentUserSession = null;
+
+        // Load user info and dataset info
+        fetch('/api/session-info')
+            .then(response => response.json())
+            .then(data => {
+                currentUserSession = data;  // Store session info globally
+                document.getElementById('userName').textContent = data.full_name;
+                // Initialize visibility settings based on role
+                initializeVisibilitySettings(data.role, data.department);
+                // Load dataset info after user info is loaded
+                loadDatasetInfo();
+            })
+            .catch(error => {
+                console.error('Error fetching session:', error);
+                window.location.href = '/page.html';
+            });
+        
+        // Initialize visibility settings based on user role
+        function initializeVisibilitySettings(role, department) {
+            const viewerOption = document.getElementById('viewerVisibilityOption');
+            const deptOption = document.getElementById('departmentSelectionOption');
+            const visibilityInfo = document.getElementById('visibilityInfo');
+            
+            // Reset all options
+            viewerOption.style.display = 'none';
+            deptOption.style.display = 'none';
+            
+            const roleLower = role.toLowerCase();
+            
+            if (roleLower === 'admin') {
+                viewerOption.style.display = 'block';
+                visibilityInfo.innerHTML = '👑 <strong>Admin:</strong> Your dashboards are visible only to you by default. Check the box above to make them visible to Viewers.';
+            } else if (roleLower === 'analyst') {
+                viewerOption.style.display = 'block';
+                visibilityInfo.innerHTML = '📊 <strong>Analyst:</strong> Your dashboards are visible only to you by default. Check the box above to make them visible to Viewers.';
+            } else if (roleLower === 'departmental') {
+                viewerOption.style.display = 'block';
+                deptOption.style.display = 'block';
+                visibilityInfo.innerHTML = '🏢 <strong>Departmental:</strong> Your dashboards are visible only to you by default. Select departments to share with, and optionally make visible to Viewers.';
+                
+                // Load available departments
+                loadDepartmentsList();
+            } else if (roleLower === 'viewer') {
+                visibilityInfo.innerHTML = '👁️ <strong>Viewer:</strong> You can only view dashboards that have been shared with you by other users.';
+                visibilityInfo.style.background = '#fff3cd';
+                visibilityInfo.style.color = '#856404';
+                
+                // Hide chart creation and dataset sections for Viewers
+                restrictViewerAccess();
+            }
+        }
+        
+        // Restrict access for Viewer role - they can only view shared dashboards
+        function restrictViewerAccess() {
+            console.log('🔒 Restricting access for Viewer role...');
+            
+            // Hide dataset information panel
+            const datasetPanel = document.getElementById('datasetInfoPanel');
+            if (datasetPanel) datasetPanel.style.display = 'none';
+            
+            // Hide RAG upload panel
+            const ragPanel = document.getElementById('ragUploadPanel');
+            if (ragPanel) ragPanel.style.display = 'none';
+            
+            // Hide main content (query builder and charts panel)
+            const mainContent = document.getElementById('mainContentSection');
+            if (mainContent) mainContent.style.display = 'none';
+            
+            // Hide dashboard preview save section
+            const dashboardPreview = document.getElementById('dashboardPreview');
+            if (dashboardPreview) {
+                // Keep preview visible but hide save section
+                const saveSection = dashboardPreview.querySelector('[style*="margin-top: 20px"]');
+                if (saveSection && saveSection.querySelector('h3')) {
+                    // This is the save dashboard section
+                    saveSection.style.display = 'none';
+                }
+            }
+            
+            // Add viewer-specific message at the top
+            const container = document.querySelector('.container');
+            const viewerMessage = document.createElement('div');
+            viewerMessage.style.cssText = 'background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);';
+            viewerMessage.innerHTML = `
+                <h2 style="margin: 0 0 10px 0; color: white;">👁️ Viewer Mode - Read Only</h2>
+                <p style="margin: 0; font-size: 16px; opacity: 0.9;">
+                    As a Viewer, you can view, load, and get AI explanations for dashboards shared with you. 
+                    You cannot create new dashboards or view dataset information.
+                </p>
+            `;
+            
+            // Insert after header
+            const header = document.querySelector('.header');
+            if (header && header.nextSibling) {
+                container.insertBefore(viewerMessage, header.nextSibling);
+            }
+            
+            console.log('✅ Viewer restrictions applied');
+        }
+        
+        // Load available departments for selection
+        async function loadDepartmentsList() {
+            const deptCheckboxes = document.getElementById('departmentCheckboxes');
+            
+            // Common departments list (you can expand this or fetch from backend)
+            const departments = ['Sales', 'Marketing', 'Finance', 'HR', 'IT', 'Operations', 'Customer Service'];
+            
+            deptCheckboxes.innerHTML = '';
+            departments.forEach(dept => {
+                const checkbox = document.createElement('label');
+                checkbox.style.display = 'block';
+                checkbox.style.marginBottom = '5px';
+                checkbox.style.cursor = 'pointer';
+                checkbox.innerHTML = `
+                    <input type="checkbox" value="${dept}" class="dept-checkbox" style="margin-right: 8px; cursor: pointer;">
+                    <span>${dept}</span>
+                `;
+                deptCheckboxes.appendChild(checkbox);
+            });
+        }
+
+        // Toggle dataset info panel
+        function toggleDatasetInfo() {
+            const content = document.getElementById('datasetInfoContent');
+            const icon = document.getElementById('datasetToggleIcon');
+            
+            content.classList.toggle('hidden');
+            icon.classList.toggle('collapsed');
+        }
+
+        // Load dataset information
+        async function loadDatasetInfo() {
+            try {
+                const response = await fetch('/api/get-dataset-info');
+                const data = await response.json();
+                
+                if (data.success && data.dataset_info) {
+                    displayDatasetInfo(data.dataset_info);
+                } else {
+                    document.getElementById('datasetInfoData').innerHTML = 
+                        '<div style="padding: 20px; color: #dc3545;">Failed to load dataset information</div>';
+                }
+            } catch (error) {
+                console.error('Error loading dataset info:', error);
+                document.getElementById('datasetInfoData').innerHTML = 
+                    '<div style="padding: 20px; color: #dc3545;">Error loading dataset information</div>';
+            }
+        }
+
+        // Display dataset information
+        function displayDatasetInfo(datasetInfo) {
+            const container = document.getElementById('datasetInfoData');
+            let html = '';
+
+            datasetInfo.tables.forEach(table => {
+                html += `
+                    <div class="table-section">
+                        <h4>
+                            <span>📊</span> ${table.display_name}
+                        </h4>
+                        
+                        <div class="table-info">
+                            <span class="info-badge">📝 ${table.row_count.toLocaleString()} rows</span>
+                            <span class="info-badge">📋 ${table.all_columns.length} columns</span>
+                        </div>
+                `;
+
+                // Numeric columns
+                if (table.numeric_columns && table.numeric_columns.length > 0) {
+                    html += `
+                        <div class="columns-group">
+                            <h5><span class="type-icon">🔢</span> Numeric Columns (${table.numeric_columns.length})</h5>
+                            <div class="column-tags">
+                    `;
+                    table.numeric_columns.forEach(col => {
+                        html += `<span class="column-tag numeric" onclick="copyToQuery('${col}')" title="Click to add to query">${col}</span>`;
+                    });
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Text columns
+                if (table.text_columns && table.text_columns.length > 0) {
+                    html += `
+                        <div class="columns-group">
+                            <h5><span class="type-icon">📝</span> Text Columns (${table.text_columns.length})</h5>
+                            <div class="column-tags">
+                    `;
+                    table.text_columns.forEach(col => {
+                        html += `<span class="column-tag text" onclick="copyToQuery('${col}')" title="Click to add to query">${col}</span>`;
+                    });
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Date columns
+                if (table.date_columns && table.date_columns.length > 0) {
+                    html += `
+                        <div class="columns-group">
+                            <h5><span class="type-icon">📅</span> Date Columns (${table.date_columns.length})</h5>
+                            <div class="column-tags">
+                    `;
+                    table.date_columns.forEach(col => {
+                        html += `<span class="column-tag date" onclick="copyToQuery('${col}')" title="Click to add to query">${col}</span>`;
+                    });
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Sample data
+                if (table.sample_data && table.sample_data.length > 0) {
+                    html += `
+                        <div class="sample-data">
+                            <h5>🔍 Sample Data (First ${table.sample_data.length} rows)</h5>
+                            <div style="overflow-x: auto;">
+                                <table class="sample-table">
+                                    <thead>
+                                        <tr>
+                    `;
+                    
+                    // Table headers
+                    const columns = Object.keys(table.sample_data[0]);
+                    columns.forEach(col => {
+                        html += `<th>${col}</th>`;
+                    });
+                    
+                    html += `
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                    `;
+                    
+                    // Table rows
+                    table.sample_data.forEach(row => {
+                        html += '<tr>';
+                        columns.forEach(col => {
+                            const value = row[col] !== null && row[col] !== undefined ? row[col] : '—';
+                            html += `<td>${value}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    
+                    html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Copy column name to query input
+        function copyToQuery(columnName) {
+            const queryInput = document.getElementById('queryInput');
+            const currentQuery = queryInput.value.trim();
+            
+            // Add column name to existing query or start new query
+            if (currentQuery) {
+                queryInput.value = currentQuery + ' ' + columnName;
+            } else {
+                queryInput.value = columnName;
+            }
+            
+            queryInput.focus();
+            
+            // Show feedback
+            showStatus(`✅ Added "${columnName}" to query`, 'success');
+        }
+
+        // Use example query
+        function useExample(query) {
+            document.getElementById('queryInput').value = query;
+            document.getElementById('queryInput').focus();
+        }
+
+        // Clear input
+        function clearInput() {
+            document.getElementById('queryInput').value = '';
+        }
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const container = document.getElementById('statusContainer');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.textContent = message;
+            container.appendChild(statusDiv);
+            
+            setTimeout(() => {
+                statusDiv.style.opacity = '0';
+                setTimeout(() => statusDiv.remove(), 300);
+            }, 5000);
+        }
+
+        // Add chart
+        async function addChart() {
+            const query = document.getElementById('queryInput').value.trim();
+            
+            if (!query) {
+                showStatus('⚠️ Please enter a query', 'error');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loadingIndicator').classList.add('active');
+
+            try {
+                const response = await fetch('/api/add-chart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Add to local chart list
+                    const chart = {
+                        id: chartIdCounter++,
+                        query: query,
+                        timestamp: new Date().toLocaleString()
+                    };
+                    charts.push(chart);
+                    
+                    updateChartsList();
+                    clearInput();
+                    showStatus(`✅ Chart added successfully! Total: ${charts.length}`, 'success');
+                } else {
+                    showStatus(`❌ ${result.message || 'Failed to add chart'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error processing query', 'error');
+            } finally {
+                document.getElementById('loadingIndicator').classList.remove('active');
+            }
+        }
+
+        // Update charts list display
+        function updateChartsList() {
+            const chartsList = document.getElementById('chartsList');
+            const chartCount = document.getElementById('chartCount');
+            
+            chartCount.textContent = `${charts.length} chart${charts.length !== 1 ? 's' : ''}`;
+            
+            if (charts.length === 0) {
+                chartsList.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        <h3>No Charts Yet</h3>
+                        <p>Add your first chart by entering a query above</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            chartsList.innerHTML = charts.map(chart => `
+                <div class="chart-item">
+                    <div class="chart-item-header">
+                        <h4>Chart #${chart.id + 1}</h4>
+                        <button class="delete-chart" onclick="deleteChart(${chart.id})">Delete</button>
+                    </div>
+                    <p><strong>Query:</strong> ${chart.query}</p>
+                    <p><small>Added: ${chart.timestamp}</small></p>
+                </div>
+            `).join('');
+        }
+
+        // Delete chart
+        async function deleteChart(chartId) {
+            if (!confirm('Are you sure you want to delete this chart?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/delete-chart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ chart_id: chartId })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    charts = charts.filter(c => c.id !== chartId);
+                    updateChartsList();
+                    showStatus('✅ Chart deleted', 'success');
+                } else {
+                    showStatus('❌ Failed to delete chart', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error deleting chart', 'error');
+            }
+        }
+
+        // Clear all charts
+        async function clearAllCharts() {
+            if (charts.length === 0) {
+                showStatus('⚠️ No charts to clear', 'info');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to clear all ${charts.length} charts?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/clear-charts', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    charts = [];
+                    chartIdCounter = 0;
+                    updateChartsList();
+                    document.getElementById('dashboardPreview').style.display = 'none';
+                    showStatus('✅ All charts cleared', 'success');
+                } else {
+                    showStatus('❌ Failed to clear charts', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error clearing charts', 'error');
+            }
+        }
+
+        // Generate dashboard
+        async function generateDashboard() {
+            if (charts.length === 0) {
+                showStatus('⚠️ Add at least one chart before generating dashboard', 'error');
+                return;
+            }
+
+            showStatus(`🎨 Generating dashboard with ${charts.length} charts...`, 'info');
+
+            try {
+                const response = await fetch('/api/generate-dashboard', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus('✅ Dashboard generated successfully!', 'success');
+                    
+                    // Show preview
+                    const previewSection = document.getElementById('dashboardPreview');
+                    const previewFrame = document.getElementById('previewFrame');
+                    
+                    previewSection.style.display = 'block';
+                    previewFrame.src = result.dashboard_url + '?t=' + new Date().getTime();
+                    
+                    // Show the RAG explain button now that dashboard is generated
+                    document.getElementById('explainDashboardBtn').style.display = 'inline-block';
+                    
+                    // Store generated dashboard info for RAG
+                    window.dashboardGenerated = true;
+                    window.generatedCharts = [...charts]; // Keep a copy for explanations
+                    
+                    // Store snapshot file path for saving
+                    window.snapshotFile = result.snapshot_file;
+                    console.log('📸 Snapshot file stored:', window.snapshotFile);
+                    
+                    // DON'T clear the frontend chart list - keep charts visible for user reference
+                    // Backend already cleared server-side charts after generation
+                    // Users can see what was generated and can manually clear if needed
+                    
+                    showStatus('✅ Dashboard generated successfully!', 'success');
+                    
+                    // Scroll to preview
+                    previewSection.scrollIntoView({ behavior: 'smooth' });
+
+                    // Open in new tab option
+                    if (confirm('Dashboard generated! Open in new tab?')) {
+                        window.open(result.dashboard_url, '_blank');
+                    }
+                } else {
+                    showStatus(`❌ ${result.message || 'Failed to generate dashboard'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error generating dashboard', 'error');
+            }
+        }
+
+        // Save dashboard to history
+        async function saveDashboard() {
+            const title = document.getElementById('dashboardTitle').value.trim();
+            const description = document.getElementById('dashboardDescription').value.trim();
+            
+            if (!title) {
+                showStatus('⚠️ Please enter a dashboard title', 'error');
+                return;
+            }
+            
+            if (charts.length === 0) {
+                showStatus('⚠️ Cannot save empty dashboard', 'error');
+                return;
+            }
+            
+            // Get visibility settings
+            const visibleToViewer = document.getElementById('visibleToViewer')?.checked || false;
+            
+            // Get selected departments (for Departmental role)
+            const allowedDepartments = [];
+            const deptCheckboxes = document.querySelectorAll('.dept-checkbox:checked');
+            deptCheckboxes.forEach(cb => allowedDepartments.push(cb.value));
+            
+            // Debug logging
+            console.log('🔐 RBAC Settings:', {
+                visibleToViewer: visibleToViewer,
+                allowedDepartments: allowedDepartments,
+                userRole: currentUserSession?.role
+            });
+            
+            try {
+                const response = await fetch('/api/save-dashboard', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        description: description,
+                        charts_config: charts,
+                        file_path: 'interactive_dashboard.html',
+                        snapshot_file: window.snapshotFile,  // Pass the snapshot file path
+                        visible_to_viewer: visibleToViewer,  // RBAC setting
+                        allowed_departments: allowedDepartments  // RBAC setting
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('✅ Dashboard saved to history!', 'success');
+                    document.getElementById('dashboardTitle').value = '';
+                    document.getElementById('dashboardDescription').value = '';
+                    document.getElementById('visibleToViewer').checked = false;
+                    
+                    // Uncheck all department checkboxes
+                    document.querySelectorAll('.dept-checkbox').forEach(cb => cb.checked = false);
+                    
+                    // Store the saved dashboard ID for export
+                    window.lastSavedDashboardId = result.dashboard_id;
+                    
+                    loadDashboardHistory();
+                } else {
+                    showStatus(`❌ ${result.message || 'Failed to save dashboard'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error saving dashboard', 'error');
+            }
+        }
+        
+        // Load dashboard history
+        async function loadDashboardHistory() {
+            try {
+                const response = await fetch('/api/get-dashboards');
+                const result = await response.json();
+                
+                const historyList = document.getElementById('dashboardHistoryList');
+                
+                if (result.success && result.dashboards && result.dashboards.length > 0) {
+                    let html = '<div style="display: grid; gap: 15px;">';
+                    
+                    result.dashboards.forEach(dashboard => {
+                        const createdDate = new Date(dashboard.created_at).toLocaleString();
+                        const updatedDate = new Date(dashboard.updated_at).toLocaleString();
+                        
+                        // Build visibility badges
+                        let visibilityBadges = '';
+                        if (dashboard.is_owner) {
+                            visibilityBadges += '<span style="background: #667eea; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-right: 5px;">👤 Your Dashboard</span>';
+                        } else {
+                            visibilityBadges += `<span style="background: #43e97b; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-right: 5px;">👥 Shared by ${escapeHtml(dashboard.created_by)}</span>`;
+                        }
+                        
+                        if (dashboard.visible_to_viewer) {
+                            visibilityBadges += '<span style="background: #f093fb; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-right: 5px;">👁️ Visible to Viewers</span>';
+                        }
+                        
+                        if (dashboard.allowed_departments && dashboard.allowed_departments.length > 0) {
+                            visibilityBadges += `<span style="background: #38f9d7; color: #333; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-right: 5px;">🏢 ${dashboard.allowed_departments.join(', ')}</span>`;
+                        }
+                        
+                        html += `
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                    <div style="flex: 1;">
+                                        <h3 style="margin: 0 0 5px 0; color: #333;">${escapeHtml(dashboard.title)}</h3>
+                                        ${dashboard.description ? `<p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">${escapeHtml(dashboard.description)}</p>` : ''}
+                                        <div style="margin-top: 8px;">
+                                            ${visibilityBadges}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button class="btn btn-secondary" onclick="loadDashboardById(${dashboard.id})" style="padding: 8px 15px; font-size: 13px;">
+                                            📂 Load
+                                        </button>
+                                        <button class="btn btn-success" onclick="viewDashboardFile(${dashboard.id})" style="padding: 8px 15px; font-size: 13px;">
+                                            👁️ View
+                                        </button>
+                                        ${dashboard.is_owner ? `
+                                        <button class="btn btn-danger" onclick="deleteDashboardById(${dashboard.id})" style="padding: 8px 15px; font-size: 13px;">
+                                            🗑️ Delete
+                                        </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 15px; font-size: 13px; color: #666; margin-top: 10px;">
+                                    <span>📊 ${dashboard.chart_count} chart(s)</span>
+                                    <span>📅 Created: ${createdDate}</span>
+                                    <span>🔄 Updated: ${updatedDate}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    historyList.innerHTML = html;
+                } else {
+                    historyList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 64px; height: 64px; margin-bottom: 15px; opacity: 0.5;">
+                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 style="color: #666;">No Saved Dashboards</h3>
+                            <p>Create and save a dashboard to see it here</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('dashboardHistoryList').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #dc3545;">
+                        <p>Error loading dashboard history</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load dashboard by ID
+        async function loadDashboardById(dashboardId) {
+            if (charts.length > 0 && !confirm('Loading a dashboard will clear current charts. Continue?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/load-dashboard/${dashboardId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Clear current charts
+                    charts = [];
+                    chartIdCounter = 0;
+                    
+                    // Load charts from dashboard
+                    if (result.dashboard.charts_config) {
+                        charts = result.dashboard.charts_config;
+                        chartIdCounter = charts.length;
+                        
+                        // Set dashboard as generated and store charts for AI explanation
+                        window.dashboardGenerated = true;
+                        window.generatedCharts = [...result.dashboard.charts_config];
+                        
+                        // Show the Explain with AI button (regular or viewer-specific)
+                        const explainBtn = document.getElementById('explainDashboardBtn');
+                        const viewerExplainSection = document.getElementById('viewerExplainSection');
+                        
+                        if (currentUserSession && currentUserSession.role.toLowerCase() === 'viewer') {
+                            // For viewers, show the special viewer explanation section
+                            if (viewerExplainSection) {
+                                viewerExplainSection.style.display = 'block';
+                            }
+                            console.log('📊 Viewer loaded dashboard with', charts.length, 'charts - AI explanation enabled');
+                        } else {
+                            // For other roles, show regular explain button
+                            if (explainBtn) {
+                                explainBtn.style.display = 'inline-block';
+                            }
+                            console.log('📊 Dashboard loaded with', charts.length, 'charts - AI explanation enabled');
+                        }
+                    }
+                    
+                    updateChartsList();
+                    showStatus(`✅ Loaded dashboard: ${result.dashboard.title}`, 'success');
+                    
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    showStatus(`❌ ${result.message || 'Failed to load dashboard'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error loading dashboard', 'error');
+            }
+        }
+        
+        // Delete dashboard by ID
+        async function deleteDashboardById(dashboardId) {
+            if (!confirm('Are you sure you want to delete this dashboard? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/delete-dashboard/${dashboardId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('✅ Dashboard deleted successfully', 'success');
+                    loadDashboardHistory();
+                } else {
+                    showStatus(`❌ ${result.message || 'Failed to delete dashboard'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error deleting dashboard', 'error');
+            }
+        }
+        
+        // View dashboard file
+        function viewDashboardFile(dashboardId) {
+            // Use the new endpoint to view the specific saved dashboard
+            window.open(`/view-saved-dashboard/${dashboardId}`, '_blank');
+        }
+        
+        // HTML escape helper
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load dashboard history on page load
+        window.addEventListener('load', function() {
+            loadDashboardHistory();
+        });
+
+        // Logout
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/page.html';
+                });
+        }
+
+        // Keyboard shortcuts
+        document.getElementById('queryInput').addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to add chart
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                addChart();
+            }
+        });
+
+        // ========== RAG FUNCTIONALITY ==========
+        
+        let uploadedRagFilePath = null;
+        
+        // Toggle RAG panel
+        function toggleRagPanel() {
+            const content = document.getElementById('ragPanelContent');
+            const icon = document.getElementById('ragToggleIcon');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.remove('collapsed');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.add('collapsed');
+            }
+        }
+        
+        // Upload RAG file
+        async function uploadRagFile() {
+            const fileInput = document.getElementById('ragFileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('⚠️ Please select a file first', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const statusDiv = document.getElementById('ragUploadStatus');
+            statusDiv.innerHTML = '<div class="status-message status-info">⏳ Uploading file...</div>';
+            
+            try {
+                const response = await fetch('/api/upload-file-for-rag', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    uploadedRagFilePath = result.file_path;
+                    statusDiv.innerHTML = `
+                        <div class="status-message status-success">
+                            ✅ File uploaded successfully: ${result.filename}<br>
+                            <small>Size: ${(result.file_size / 1024).toFixed(2)} KB</small>
+                        </div>
+                    `;
+                    showStatus('✅ File uploaded! Now click "Process with AI" to analyze', 'success');
+                } else {
+                    statusDiv.innerHTML = `<div class="status-message status-error">❌ ${result.error}</div>`;
+                    showStatus('❌ Upload failed', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.innerHTML = '<div class="status-message status-error">❌ Error uploading file</div>';
+                showStatus('❌ Error uploading file', 'error');
+            }
+        }
+        
+        // Process RAG document
+        async function processRagDocument() {
+            if (!uploadedRagFilePath) {
+                showStatus('⚠️ Please upload a file first', 'error');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('ragUploadStatus');
+            statusDiv.innerHTML = '<div class="status-message status-info">🤖 Processing document with AI... This may take a moment.</div>';
+            
+            try {
+                const response = await fetch('/api/process-rag-document', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        file_path: uploadedRagFilePath
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDiv.innerHTML = '<div class="status-message status-success">✅ Document processed successfully!</div>';
+                    
+                    // Display Q&A results
+                    const resultsDiv = document.getElementById('ragResults');
+                    const qaContent = document.getElementById('ragQAContent');
+                    
+                    let qaHtml = '';
+                    result.qa_pairs.forEach((qa, index) => {
+                        qaHtml += `
+                            <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #667eea;">
+                                <h5 style="color: #667eea; margin-bottom: 10px;">❓ ${qa.question}</h5>
+                                <p style="color: #333; line-height: 1.6;">${qa.answer}</p>
+                            </div>
+                        `;
+                    });
+                    
+                    qaContent.innerHTML = qaHtml;
+                    resultsDiv.style.display = 'block';
+                    
+                    // Show query section for custom questions
+                    document.getElementById('ragQuerySection').style.display = 'block';
+                    
+                    showStatus('✅ Document analyzed! Insights generated below', 'success');
+                } else {
+                    statusDiv.innerHTML = `<div class="status-message status-error">❌ ${result.error}</div>`;
+                    showStatus('❌ Processing failed', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.innerHTML = '<div class="status-message status-error">❌ Error processing document</div>';
+                showStatus('❌ Error processing document', 'error');
+            }
+        }
+        
+        // Query RAG document with custom question
+        async function queryRagDocument() {
+            const question = document.getElementById('ragQuestion').value.trim();
+            
+            if (!question) {
+                showStatus('⚠️ Please enter a question', 'error');
+                return;
+            }
+            
+            if (!uploadedRagFilePath) {
+                showStatus('⚠️ Please upload and process a file first', 'error');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('ragQueryResult');
+            resultDiv.innerHTML = '<div class="status-message status-info">🤔 Thinking...</div>';
+            
+            try {
+                const response = await fetch('/api/query-rag', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        file_path: uploadedRagFilePath,
+                        question: question
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div style="padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <h5 style="color: #28a745; margin-bottom: 10px;">✅ Answer:</h5>
+                            <p style="color: #333; line-height: 1.6;">${result.answer}</p>
+                        </div>
+                    `;
+                    document.getElementById('ragQuestion').value = '';
+                } else {
+                    resultDiv.innerHTML = `<div class="status-message status-error">❌ ${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<div class="status-message status-error">❌ Error querying document</div>';
+            }
+        }
+        
+        // Allow Enter key to submit question
+        document.addEventListener('DOMContentLoaded', function() {
+            const ragQuestionInput = document.getElementById('ragQuestion');
+            if (ragQuestionInput) {
+                ragQuestionInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        queryRagDocument();
+                    }
+                });
+            }
+        });
+        
+        // ========== END RAG FUNCTIONALITY ==========
+        
+        // ========== DASHBOARD EXPLAINER (ACTIVATED AFTER GENERATION) ==========
+        
+        // Explain dashboard with RAG - only works after dashboard is generated
+        async function explainDashboard() {
+            // Check if dashboard has been generated or loaded
+            if (!window.dashboardGenerated || !window.generatedCharts || window.generatedCharts.length === 0) {
+                showStatus('⚠️ Please load or generate a dashboard first before using AI explanation', 'error');
+                return;
+            }
+            
+            // Check if user is a viewer (viewers don't need to upload files)
+            const isViewer = currentUserSession && currentUserSession.role.toLowerCase() === 'viewer';
+            
+            // Check if file has been uploaded (skip for viewers)
+            if (!uploadedRagFilePath && !isViewer) {
+                const proceed = confirm('No company profile uploaded. Would you like to upload one now for better explanations?');
+                if (proceed) {
+                    document.getElementById('ragFileInput').click();
+                    showStatus('ℹ️ After uploading, click "Explain with AI" again', 'info');
+                }
+                return;
+            }
+            
+            // Show processing status
+            showStatus('🤖 Analyzing dashboard with AI... This may take a moment', 'info');
+            
+            try {
+                // Step 1: Load company profile into explainer (skip for viewers if no file uploaded)
+                if (uploadedRagFilePath) {
+                    const uploadResponse = await fetch('/api/upload-company-profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            file_url: uploadedRagFilePath
+                        })
+                    });
+                    
+                    const uploadResult = await uploadResponse.json();
+                    
+                    if (!uploadResult.success) {
+                        console.warn('Company profile upload failed, continuing anyway...');
+                    }
+                } else if (isViewer) {
+                    console.log('📊 Viewer mode: Skipping company profile upload');
+                } else {
+                    throw new Error('No company profile available');
+                }
+                
+                // Step 2: Load dataset information
+                const datasetResponse = await fetch('/api/load-dataset-for-explanation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const datasetResult = await datasetResponse.json();
+                
+                if (!datasetResult.success) {
+                    throw new Error('Failed to load dataset information');
+                }
+                
+                // Step 3: Generate explanations based on generated charts
+                const explainResponse = await fetch('/api/explain-dashboard', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        charts_config: window.generatedCharts,
+                        title: 'Generated Dashboard'
+                    })
+                });
+                
+                const explainResult = await explainResponse.json();
+                
+                if (explainResult.success) {
+                    // Display explanations in a modal or new section
+                    displayDashboardExplanations(explainResult);
+                    showStatus('✅ Dashboard explanation generated successfully!', 'success');
+                } else {
+                    throw new Error(explainResult.error || 'Failed to generate explanations');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Display dashboard explanations (inline, not popup)
+        function displayDashboardExplanations(result) {
+            const explanationSection = document.getElementById('aiExplanationSection');
+            const explanationContent = document.getElementById('aiExplanationContent');
+            
+            let html = `
+                <div style="background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 10px 0; color: #333;">📊 Overall Insights</h3>
+                    ${result.overall_insights ? `
+                        <div style="margin: 10px 0;">
+                            <strong>Key Findings:</strong>
+                            <p style="margin: 5px 0 10px 20px; color: #555;">${result.overall_insights.key_findings || 'N/A'}</p>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <strong>Trends:</strong>
+                            <p style="margin: 5px 0 10px 20px; color: #555;">${result.overall_insights.trends || 'N/A'}</p>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <strong>Recommendations:</strong>
+                            <p style="margin: 5px 0 10px 20px; color: #555;">${result.overall_insights.recommendations || 'N/A'}</p>
+                        </div>
+                    ` : '<p style="color: #999;">No overall insights available</p>'}
+                </div>
+                
+                <h3 style="margin: 20px 0 15px 0; color: #333;">📈 Chart Explanations</h3>
+            `;
+            
+            if (result.chart_explanations && result.chart_explanations.length > 0) {
+                result.chart_explanations.forEach((chartExpl, index) => {
+                    html += `
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                            <h4 style="margin: 0 0 10px 0; color: #667eea;">Chart ${index + 1}: ${chartExpl.chart_title || 'Untitled'}</h4>
+                            <p style="color: #555; line-height: 1.6; margin: 10px 0;">${chartExpl.explanation || 'No explanation available'}</p>
+                            ${chartExpl.insights && chartExpl.insights.length > 0 ? `
+                                <div style="margin-top: 10px;">
+                                    <strong style="color: #333;">Key Insights:</strong>
+                                    <ul style="margin: 5px 0 0 20px; color: #555;">
+                                        ${chartExpl.insights.map(insight => `<li>${insight}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p style="color: #999; padding: 20px; text-align: center;">No chart explanations available</p>';
+            }
+            
+            html += `
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee;">
+                    <p style="color: #999; font-size: 13px; text-align: center;">
+                        Generated: ${new Date(result.timestamp).toLocaleString()}<br>
+                        Data Sources: ${result.data_sources ? Object.values(result.data_sources).join(', ') : 'N/A'}
+                    </p>
+                </div>
+            `;
+            
+            // Display inline below dashboard preview
+            explanationContent.innerHTML = html;
+            explanationSection.style.display = 'block';
+            
+            // Smooth scroll to explanation section
+            explanationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // ========== END DASHBOARD EXPLAINER ==========
+        
+        // ========== CHART COUNT MONITORING (PREVENT ACCUMULATION) ==========
+        
+        // Periodic check to warn user if chart count is getting high
+        async function checkServerChartCount() {
+            try {
+                const response = await fetch('/api/current-chart-count');
+                const result = await response.json();
+                
+                if (result.success && result.chart_count > 15) {
+                    console.warn(`⚠️ High chart count detected: ${result.chart_count} charts in memory`);
+                    
+                    // Show warning banner if chart count is very high
+                    if (result.chart_count > 20) {
+                        showStatus(`⚠️ Warning: ${result.chart_count} charts in memory. Generate dashboard soon to avoid issues.`, 'warning');
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking chart count:', error);
+            }
+        }
+        
+        // Check chart count periodically (every 30 seconds)
+        setInterval(checkServerChartCount, 30000);
+        
+        // Initial check on page load
+        setTimeout(checkServerChartCount, 2000);
+        
+        // ========== END CHART COUNT MONITORING ==========
+        
+        // ========== DATASET MANAGEMENT ==========
+        
+        // Load available datasets
+        async function loadAvailableDatasets() {
+            console.log('🔄 Loading available datasets...');
+            try {
+                const response = await fetch('/api/get-available-datasets');
+                const result = await response.json();
+                
+                console.log('📊 Datasets response:', result);
+                
+                if (result.success) {
+                    const selector = document.getElementById('datasetSelector');
+                    
+                    if (!selector) {
+                        console.error('❌ Dataset selector element not found!');
+                        return;
+                    }
+                    
+                    selector.innerHTML = '';
+                    
+                    const datasets = result.datasets;
+                    const currentDataset = result.current_dataset;
+                    
+                    console.log(`✅ Found ${Object.keys(datasets).length} datasets`);
+                    console.log(`📍 Current dataset: ${currentDataset}`);
+                    
+                    // Populate dropdown
+                    for (const [datasetName, datasetInfo] of Object.entries(datasets)) {
+                        const option = document.createElement('option');
+                        option.value = datasetName;
+                        option.textContent = `${datasetInfo.display_name} (${datasetInfo.table_count} tables)`;
+                        
+                        if (datasetName === currentDataset) {
+                            option.selected = true;
+                        }
+                        
+                        selector.appendChild(option);
+                        console.log(`  ✓ Added dataset: ${datasetName}`);
+                    }
+                    
+                    // Show dataset info
+                    updateDatasetInfo(currentDataset, datasets[currentDataset]);
+                    showStatus(`✅ Loaded ${Object.keys(datasets).length} dataset(s)`, 'success');
+                } else {
+                    console.error('❌ Failed to load datasets:', result.error);
+                    showStatus('Failed to load datasets', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error loading datasets:', error);
+                showStatus('Error loading datasets', 'error');
+            }
+        }
+
+        // Handle dataset change
+        async function handleDatasetChange() {
+            const selector = document.getElementById('datasetSelector');
+            const selectedDataset = selector.value;
+            
+            if (!selectedDataset) return;
+            
+            try {
+                showStatus('🔄 Switching dataset...', 'info');
+                
+                const response = await fetch('/api/switch-dataset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        dataset_name: selectedDataset
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`✅ Successfully switched to ${selectedDataset}`, 'success');
+                    
+                    // Reload dataset info
+                    const datasetsResponse = await fetch('/api/get-available-datasets');
+                    const datasetsResult = await datasetsResponse.json();
+                    
+                    if (datasetsResult.success) {
+                        updateDatasetInfo(selectedDataset, datasetsResult.datasets[selectedDataset]);
+                    }
+                    
+                    // Refresh dataset info panel
+                    await loadDatasetInfo();
+                    
+                    // Clear input
+                    document.getElementById('queryInput').value = '';
+                } else {
+                    showStatus(`❌ Failed to switch dataset: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error switching dataset:', error);
+                showStatus('❌ Error switching dataset', 'error');
+            }
+        }
+
+        // Update dataset info display
+        function updateDatasetInfo(datasetName, datasetInfo) {
+            const infoDiv = document.getElementById('datasetInfo');
+            const detailsP = document.getElementById('datasetDetails');
+            
+            if (datasetInfo) {
+                const tables = datasetInfo.tables.join(', ');
+                detailsP.innerHTML = `
+                    <strong>Dataset:</strong> ${datasetInfo.display_name} | 
+                    <strong>Tables:</strong> ${tables}
+                `;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        // Load datasets on page init
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded - initializing dataset selector...');
+            setTimeout(() => {
+                loadAvailableDatasets();
+            }, 500); // Small delay to ensure page is fully rendered
+        });
+        
+        // ========== END DATASET MANAGEMENT ==========
+    </script>
+</body>
+</html>

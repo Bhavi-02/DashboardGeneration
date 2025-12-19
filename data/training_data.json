@@ -1,0 +1,2128 @@
+[
+  {
+    "query": "Show me sales by region in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "region",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Create a line graph showing revenue trends over the last 12 months",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "revenue",
+    "dimension": "month",
+    "filters": [
+      "last_12_months"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display top 10 products by profit margin in a table",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "profit_margin",
+    "dimension": "product",
+    "filters": [
+      "top_10"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Filter the dashboard to show only Q1 2024 data",
+    "intent": "filter_request",
+    "chart_type": null,
+    "metric": null,
+    "dimension": "quarter",
+    "filters": [
+      "Q1_2024"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show customer segmentation as a pie chart",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "customer_count",
+    "dimension": "customer_segment",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "What are the total sales figures for the North region?",
+    "intent": "data_inquiry",
+    "chart_type": "card",
+    "metric": "sales",
+    "dimension": "region",
+    "filters": [
+      "North"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Create a scatter plot comparing marketing spend vs revenue by quarter",
+    "intent": "visualization_request",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "marketing_spend",
+      "revenue"
+    ],
+    "dimension": "quarter",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show me a heatmap of sales performance by state and month",
+    "intent": "visualization_request",
+    "chart_type": "heatmap",
+    "metric": "sales",
+    "dimension": [
+      "state",
+      "month"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Filter to show only products with sales above $50 000",
+    "intent": "filter_request",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "product",
+    "filters": [
+      "sales_above_50000"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Display inventory levels in a column chart grouped by category",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "inventory_level",
+    "dimension": "category",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show year-over-year growth rates for each business unit",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "growth_rate",
+    "dimension": "business_unit",
+    "filters": [
+      "year_over_year"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Create a waterfall chart showing profit breakdown by cost components",
+    "intent": "visualization_request",
+    "chart_type": "waterfall_chart",
+    "metric": "profit",
+    "dimension": "cost_component",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Filter the data to show only active customers from 2023",
+    "intent": "filter_request",
+    "chart_type": null,
+    "metric": null,
+    "dimension": [
+      "customer_status",
+      "year"
+    ],
+    "filters": [
+      "active_customers",
+      "2023"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "What\u00e2\u20ac\u2122s the average order value by customer tier?",
+    "intent": "data_inquiry",
+    "chart_type": "card",
+    "metric": "average_order_value",
+    "dimension": "customer_tier",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show monthly recurring revenue trend in a line chart with forecasting",
+    "intent": "visualization_request",
+    "chart_type": "line_chart_with_forecast",
+    "metric": "monthly_recurring_revenue",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show me monthly sales by region in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "region",
+    "filters": [
+      "month"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Create a pie chart showing customer count by region for active customers",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "customer_count",
+    "dimension": "region",
+    "filters": [
+      "active_customers"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Display total profit by product category for last year",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "profit",
+    "dimension": "category",
+    "filters": [
+      "last_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What is the average revenue by month in 2025?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "revenue",
+    "dimension": "month",
+    "filters": [
+      "2025"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "List the top 10 products by sales in a bar chart",
+    "intent": "filter_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "product",
+    "filters": [
+      "top_10"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show me profit margin by business unit in a table",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "profit_margin",
+    "dimension": "business_unit",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "How many new customers joined last quarter?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "customer_count",
+    "dimension": "quarter",
+    "filters": [
+      "last_quarter"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Create a heatmap of inventory levels by category and month",
+    "intent": "visualization_request",
+    "chart_type": "heatmap",
+    "metric": "inventory_level",
+    "dimension": [
+      "category",
+      "month"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales above $100,000 for North region in a card",
+    "intent": "filter_request",
+    "chart_type": "card",
+    "metric": "sales",
+    "dimension": "region",
+    "filters": [
+      "North",
+      "above_100000"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display order quantity by month for 2024 in a line chart",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "order_quantity",
+    "dimension": "month",
+    "filters": [
+      "2024"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show discount amount by region for electronics category",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "discount_amount",
+    "dimension": "region",
+    "filters": [
+      "electronics"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What is the total freight by shipping date?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "freight",
+    "dimension": "ship_date",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display revenue by quarter in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "revenue",
+    "dimension": "quarter",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show profit breakdown by cost component in a waterfall chart",
+    "intent": "visualization_request",
+    "chart_type": "waterfall_chart",
+    "metric": "profit",
+    "dimension": "cost_component",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Filter the dashboard to active customers from France in 2024",
+    "intent": "filter_request",
+    "chart_type": null,
+    "metric": null,
+    "dimension": [
+      "customer_status",
+      "country"
+    ],
+    "filters": [
+      "active_customers",
+      "France",
+      "2024"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show average order value by customer tier",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "average_order_value",
+    "dimension": "customer_tier",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Create a scatter plot comparing marketing spend versus revenue by quarter",
+    "intent": "visualization_request",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "marketing_spend",
+      "revenue"
+    ],
+    "dimension": "quarter",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What was the maximum sales by category last year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "category",
+    "filters": [
+      "last_year"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Display average profit margin by product in Q2 2025",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "profit_margin",
+    "dimension": "product",
+    "filters": [
+      "Q2_2025"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show monthly recurring revenue in a line chart with forecasting",
+    "intent": "visualization_request",
+    "chart_type": "line_chart_with_forecast",
+    "metric": "monthly_recurring_revenue",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "List products with order quantity over 100 units in 2023",
+    "intent": "filter_request",
+    "chart_type": "table",
+    "metric": "order_quantity",
+    "dimension": "product",
+    "filters": [
+      "over_100_units",
+      "2023"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show me year-over-year revenue trend for each sales territory",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "revenue",
+    "dimension": "sales_territory",
+    "filters": [
+      "year_over_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display tax amount by product in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "tax_amt",
+    "dimension": "product",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show the count of orders by month this year",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "order_quantity",
+    "dimension": "month",
+    "filters": [
+      "this_year"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Which product drove the highest revenue in Q3 2024?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "revenue",
+    "dimension": "product",
+    "filters": [
+      "Q3_2024"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Present a table of inventory levels over all categories",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "inventory_level",
+    "dimension": "category",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Filter dashboard for electronics sales in North America",
+    "intent": "filter_request",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": [
+      "product_category",
+      "region"
+    ],
+    "filters": [
+      "electronics",
+      "North America"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show average customer lifetime value by region in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "customer_lifetime_value",
+    "dimension": "region",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "How many units were shipped in December?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "order_quantity",
+    "dimension": "month",
+    "filters": [
+      "December"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show the sum of discounts by territory this year",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "discount_amount",
+    "dimension": "sales_territory",
+    "filters": [
+      "this_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display number of returned items by month",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "returns",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "Provide a pie chart for customer segmentation in 2025",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "customer_count",
+    "dimension": "customer_segment",
+    "filters": [
+      "2025"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "How much profit was generated by top 10 products?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "profit",
+    "dimension": "product",
+    "filters": [
+      "top_10"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display YoY growth rate for each business unit in a table",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "growth_rate",
+    "dimension": "business_unit",
+    "filters": [
+      "year_over_year"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show shipping cost by carrier in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "freight",
+    "dimension": "carrier",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales by city for active customers",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "sales",
+    "dimension": "city",
+    "filters": [
+      "active_customers"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display total revenue for all business units this quarter",
+    "intent": "visualization_request",
+    "chart_type": "card",
+    "metric": "revenue",
+    "dimension": "business_unit",
+    "filters": [
+      "this_quarter"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What was the minimum inventory level by warehouse this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "inventory_level",
+    "dimension": "warehouse",
+    "filters": [
+      "this_year"
+    ],
+    "aggregation": "min"
+  },
+  {
+    "query": "Create a scatter plot of order quantity versus profit by product",
+    "intent": "visualization_request",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "order_quantity",
+      "profit"
+    ],
+    "dimension": "product",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales trends by week in a line chart",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": "week",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display the best-selling product by region",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "product",
+    "filters": [
+      "best_selling"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Show table of customer count by year for all segments",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "customer_count",
+    "dimension": [
+      "year",
+      "customer_segment"
+    ],
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "What is the average order value for repeat customers this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "average_order_value",
+    "dimension": "customer_type",
+    "filters": [
+      "repeat",
+      "this_year"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Display inventory level by product for over 100 units",
+    "intent": "filter_request",
+    "chart_type": "column_chart",
+    "metric": "inventory_level",
+    "dimension": "product",
+    "filters": [
+      "over_100_units"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show monthly recurring revenue forecast for the next 6 months",
+    "intent": "visualization_request",
+    "chart_type": "line_chart_with_forecast",
+    "metric": "monthly_recurring_revenue",
+    "dimension": "month",
+    "filters": [
+      "next_6_months"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Present a bar chart for the count of sales order lines by order status",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "sales_order_line_number",
+    "dimension": "order_status",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "How much freight was paid for expedited shipping?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "freight",
+    "dimension": "shipping_method",
+    "filters": [
+      "expedited"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display product standard cost by category for 2023",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "product_standard_cost",
+    "dimension": "category",
+    "filters": [
+      "2023"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show extended amount by month in a heatmap",
+    "intent": "visualization_request",
+    "chart_type": "heatmap",
+    "metric": "extended_amount",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What is the total sales value for canceled orders this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "order_status",
+    "filters": [
+      "canceled",
+      "this_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show me monthly sales by region in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "region",
+    "filters": [
+      "month"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display total profit by product category for last year",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "profit",
+    "dimension": "category",
+    "filters": [
+      "last_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Create a pie chart showing customer count by region for active customers",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "customer_count",
+    "dimension": "region",
+    "filters": [
+      "active_customers"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "What is the average revenue by month in 2025?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "revenue",
+    "dimension": "month",
+    "filters": [
+      "2025"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show me profit margin by business unit in a table",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "profit_margin",
+    "dimension": "business_unit",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "List the top 10 products by sales in a bar chart",
+    "intent": "filter_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "product",
+    "filters": [
+      "top_10"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "How many new customers joined last quarter?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "customer_count",
+    "dimension": "quarter",
+    "filters": [
+      "last_quarter"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Create a heatmap of inventory levels by category and month",
+    "intent": "visualization_request",
+    "chart_type": "heatmap",
+    "metric": "inventory_level",
+    "dimension": [
+      "category",
+      "month"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales above $100,000 for North region in a card",
+    "intent": "filter_request",
+    "chart_type": "card",
+    "metric": "sales",
+    "dimension": "region",
+    "filters": [
+      "North",
+      "above_100000"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display order quantity by month for 2024 in a line chart",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "order_quantity",
+    "dimension": "month",
+    "filters": [
+      "2024"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show discount amount by region for electronics category",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "discount_amount",
+    "dimension": "region",
+    "filters": [
+      "electronics"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What is the total freight by shipping date?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "freight",
+    "dimension": "ship_date",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display revenue by quarter in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "revenue",
+    "dimension": "quarter",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show profit breakdown by cost component in a waterfall chart",
+    "intent": "visualization_request",
+    "chart_type": "waterfall_chart",
+    "metric": "profit",
+    "dimension": "cost_component",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Filter the dashboard to active customers from France in 2024",
+    "intent": "filter_request",
+    "chart_type": null,
+    "metric": null,
+    "dimension": [
+      "customer_status",
+      "country"
+    ],
+    "filters": [
+      "active_customers",
+      "France",
+      "2024"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show average order value by customer tier",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "average_order_value",
+    "dimension": "customer_tier",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Create a scatter plot comparing marketing spend versus revenue by quarter",
+    "intent": "visualization_request",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "marketing_spend",
+      "revenue"
+    ],
+    "dimension": "quarter",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What was the maximum sales by category last year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "category",
+    "filters": [
+      "last_year"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Display average profit margin by product in Q2 2025",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "profit_margin",
+    "dimension": "product",
+    "filters": [
+      "Q2_2025"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show monthly recurring revenue in a line chart with forecasting",
+    "intent": "visualization_request",
+    "chart_type": "line_chart_with_forecast",
+    "metric": "monthly_recurring_revenue",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "List products with order quantity over 100 units in 2023",
+    "intent": "filter_request",
+    "chart_type": "table",
+    "metric": "order_quantity",
+    "dimension": "product",
+    "filters": [
+      "over_100_units",
+      "2023"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show me year-over-year revenue trend for each sales territory",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "revenue",
+    "dimension": "sales_territory",
+    "filters": [
+      "year_over_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display tax amount by product in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "tax_amt",
+    "dimension": "product",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show the count of orders by month this year",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "order_quantity",
+    "dimension": "month",
+    "filters": [
+      "this_year"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Which product drove the highest revenue in Q3 2024?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "revenue",
+    "dimension": "product",
+    "filters": [
+      "Q3_2024"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Present a table of inventory levels over all categories",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "inventory_level",
+    "dimension": "category",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Filter dashboard for electronics sales in North America",
+    "intent": "filter_request",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": [
+      "product_category",
+      "region"
+    ],
+    "filters": [
+      "electronics",
+      "North America"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show average customer lifetime value by region in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "customer_lifetime_value",
+    "dimension": "region",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "How many units were shipped in December?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "order_quantity",
+    "dimension": "month",
+    "filters": [
+      "December"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show the sum of discounts by territory this year",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "discount_amount",
+    "dimension": "sales_territory",
+    "filters": [
+      "this_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display number of returned items by month",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "returns",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "Provide a pie chart for customer segmentation in 2025",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "customer_count",
+    "dimension": "customer_segment",
+    "filters": [
+      "2025"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "How much profit was generated by top 10 products?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "profit",
+    "dimension": "product",
+    "filters": [
+      "top_10"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display YoY growth rate for each business unit in a table",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "growth_rate",
+    "dimension": "business_unit",
+    "filters": [
+      "year_over_year"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show shipping cost by carrier in a bar chart",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "freight",
+    "dimension": "carrier",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales by city for active customers",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "sales",
+    "dimension": "city",
+    "filters": [
+      "active_customers"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display total revenue for all business units this quarter",
+    "intent": "visualization_request",
+    "chart_type": "card",
+    "metric": "revenue",
+    "dimension": "business_unit",
+    "filters": [
+      "this_quarter"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What was the minimum inventory level by warehouse this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "inventory_level",
+    "dimension": "warehouse",
+    "filters": [
+      "this_year"
+    ],
+    "aggregation": "min"
+  },
+  {
+    "query": "Create a scatter plot of order quantity versus profit by product",
+    "intent": "visualization_request",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "order_quantity",
+      "profit"
+    ],
+    "dimension": "product",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales trends by week in a line chart",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": "week",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display the best-selling product by region",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "product",
+    "filters": [
+      "best_selling"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Show table of customer count by year for all segments",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "customer_count",
+    "dimension": [
+      "year",
+      "customer_segment"
+    ],
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "What is the average order value for repeat customers this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "average_order_value",
+    "dimension": "customer_type",
+    "filters": [
+      "repeat",
+      "this_year"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Display inventory level by product for over 100 units",
+    "intent": "filter_request",
+    "chart_type": "column_chart",
+    "metric": "inventory_level",
+    "dimension": "product",
+    "filters": [
+      "over_100_units"
+    ],
+    "aggregation": null
+  },
+  {
+    "query": "Show monthly recurring revenue forecast for the next 6 months",
+    "intent": "visualization_request",
+    "chart_type": "line_chart_with_forecast",
+    "metric": "monthly_recurring_revenue",
+    "dimension": "month",
+    "filters": [
+      "next_6_months"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Present a bar chart for the count of sales order lines by order status",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "sales_order_line_number",
+    "dimension": "order_status",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "How much freight was paid for expedited shipping?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "freight",
+    "dimension": "shipping_method",
+    "filters": [
+      "expedited"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display product standard cost by category for 2023",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "product_standard_cost",
+    "dimension": "category",
+    "filters": [
+      "2023"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show extended amount by month in a heatmap",
+    "intent": "visualization_request",
+    "chart_type": "heatmap",
+    "metric": "extended_amount",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What is the total sales value for canceled orders this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "order_status",
+    "filters": [
+      "canceled",
+      "this_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Which customers had the highest order quantity last quarter?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "order_quantity",
+    "dimension": "customer",
+    "filters": [
+      "last_quarter"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Show the average discount by sales territory for last year",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "discount_amount",
+    "dimension": "sales_territory",
+    "filters": [
+      "last_year"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Display profit by month for 2024 in a line chart",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "profit",
+    "dimension": "month",
+    "filters": [
+      "2024"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show number of orders by day in a table",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "order_quantity",
+    "dimension": "day",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "Which product had the biggest increase in sales this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "sales",
+    "dimension": "product",
+    "filters": [
+      "this_year"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Show total revenue for electronics category over the last 6 months",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "revenue",
+    "dimension": "category",
+    "filters": [
+      "electronics",
+      "last_6_months"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display the minimum shipping cost by region",
+    "intent": "visualization_request",
+    "chart_type": "card",
+    "metric": "freight",
+    "dimension": "region",
+    "filters": [],
+    "aggregation": "min"
+  },
+  {
+    "query": "Show a heatmap of sales by state and month",
+    "intent": "visualization_request",
+    "chart_type": "heatmap",
+    "metric": "sales",
+    "dimension": [
+      "state",
+      "month"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Who were the top 5 customers by total profit last year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "profit",
+    "dimension": "customer",
+    "filters": [
+      "top_5",
+      "last_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display YoY growth for revenue in a line chart",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "revenue",
+    "dimension": "year",
+    "filters": [
+      "year_over_year"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show total order quantity for shoes in Q2 2025",
+    "intent": "visualization_request",
+    "chart_type": "card",
+    "metric": "order_quantity",
+    "dimension": "product",
+    "filters": [
+      "shoes",
+      "Q2_2025"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "How many products were returned last December?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "returns",
+    "dimension": "month",
+    "filters": [
+      "December"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Display average freight cost for expedited orders",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "freight",
+    "dimension": "shipping_method",
+    "filters": [
+      "expedited"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show marketing spend versus revenue by region in a scatter plot",
+    "intent": "visualization_request",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "marketing_spend",
+      "revenue"
+    ],
+    "dimension": "region",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show order quantity by week for 2023",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "order_quantity",
+    "dimension": "week",
+    "filters": [
+      "2023"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display the count of shipped orders by customer type",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "order_quantity",
+    "dimension": "customer_type",
+    "filters": [
+      "shipped"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Show total tax amount by product in a column chart",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "tax_amt",
+    "dimension": "product",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What is the max discount offered in electronics this year?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "discount_amount",
+    "dimension": "product_category",
+    "filters": [
+      "electronics",
+      "this_year"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Display profit margin by quarter for every business unit",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "profit_margin",
+    "dimension": "quarter",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show the median inventory level by state",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "inventory_level",
+    "dimension": "state",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show extended amount for all categories in 2024",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "extended_amount",
+    "dimension": "category",
+    "filters": [
+      "2024"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display customer PONumber by region for active customers",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "customer_ponumber",
+    "dimension": "region",
+    "filters": [
+      "active_customers"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Show the sum of sales for all orders with discount",
+    "intent": "visualization_request",
+    "chart_type": "card",
+    "metric": "sales",
+    "dimension": "order",
+    "filters": [
+      "discount"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "How many orders were revised more than 2 times?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "revision_number",
+    "dimension": "order",
+    "filters": [
+      "over_2"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Display the average unit price by product line",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "unit_price",
+    "dimension": "product_line",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show monthly trend for tax amount in a line chart",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "tax_amt",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Which order had the highest freight cost last month?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "freight",
+    "dimension": "order",
+    "filters": [
+      "last_month"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "Show yearly breakdown of profit by cost component",
+    "intent": "visualization_request",
+    "chart_type": "waterfall_chart",
+    "metric": "profit",
+    "dimension": [
+      "year",
+      "cost_component"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display the sum of revenue by promotion in 2025",
+    "intent": "visualization_request",
+    "chart_type": "column_chart",
+    "metric": "revenue",
+    "dimension": "promotion",
+    "filters": [
+      "2025"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "List all sales by currency in a table for 2023",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "sales",
+    "dimension": "currency",
+    "filters": [
+      "2023"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "How many shipped orders did we have in Q1?",
+    "intent": "data_inquiry",
+    "chart_type": null,
+    "metric": "order_quantity",
+    "dimension": "quarter",
+    "filters": [
+      "shipped",
+      "Q1"
+    ],
+    "aggregation": "count"
+  },
+  {
+    "query": "Show discount percent by product in a pie chart",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "unit_price_discount_pct",
+    "dimension": "product",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Display freight cost by shipping date for next 3 months",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "freight",
+    "dimension": "ship_date",
+    "filters": [
+      "next_3_months"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Present line chart of unit price by product for all categories",
+    "intent": "visualization_request",
+    "chart_type": "line_chart",
+    "metric": "unit_price",
+    "dimension": "product",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show carrier tracking number count by region",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "carrier_tracking_number",
+    "dimension": "region",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "Show revision number by order for all orders revised in 2024",
+    "intent": "visualization_request",
+    "chart_type": "table",
+    "metric": "revision_number",
+    "dimension": "order",
+    "filters": [
+      "2024"
+    ],
+    "aggregation": "max"
+  },
+  {
+    "query": "What is the year-on-year growth in sales revenue from 2017 to 2025?",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales_revenue",
+    "dimension": "year",
+    "filters": [
+      "2017_to_2025"
+    ],
+    "aggregation": "sum",
+    "calculation": "year_over_year_growth"
+  },
+  {
+    "query": "Show me year over year sales growth",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": "year",
+    "filters": [],
+    "aggregation": "sum",
+    "calculation": "year_over_year_growth"
+  },
+  {
+    "query": "Calculate YoY revenue growth from 2017 to 2025",
+    "intent": "trend_analysis",
+    "chart_type": "bar_chart",
+    "metric": "revenue",
+    "dimension": "year",
+    "filters": [
+      "2017_to_2025"
+    ],
+    "aggregation": "sum",
+    "calculation": "year_over_year_growth"
+  },
+  {
+    "query": "Which branch generated higher total sales across the years?",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "total_sales",
+    "dimension": "branch",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Compare total sales by branch",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "branch",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales performance across all branches",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "branch",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "How do sales trends differ by state?",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": "state",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales trends for each state over time",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": [
+      "state",
+      "date"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Compare state-wise sales patterns",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "state",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Which products consistently perform best in terms of revenue and quantity sold?",
+    "intent": "ranking",
+    "chart_type": "bar_chart",
+    "metric": [
+      "revenue",
+      "quantity"
+    ],
+    "dimension": "product",
+    "filters": [
+      "top_performers"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show top performing products by revenue and quantity",
+    "intent": "ranking",
+    "chart_type": "bar_chart",
+    "metric": [
+      "revenue",
+      "quantity_sold"
+    ],
+    "dimension": "product",
+    "filters": [
+      "top_10"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "List best selling products by sales and units",
+    "intent": "ranking",
+    "chart_type": "table",
+    "metric": [
+      "sales",
+      "units"
+    ],
+    "dimension": "product",
+    "filters": [
+      "top_performers"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Compare Insulated vs Non-Insulated goods in terms of total revenue contribution",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "revenue",
+    "dimension": "product_type",
+    "filters": [
+      "insulated_vs_non_insulated"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show revenue comparison between Insulated and Non-Insulated products",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "total_revenue",
+    "dimension": "insulation_type",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Compare average selling rate of Insulated vs Non-Insulated goods",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "selling_rate",
+    "dimension": "product_type",
+    "filters": [
+      "insulated_vs_non_insulated"
+    ],
+    "aggregation": "avg"
+  },
+  {
+    "query": "What is the average price of Insulated versus Non-Insulated products?",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "price",
+    "dimension": "insulation_type",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show growth trend over time for Insulated vs Non-Insulated goods",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": [
+      "product_type",
+      "date"
+    ],
+    "filters": [
+      "insulated_vs_non_insulated"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Which product category dominates in each branch?",
+    "intent": "cross_analysis",
+    "chart_type": "stacked_bar_chart",
+    "metric": "sales",
+    "dimension": [
+      "branch",
+      "category"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show category distribution by branch",
+    "intent": "cross_analysis",
+    "chart_type": "stacked_bar_chart",
+    "metric": "sales",
+    "dimension": [
+      "branch",
+      "product_category"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What products sell most in each branch location?",
+    "intent": "cross_analysis",
+    "chart_type": "grouped_bar_chart",
+    "metric": "quantity",
+    "dimension": [
+      "branch",
+      "product"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Are there seasonal spikes in sales for certain product categories?",
+    "intent": "seasonality_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": [
+      "month",
+      "category"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show seasonal sales patterns by product category",
+    "intent": "seasonality_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": [
+      "season",
+      "product_category"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Identify seasonal trends in product sales",
+    "intent": "seasonality_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": [
+      "month",
+      "product"
+    ],
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "What is the average pre-tax value per order across years?",
+    "intent": "aggregation",
+    "chart_type": "line_chart",
+    "metric": "pre_tax_value",
+    "dimension": "year",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show average order value by year",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "order_value",
+    "dimension": "year",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Calculate mean pre-tax order value over time",
+    "intent": "aggregation",
+    "chart_type": "line_chart",
+    "metric": "pre_tax_amount",
+    "dimension": "year",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "How does rate variation affect sales quantity?",
+    "intent": "correlation_analysis",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "rate",
+      "quantity"
+    ],
+    "dimension": "product",
+    "filters": [],
+    "aggregation": null
+  },
+  {
+    "query": "Show relationship between price and sales volume",
+    "intent": "correlation_analysis",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "price",
+      "sales_quantity"
+    ],
+    "dimension": "product",
+    "filters": [],
+    "aggregation": null
+  },
+  {
+    "query": "Analyze impact of pricing on sales quantity",
+    "intent": "correlation_analysis",
+    "chart_type": "scatter_plot",
+    "metric": [
+      "rate",
+      "units_sold"
+    ],
+    "dimension": "product",
+    "filters": [],
+    "aggregation": null
+  },
+  {
+    "query": "Build a dashboard showing sales by year",
+    "intent": "dashboard_request",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": "year",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show sales by category in dashboard",
+    "intent": "dashboard_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "category",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display sales by branch on dashboard",
+    "intent": "dashboard_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "branch",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Create sales by state visualization",
+    "intent": "dashboard_request",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "state",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show total revenue by year",
+    "intent": "aggregation",
+    "chart_type": "bar_chart",
+    "metric": "revenue",
+    "dimension": "year",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display quantity sold by product category",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "quantity",
+    "dimension": "category",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Compare sales performance across different branches",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "branch",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show monthly sales trends",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": "month",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Which state has highest sales revenue?",
+    "intent": "ranking",
+    "chart_type": "bar_chart",
+    "metric": "revenue",
+    "dimension": "state",
+    "filters": [
+      "top_1"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show top 5 branches by total sales",
+    "intent": "ranking",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "branch",
+    "filters": [
+      "top_5"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "List top 10 products by revenue",
+    "intent": "ranking",
+    "chart_type": "bar_chart",
+    "metric": "revenue",
+    "dimension": "product",
+    "filters": [
+      "top_10"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show quarterly sales comparison",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "quarter",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Compare sales between 2024 and 2025",
+    "intent": "comparison",
+    "chart_type": "bar_chart",
+    "metric": "sales",
+    "dimension": "year",
+    "filters": [
+      "2024",
+      "2025"
+    ],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Show revenue distribution by product type",
+    "intent": "visualization_request",
+    "chart_type": "pie_chart",
+    "metric": "revenue",
+    "dimension": "product_type",
+    "filters": [],
+    "aggregation": "sum"
+  },
+  {
+    "query": "Display average transaction value by branch",
+    "intent": "aggregation",
+    "chart_type": "bar_chart",
+    "metric": "transaction_value",
+    "dimension": "branch",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Show customer count by state",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "customer_count",
+    "dimension": "state",
+    "filters": [],
+    "aggregation": "count"
+  },
+  {
+    "query": "What is the growth rate of sales from 2020 to 2025?",
+    "intent": "trend_analysis",
+    "chart_type": "line_chart",
+    "metric": "sales",
+    "dimension": "year",
+    "filters": [
+      "2020_to_2025"
+    ],
+    "aggregation": "sum",
+    "calculation": "growth_rate"
+  },
+  {
+    "query": "Show profit margin by product category",
+    "intent": "visualization_request",
+    "chart_type": "bar_chart",
+    "metric": "profit_margin",
+    "dimension": "category",
+    "filters": [],
+    "aggregation": "avg"
+  },
+  {
+    "query": "Compare revenue across all years",
+    "intent": "comparison",
+    "chart_type": "line_chart",
+    "metric": "revenue",
+    "dimension": "year",
+    "filters": [],
+    "aggregation": "sum"
+  }
+]
