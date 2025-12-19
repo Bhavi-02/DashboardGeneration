@@ -477,6 +477,25 @@
         color: var(--white);
       }
 
+      #explainChartBtn {
+        background: linear-gradient(
+          135deg,
+          #f093fb 0%,
+          #f5576c 100%
+        ) !important;
+        color: white !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        font-size: 1.2em !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      #explainChartBtn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4) !important;
+      }
+
       .card-body {
         padding: 20px;
       }
@@ -878,6 +897,15 @@
             <div class="card-actions">
               <button
                 class="icon-btn"
+                id="explainChartBtn"
+                onclick="explainChart()"
+                title="Explain Chart with AI 🤖"
+                style="display: none"
+              >
+                🤖
+              </button>
+              <button
+                class="icon-btn"
                 onclick="downloadChart('png')"
                 title="Download PNG"
               >
@@ -973,6 +1001,38 @@
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- AI Explanation Section -->
+        <div
+          id="chartExplanationSection"
+          class="preview-card"
+          style="
+            display: none;
+            margin-top: 20px;
+            border-left: 5px solid #667eea;
+          "
+        >
+          <div
+            class="card-header"
+            style="
+              background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            "
+          >
+            <div class="card-title" style="color: #667eea">
+              🤖 AI Chart Explanation
+            </div>
+            <button
+              class="icon-btn"
+              onclick="document.getElementById('chartExplanationSection').style.display='none'"
+              title="Close"
+            >
+              ✖️
+            </button>
+          </div>
+          <div class="card-body" id="chartExplanationContent">
+            <!-- Explanation content will be inserted here -->
           </div>
         </div>
       </div>
@@ -1248,6 +1308,180 @@
         showMessage(`Added "${columnName}" to query`, "success");
       }
 
+      // Chart Explanation with AI
+      let currentChartQuery = null;
+
+      async function explainChart() {
+        if (!currentChartData || !currentChartQuery) {
+          showMessage("No chart to explain", "error");
+          return;
+        }
+
+        const explanationSection = document.getElementById(
+          "chartExplanationSection"
+        );
+        const explanationContent = document.getElementById(
+          "chartExplanationContent"
+        );
+
+        // Show loading state
+        explanationContent.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--gray);">
+            <div style="font-size: 2em; margin-bottom: 10px;">🤖</div>
+            <div style="font-size: 1.1em; font-weight: 500;">Analyzing chart with AI...</div>
+            <div style="font-size: 0.9em; margin-top: 8px;">This may take a moment</div>
+          </div>
+        `;
+        explanationSection.style.display = "block";
+
+        try {
+          // Load dataset information first
+          const datasetResponse = await fetch(
+            "/api/load-dataset-for-explanation",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const datasetResult = await datasetResponse.json();
+
+          if (!datasetResult.success) {
+            throw new Error("Failed to load dataset information");
+          }
+
+          // Generate explanation for single chart
+          const explainResponse = await fetch("/api/explain-dashboard", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              charts_config: [
+                {
+                  query: currentChartQuery,
+                  timestamp: new Date().toLocaleString(),
+                },
+              ],
+              title: "Chart Analysis",
+            }),
+          });
+
+          const explainResult = await explainResponse.json();
+
+          if (explainResult.success) {
+            displayChartExplanation(explainResult);
+            showMessage("✅ Chart explanation generated!", "success");
+          } else {
+            throw new Error(
+              explainResult.error || "Failed to generate explanation"
+            );
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          explanationContent.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: var(--danger-color);">
+              <div style="font-size: 2em; margin-bottom: 10px;">❌</div>
+              <div style="font-size: 1em; font-weight: 500;">Error generating explanation</div>
+              <div style="font-size: 0.85em; margin-top: 8px; color: var(--gray);">${error.message}</div>
+            </div>
+          `;
+          showMessage(`❌ ${error.message}`, "error");
+        }
+      }
+
+      // Display chart explanation
+      function displayChartExplanation(result) {
+        const explanationContent = document.getElementById(
+          "chartExplanationContent"
+        );
+
+        let html = "";
+
+        if (result.overall_insights) {
+          html += `
+            <div style="background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+              <h3 style="margin: 0 0 15px 0; color: #333; font-size: 1.1em;">📊 Key Insights</h3>
+              ${
+                result.overall_insights.key_findings
+                  ? `
+                <div style="margin: 10px 0;">
+                  <strong style="color: #555;">Key Findings:</strong>
+                  <p style="margin: 5px 0 10px 20px; color: #666; line-height: 1.6;">${result.overall_insights.key_findings}</p>
+                </div>
+              `
+                  : ""
+              }
+              ${
+                result.overall_insights.trends
+                  ? `
+                <div style="margin: 10px 0;">
+                  <strong style="color: #555;">Trends:</strong>
+                  <p style="margin: 5px 0 10px 20px; color: #666; line-height: 1.6;">${result.overall_insights.trends}</p>
+                </div>
+              `
+                  : ""
+              }
+              ${
+                result.overall_insights.recommendations
+                  ? `
+                <div style="margin: 10px 0;">
+                  <strong style="color: #555;">Recommendations:</strong>
+                  <p style="margin: 5px 0 10px 20px; color: #666; line-height: 1.6;">${result.overall_insights.recommendations}</p>
+                </div>
+              `
+                  : ""
+              }
+            </div>
+          `;
+        }
+
+        if (result.chart_explanations && result.chart_explanations.length > 0) {
+          const chartExpl = result.chart_explanations[0];
+          html += `
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+              <h4 style="margin: 0 0 15px 0; color: #667eea; font-size: 1em;">📈 Detailed Analysis</h4>
+              <p style="color: #555; line-height: 1.8; margin: 10px 0;">${
+                chartExpl.explanation || "No detailed explanation available"
+              }</p>
+              ${
+                chartExpl.insights && chartExpl.insights.length > 0
+                  ? `
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                  <strong style="color: #333; font-size: 0.95em;">Additional Insights:</strong>
+                  <ul style="margin: 10px 0 0 20px; color: #555; line-height: 1.6;">
+                    ${chartExpl.insights
+                      .map(
+                        (insight) =>
+                          `<li style="margin: 5px 0;">${insight}</li>`
+                      )
+                      .join("")}
+                  </ul>
+                </div>
+              `
+                  : ""
+              }
+            </div>
+          `;
+        }
+
+        if (result.timestamp) {
+          html += `
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; text-align: center;">
+              <p style="color: #999; font-size: 0.8em; margin: 0;">
+                Generated: ${new Date(result.timestamp).toLocaleString()}
+              </p>
+            </div>
+          `;
+        }
+
+        explanationContent.innerHTML =
+          html ||
+          '<p style="color: #999; text-align: center; padding: 40px;">No explanation available</p>';
+      }
+
       // Chart Generation
       async function generateChart() {
         const query = document.getElementById("queryInput").value.trim();
@@ -1286,7 +1520,12 @@
           if (response.ok && result.success) {
             console.log("✅ Chart data received:", result.chart_data);
             currentChartData = result.chart_data;
+            currentChartQuery = query; // Store query for explanation
             renderChart(result.chart_data, "chartPreviewBody");
+
+            // Show explain button
+            document.getElementById("explainChartBtn").style.display =
+              "inline-flex";
 
             // Update data preview
             if (result.data_preview) {

@@ -33,3 +33,4 @@ zipfile36
 beautifulsoup4
 lxml
 httpx
+rank_bm25
