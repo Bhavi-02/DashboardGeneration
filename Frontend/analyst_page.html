@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst View - Advanced Analytics</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s;
+            text-decoration: none;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #f5576c;
+            margin-bottom: 20px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .feature-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #f5576c;
+        }
+        .feature-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .feature-box p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 style="color: #f5576c;">📊 Analyst View</h2>
+        <div class="btn-group">
+            <a href="/interactive-dashboard" class="btn">📊 Dashboard Builder</a>
+            <a href="/dashboard-explainer" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🔍 Explain Dashboard</a>
+            <a href="/home" class="btn">← Back to Home</a>
+            <button class="btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Advanced Analytics Dashboard</h1>
+        <p>Access advanced analytics tools and comprehensive data insights.</p>
+
+        <div class="feature-grid">
+            <div class="feature-box">
+                <h3>📈 Data Visualization</h3>
+                <p>Create and customize advanced charts, graphs, and visualizations.</p>
+            </div>
+            <div class="feature-box">
+                <h3>📊 Report Generation</h3>
+                <p>Generate detailed reports with custom parameters and filters.</p>
+            </div>
+            <div class="feature-box">
+                <h3>🔍 Trend Analysis</h3>
+                <p>Identify patterns and trends in your data over time.</p>
+            </div>
+            <div class="feature-box">
+                <h3>💡 Predictive Insights</h3>
+                <p>Use predictive analytics to forecast future trends.</p>
+            </div>
+            <div class="feature-box">
+                <h3>📉 Performance Metrics</h3>
+                <p>Track KPIs and performance indicators across the organization.</p>
+            </div>
+            <div class="feature-box">
+                <h3>🔄 Data Export</h3>
+                <p>Export data and reports in various formats (CSV, Excel, PDF).</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => window.location.href = '/page.html');
+        }
+    </script>
+</body>
+</html>
