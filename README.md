@@ -2,6 +2,21 @@
 
 A comprehensive, AI-powered dashboard generation and visualization platform built with FastAPI, featuring advanced NLP capabilities, role-based access control, and interactive data exploration tools.
 
+## 🎉 Latest Updates (v1.1.0 - Dec 19, 2025)
+
+### ✅ Bug Fixes & Optimizations
+
+- **Fixed 20+ bare except clauses** with specific exception handling
+- **Added database connection pooling** (5 connections, auto-recycling)
+- **Implemented structured logging** with file rotation (10MB max, 5 backups)
+- **Created input validation framework** (email, username, password, XSS prevention)
+- **Enhanced error handling** with better context and debugging info
+- **Improved security** with sanitization and validation utilities
+
+📄 **See [OPTIMIZATIONS.md](OPTIMIZATIONS.md) for complete details**
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -23,9 +38,9 @@ A comprehensive, AI-powered dashboard generation and visualization platform buil
 
 Gen-Dash is an enterprise-grade dashboard generation platform that leverages natural language processing, retrieval-augmented generation, and machine learning to enable non-technical users to create professional, interactive data visualizations from complex datasets.
 
-**Current Version:** 1.0.0  
-**Build Status:** Active Development  
-**Last Updated:** December 2025
+**Current Version:** 1.1.0  
+**Build Status:** Production Ready  
+**Last Updated:** December 19, 2025
 
 ## Key Features
 

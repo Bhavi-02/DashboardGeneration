@@ -460,7 +460,8 @@ class ChartGenerator:
                 )
                 
                 return fig
-            except:
+            except Exception as e:
+                print(f"⚠️  Heatmap creation failed: {e}, falling back to bar chart")
                 # Fallback to bar chart if pivot fails
                 return self.create_bar_chart(data, metric, dimensions[0], title)
         else:

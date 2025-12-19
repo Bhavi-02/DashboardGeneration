@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Form, Request, Response, Cookie, Dep
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine
 import bcrypt
 from typing import Optional, Dict, Any, List
@@ -17,6 +17,18 @@ import plotly.io as pio
 import json
 import io
 import traceback
+import logging
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('logs/gendash.log', mode='a')
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Add dashboard path to sys.path
 dashboard_path = Path(__file__).parent / "dashboard"
@@ -48,9 +60,25 @@ except ImportError as e:
 
 DATABASE_URL = "mysql+pymysql://root:dhruv123@localhost:3306/analytics_dashboard"
 
-# For MySQL (when ready): "mysql+pymysql://appuser:YourStrongPassword@localhost/analytics_dashboard"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
-SessionLocal = sessionmaker(bind=engine)
+# Create engine with connection pooling and optimizations
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,  # Verify connections before using
+    pool_recycle=3600,   # Recycle connections after 1 hour
+    pool_size=5,         # Connection pool size
+    max_overflow=10,     # Maximum overflow connections
+    echo=False           # Set to True for SQL debugging
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Database dependency for automatic session management
+def get_db():
+    """Dependency to get database session with automatic cleanup"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Lifespan event handler for startup and shutdown
 @asynccontextmanager

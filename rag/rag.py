@@ -73,7 +73,8 @@ except Exception as _err:
                     tmp.close()
                     try:
                         os.unlink(tmp.name)
-                    except Exception:
+                    except (OSError, FileNotFoundError):
+                        # File already deleted or permission issue
                         pass
             # Otherwise return text/html
             return resp.text, 'html' if 'html' in content_type else 'text'

@@ -103,8 +103,8 @@ class DataConnector:
                             if unnamed_alt < unnamed_count:
                                 df = df_alt
                                 print(f"      ✅ Used row 2 as header")
-                        except:
-                            pass
+                        except Exception as e:
+                            print(f"      ⚠️  Could not try alternate header: {e}")
                     
                     # If still mostly unnamed, it might be intentional or need manual fixing
                     # But we'll load it anyway
@@ -240,7 +240,7 @@ class DataConnector:
                             start_year = fy_str.split('-')[0]
                             return int(start_year)
                         return 0
-                    except:
+                    except (ValueError, AttributeError, IndexError):
                         return 0
                 
                 # Create a temporary sorting column
@@ -613,7 +613,8 @@ class DataConnector:
                     other_cols = [c for c in text_mentioned if c != col]
                     if other_cols:
                         return col, other_cols[0]
-                except:
+                except (ValueError, TypeError, KeyError):
+                    # Column cannot be converted to numeric
                     continue
         
         # Method 3: Use order in query
@@ -866,7 +867,8 @@ class DataConnector:
                                 filtered_indices = original_df[year_mask].index
                                 result_df = result_df.loc[result_df.index.intersection(filtered_indices)]
                                 break
-                        except:
+                        except (StopIteration, KeyError, ValueError):
+                            # No matching year found or column access failed
                             pass
             
             # Handle region filters
