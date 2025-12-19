@@ -11,7 +11,7 @@ from datetime import datetime
 
 # Import RAG components - with error handling
 try:
-    from rag import (
+    from rag.rag import (
         TfidfEmbeddings,
         SimpleVectorStore,
         process_questions_with_rag

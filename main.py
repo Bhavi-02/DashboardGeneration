@@ -21,9 +21,9 @@ import traceback
 dashboard_path = Path(__file__).parent / "dashboard"
 sys.path.insert(0, str(dashboard_path))
 
-from models import Base, User, Dashboard
-from schemas import UserCreate, UserLogin, UserResponse
-from auth import (
+from database.models import Base, User, Dashboard
+from database.schemas import UserCreate, UserLogin, UserResponse
+from auth.auth import (
     create_session, get_session, delete_session, 
     check_permission, require_auth, require_role,
     get_accessible_pages
@@ -39,7 +39,7 @@ except ImportError as e:
 
 # Import dashboard explainer
 try:
-    from dashboard_explainer import get_dashboard_explainer
+    from dashboard.dashboard_explainer import get_dashboard_explainer
     print("✅ Dashboard Explainer loaded successfully")
 except ImportError as e:
     print(f"Warning: Could not import dashboard explainer: {e}")
@@ -2023,7 +2023,7 @@ async def process_rag_document(
 ):
     """Process uploaded document with RAG system for explainability"""
     try:
-        from rag import process_document_and_questions
+        from rag.rag import process_document_and_questions
         
         file_path = request_data.get('file_path')
         questions = request_data.get('questions', [])
@@ -2077,7 +2077,7 @@ async def query_rag_system(
 ):
     """Query the RAG system with custom questions about uploaded documents"""
     try:
-        from rag import process_document_and_questions
+        from rag.rag import process_document_and_questions
         
         file_path = request_data.get('file_path')
         question = request_data.get('question')

@@ -23,7 +23,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # this optional and provide a lightweight fallback to avoid import-time
 # failures when only basic functionality is required.
 try:
-    from loaders import DocumentLoader, load_file, download_and_load  # type: ignore
+    from rag.loaders import DocumentLoader, load_file, download_and_load  # type: ignore
 except Exception as _err:
     print(f"⚠️ Optional 'loaders' import failed (fallback enabled): {_err}")
 

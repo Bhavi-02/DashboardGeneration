@@ -3,7 +3,7 @@ Add Dashboard table to the database
 Run this script to create the new dashboard table
 """
 from sqlalchemy import create_engine
-from models import Base, Dashboard, User
+from database.models import Base, Dashboard, User
 
 # Database URL - same as main.py
 DATABASE_URL = "mysql+pymysql://root:root@localhost:3306/analytics_dashboard"
