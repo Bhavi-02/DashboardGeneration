@@ -136,12 +136,16 @@ class ChartGenerator:
         """Create a beautiful bar chart from real data with enhanced colors"""
         if data is None or data.empty:
             raise Exception("❌ No data available for bar chart generation")
+        
+        # Reset index to ensure we're not plotting index values
+        data = data.reset_index(drop=True)
             
         metric_col = data.columns[1]  # Second column is metric
         dimension_col = data.columns[0]  # First column is dimension
         
         # Data is already aggregated in data_connector, so use it directly
         aggregated_data = data.copy()
+        
         # Debugging: print data snapshot and dtypes to diagnose empty plots
         try:
             print("🔎 create_bar_chart - snapshot of aggregated_data:")
@@ -187,19 +191,33 @@ class ChartGenerator:
         else:
             colors = self.color_palettes['business']
         
-        # Create color column for proper color assignment
-        color_cycle = colors * (unique_dims // len(colors) + 1)
-        aggregated_data['color'] = color_cycle[:unique_dims]
+        # Extract values explicitly to avoid any Plotly confusion
+        x_values = aggregated_data[dimension_col].tolist()
+        y_values = aggregated_data[metric_col].tolist()
         
-        fig = px.bar(
-            aggregated_data, 
-            x=dimension_col, 
-            y=metric_col,
-            color='color',
-            title=title or f"{metric.title()} by {dimension.title()}",
-            color_discrete_map={color: color for color in colors},
-            template='plotly_white'
-        )
+        print(f"   📊 Plotting X values: {x_values}")
+        print(f"   📊 Plotting Y values: {y_values}")
+        
+        # Create color array
+        color_cycle = colors * (unique_dims // len(colors) + 1)
+        bar_colors = color_cycle[:unique_dims]
+        
+        # Create figure using graph_objects for more control
+        import plotly.graph_objects as go
+        
+        fig = go.Figure()
+        
+        fig.add_trace(go.Bar(
+            x=x_values,
+            y=y_values,
+            marker=dict(
+                color=bar_colors,
+                line=dict(color='white', width=1)
+            ),
+            hovertemplate='<b>%{x}</b><br>' +
+                         f'{metric.title()}: %{{y:,.0f}}<br>' +
+                         '<extra></extra>'
+        ))
         
         fig.update_layout(
             title={
@@ -248,19 +266,48 @@ class ChartGenerator:
         """Create a beautiful line chart from real data with enhanced colors"""
         if data is None or data.empty:
             raise Exception("❌ No data available for line chart generation")
+        
+        # Reset index to ensure we're not plotting index values
+        data = data.reset_index(drop=True)
             
         metric_col = data.columns[1]  # Second column is metric
         dimension_col = data.columns[0]  # First column is dimension
         
-        fig = px.line(
-            data, 
-            x=dimension_col, 
-            y=metric_col,
-            title=title or f"{metric.title()} Trend by {dimension.title()}",
-            markers=True,
-            template='plotly_white',
-            color_discrete_sequence=['#3498DB']
-        )
+        # Debug: Print actual data being charted
+        print(f"\n🔍 DEBUG create_line_chart:")
+        print(f"   Data shape: {data.shape}")
+        print(f"   Columns: {data.columns.tolist()}")
+        print(f"   Dimension column: {dimension_col}")
+        print(f"   Metric column: {metric_col}")
+        print(f"   First 5 rows:")
+        print(data.head().to_string())
+        print(f"   Data types: {data.dtypes.to_dict()}")
+        print(f"   X values (first 5): {data[dimension_col].head().tolist()}")
+        print(f"   Y values (first 5): {data[metric_col].head().tolist()}")
+        
+        # Extract values explicitly to avoid any Plotly confusion
+        x_values = data[dimension_col].tolist()
+        y_values = data[metric_col].tolist()
+        
+        print(f"   📊 Plotting X values: {x_values}")
+        print(f"   📊 Plotting Y values: {y_values}")
+        
+        # Create figure using graph_objects for more control
+        import plotly.graph_objects as go
+        
+        fig = go.Figure()
+        
+        fig.add_trace(go.Scatter(
+            x=x_values,
+            y=y_values,
+            mode='lines+markers',
+            name=metric.title(),
+            line=dict(width=3, color='#3498DB'),
+            marker=dict(size=8, color='#E74C3C', line=dict(width=2, color='white')),
+            hovertemplate='<b>%{x}</b><br>' +
+                         f'{metric.title()}: %{{y:,.0f}}<br>' +
+                         '<extra></extra>'
+        ))
         
         fig.update_layout(
             title={
@@ -275,16 +322,8 @@ class ChartGenerator:
             paper_bgcolor='rgba(0,0,0,0)',
             font={'family': 'Arial', 'color': '#34495E'},
             height=500,
-            margin=dict(t=80, l=60, r=60, b=60)
-        )
-        
-        # Enhance line styling
-        fig.update_traces(
-            line=dict(width=3, color='#3498DB'),
-            marker=dict(size=8, color='#E74C3C', line=dict(width=2, color='white')),
-            hovertemplate='<b>%{x}</b><br>' +
-                         f'{metric.title()}: %{{y:,.0f}}<br>' +
-                         '<extra></extra>'
+            margin=dict(t=80, l=60, r=60, b=60),
+            template='plotly_white'
         )
         
         # Enhance gridlines
@@ -308,13 +347,16 @@ class ChartGenerator:
         if data is None or data.empty:
             raise Exception("❌ No data available for pie chart generation")
         
+        # Reset index to ensure we're not plotting index values
+        data = data.reset_index(drop=True)
+        
         # Handle case where pie chart has only one metric (single column data)
         if len(data.columns) == 1:
             print("📊 Pie chart with single metric - using row index as dimension")
             # For single column, use index as dimension
             metric_col = data.columns[0]
             data_for_chart = data.copy()
-            data_for_chart['dimension'] = data_for_chart.index
+            data_for_chart['dimension'] = data_for_chart.index.astype(str)
             dimension_col = 'dimension'
         else:
             metric_col = data.columns[1]  # Second column is metric
@@ -325,14 +367,30 @@ class ChartGenerator:
         if len(data_for_chart) > 8:
             print(f"⚠️  Warning: Showing {len(data_for_chart)} categories in pie chart. Consider using fewer categories for better readability.")
         
-        fig = px.pie(
-            data_for_chart, 
-            values=metric_col, 
-            names=dimension_col,
-            title=title or f"{metric.title()} Distribution by {dimension.title()}",
-            color_discrete_sequence=self.color_palettes['modern'],
-            template='plotly_white'
-        )
+        # Extract values explicitly to avoid any Plotly confusion
+        labels = data_for_chart[dimension_col].astype(str).tolist()
+        values = data_for_chart[metric_col].tolist()
+        
+        print(f"   📊 Plotting pie chart labels: {labels}")
+        print(f"   📊 Plotting pie chart values: {values}")
+        
+        # Create figure using graph_objects for more control
+        import plotly.graph_objects as go
+        
+        fig = go.Figure()
+        
+        fig.add_trace(go.Pie(
+            labels=labels,
+            values=values,
+            marker=dict(
+                colors=self.color_palettes['modern'],
+                line=dict(color='white', width=2)
+            ),
+            hovertemplate='<b>%{label}</b><br>' +
+                         f'{metric.title()}: %{{value:,.0f}}<br>' +
+                         'Percentage: %{percent}<br>' +
+                         '<extra></extra>'
+        ))
         
         fig.update_layout(
             title={
@@ -351,18 +409,14 @@ class ChartGenerator:
                 x=1.05
             ),
             height=500,
-            margin=dict(t=80, l=60, r=150, b=60)
+            margin=dict(t=80, l=60, r=150, b=60),
+            template='plotly_white'
         )
         
         # Enhance pie chart styling
         fig.update_traces(
             textposition='inside',
-            textinfo='percent+label',
-            hovertemplate='<b>%{label}</b><br>' +
-                         f'{metric.title()}: %{{value:,.0f}}<br>' +
-                         'Percentage: %{percent}<br>' +
-                         '<extra></extra>',
-            marker=dict(line=dict(color='white', width=2))
+            textinfo='percent+label'
         )
         
         return fig
@@ -371,6 +425,9 @@ class ChartGenerator:
         """Create a scatter plot for comparing metrics"""
         if data is None or data.empty:
             raise Exception("❌ No data available for scatter plot generation")
+        
+        # Reset index to ensure we're not plotting index values
+        data = data.reset_index(drop=True)
             
         # For scatter plot, we need at least 2 numeric columns
         numeric_cols = data.select_dtypes(include=['number']).columns.tolist()
@@ -380,18 +437,76 @@ class ChartGenerator:
             metric2_col = numeric_cols[1]
             dimension_col = data.columns[0]  # First column as color dimension
             
-            fig = px.scatter(
-                data, 
-                x=metric1_col, 
-                y=metric2_col,
-                color=dimension_col,
-                title=title or f"{metric1_col} vs {metric2_col} by {dimension_col}",
-                size_max=15
-            )
+            # Extract values explicitly to avoid any Plotly confusion
+            x_values = data[metric1_col].tolist()
+            y_values = data[metric2_col].tolist()
+            colors = data[dimension_col].astype(str).tolist()
+            
+            print(f"   📊 Plotting scatter X values: {x_values[:5]}...")
+            print(f"   📊 Plotting scatter Y values: {y_values[:5]}...")
+            print(f"   📊 Plotting scatter colors: {colors[:5]}...")
+            
+            # Create figure using graph_objects for more control
+            import plotly.graph_objects as go
+            
+            fig = go.Figure()
+            
+            # Group by dimension for colored scatter points
+            unique_dims = data[dimension_col].unique()
+            colors_palette = self.color_palettes['vibrant']
+            
+            for idx, dim_value in enumerate(unique_dims):
+                dim_data = data[data[dimension_col] == dim_value]
+                x_dim = dim_data[metric1_col].tolist()
+                y_dim = dim_data[metric2_col].tolist()
+                
+                fig.add_trace(go.Scatter(
+                    x=x_dim,
+                    y=y_dim,
+                    mode='markers',
+                    name=str(dim_value),
+                    marker=dict(
+                        size=10,
+                        color=colors_palette[idx % len(colors_palette)],
+                        line=dict(width=1, color='white')
+                    ),
+                    hovertemplate=f'<b>{dim_value}</b><br>' +
+                                 f'{metric1_col}: %{{x:,.0f}}<br>' +
+                                 f'{metric2_col}: %{{y:,.0f}}<br>' +
+                                 '<extra></extra>'
+                ))
             
             fig.update_layout(
+                title={
+                    'text': title or f"{metric1_col} vs {metric2_col} by {dimension_col}",
+                    'x': 0.5,
+                    'xanchor': 'center',
+                    'font': {'size': 20, 'color': '#2C3E50', 'family': 'Arial Black'}
+                },
                 xaxis_title=metric1_col,
-                yaxis_title=metric2_col
+                yaxis_title=metric2_col,
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font={'family': 'Arial', 'color': '#34495E'},
+                height=500,
+                margin=dict(t=80, l=60, r=60, b=60),
+                template='plotly_white'
+            )
+            
+            # Enhance gridlines
+            fig.update_xaxes(
+                showgrid=True,
+                gridwidth=1,
+                gridcolor='#ECF0F1',
+                linecolor='#BDC3C7',
+                linewidth=2
+            )
+            fig.update_yaxes(
+                showgrid=True,
+                gridwidth=1,
+                gridcolor='#ECF0F1',
+                linecolor='#BDC3C7',
+                linewidth=2
             )
             
             return fig
@@ -403,16 +518,26 @@ class ChartGenerator:
         """Create a table visualization from real data"""
         if data is None or data.empty:
             raise Exception("❌ No data available for table generation")
-            
+        
+        # Reset index to ensure clean data
+        data = data.reset_index(drop=True)
+        
+        # Extract column names and values explicitly
+        column_names = data.columns.tolist()
+        column_values = [data[col].tolist() for col in data.columns]
+        
+        print(f"   📊 Creating table with columns: {column_names}")
+        print(f"   📊 Table rows: {len(data)}")
+        
         fig = go.Figure(data=[go.Table(
             header=dict(
-                values=list(data.columns),
+                values=column_names,
                 fill_color='lightblue',
                 align='center',
                 font=dict(size=12, color='white')
             ),
             cells=dict(
-                values=[data[col] for col in data.columns],
+                values=column_values,
                 fill_color='white',
                 align='center',
                 font=dict(size=11)
@@ -430,6 +555,9 @@ class ChartGenerator:
         """Create a heatmap from real data"""
         if data is None or data.empty:
             raise Exception("❌ No data available for heatmap generation")
+        
+        # Reset index to ensure clean data
+        data = data.reset_index(drop=True)
             
         # For heatmap, we need to pivot the data if we have enough dimensions
         numeric_cols = data.select_dtypes(include=['number']).columns.tolist()
@@ -446,17 +574,40 @@ class ChartGenerator:
                     fill_value=0
                 )
                 
+                # Extract values explicitly to avoid any Plotly confusion
+                z_values = pivot_data.values.tolist()
+                x_values = pivot_data.columns.tolist()
+                y_values = pivot_data.index.tolist()
+                
+                print(f"   📊 Creating heatmap with shape: {len(y_values)} x {len(x_values)}")
+                print(f"   📊 X categories: {x_values}")
+                print(f"   📊 Y categories: {y_values}")
+                
                 fig = go.Figure(data=go.Heatmap(
-                    z=pivot_data.values,
-                    x=pivot_data.columns,
-                    y=pivot_data.index,
-                    colorscale='Viridis'
+                    z=z_values,
+                    x=x_values,
+                    y=y_values,
+                    colorscale='Viridis',
+                    hovertemplate='<b>%{y}</b> × <b>%{x}</b><br>' +
+                                 f'{metric.title()}: %{{z:,.2f}}<br>' +
+                                 '<extra></extra>'
                 ))
                 
                 fig.update_layout(
-                    title=title or f"{metric.title()} Heatmap",
+                    title={
+                        'text': title or f"{metric.title()} Heatmap",
+                        'x': 0.5,
+                        'xanchor': 'center',
+                        'font': {'size': 20, 'color': '#2C3E50', 'family': 'Arial Black'}
+                    },
                     xaxis_title=categorical_cols[1],
-                    yaxis_title=categorical_cols[0]
+                    yaxis_title=categorical_cols[0],
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font={'family': 'Arial', 'color': '#34495E'},
+                    height=500,
+                    margin=dict(t=80, l=100, r=60, b=60),
+                    template='plotly_white'
                 )
                 
                 return fig
@@ -472,21 +623,27 @@ class ChartGenerator:
         """Create a single value card from real data"""
         if data is None or data.empty:
             raise Exception("❌ No data available for card generation")
+        
+        # Reset index to ensure clean data
+        data = data.reset_index(drop=True)
             
         metric_col = data.columns[1] if len(data.columns) > 1 else data.columns[0]
         
+        # Calculate aggregated value and convert to Python native type
         if aggregation == 'sum' or aggregation == 'total':
-            value = data[metric_col].sum()
+            value = float(data[metric_col].sum())
         elif aggregation == 'avg' or aggregation == 'average':
-            value = data[metric_col].mean()
+            value = float(data[metric_col].mean())
         elif aggregation == 'count':
-            value = len(data)
+            value = float(len(data))
         elif aggregation == 'max':
-            value = data[metric_col].max()
+            value = float(data[metric_col].max())
         elif aggregation == 'min':
-            value = data[metric_col].min()
+            value = float(data[metric_col].min())
         else:
-            value = data[metric_col].sum()  # Default to sum
+            value = float(data[metric_col].sum())  # Default to sum
+        
+        print(f"   📊 Card value ({aggregation or 'total'}): {value}")
             
         # Format the value
         if value >= 1000000:

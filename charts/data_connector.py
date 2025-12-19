@@ -475,7 +475,12 @@ class DataConnector:
                 if metric_col and dimension_col:
                     print(f"   🎯 Column-based assignment: {metric_col} (metric), {dimension_col} (dimension)")
                     result_df = df[[dimension_col, metric_col]].copy()
-                    result_df.columns = [f'dimension_{dimension_col}', f'metric_{metric_col}']
+                    
+                    # Strip spaces from column names to avoid Plotly issues
+                    dimension_col_clean = dimension_col.strip()
+                    metric_col_clean = metric_col.strip()
+                    
+                    result_df.columns = [f'dimension_{dimension_col_clean}', f'metric_{metric_col_clean}']
                     
                     # Apply aggregation FIRST (group by dimension)
                     if aggregation:
@@ -484,10 +489,10 @@ class DataConnector:
                     else:
                         # Default aggregation for charts (sum)
                         print(f"📊 Applying default aggregation: sum")
-                        result_df = result_df.groupby(f'dimension_{dimension_col}')[f'metric_{metric_col}'].sum().reset_index()
+                        result_df = result_df.groupby(f'dimension_{dimension_col_clean}')[f'metric_{metric_col_clean}'].sum().reset_index()
                     
                     # Sort by fiscal year if dimension is FY-like
-                    result_df = self.sort_fiscal_year_column(result_df, f'dimension_{dimension_col}')
+                    result_df = self.sort_fiscal_year_column(result_df, f'dimension_{dimension_col_clean}')
                     
                     # Apply filters AFTER aggregation (especially important for "top N" filters)
                     if filters:
@@ -496,11 +501,19 @@ class DataConnector:
                     result_df = result_df.dropna()
                     if result_df.empty:
                         raise Exception(f"❌ No data remaining after applying filters and aggregation")
+                    
+                    # CRITICAL: Reset index before returning to ensure clean data
+                    result_df = result_df.reset_index(drop=True)
+                    
                     # Debugging output
                     try:
-                        print("🔎 get_data_for_chart_column_based - result_df (column-based, >=2):")
-                        print(result_df.head(10).to_dict(orient='records'))
-                        print("🔎 dtypes:", result_df.dtypes.to_dict())
+                        print("🔎 get_data_for_chart_column_based - FINAL result_df (column-based, >=2):")
+                        print(f"   Shape: {result_df.shape}")
+                        print(f"   Columns: {result_df.columns.tolist()}")
+                        print(f"   Index: {result_df.index.tolist()}")
+                        print(f"   First 10 rows:")
+                        print(result_df.head(10).to_string())
+                        print(f"   dtypes: {result_df.dtypes.to_dict()}")
                     except Exception:
                         print("🔎 get_data_for_chart_column_based - could not print result_df")
                     return result_df
@@ -534,8 +547,12 @@ class DataConnector:
                     else:
                         raise Exception(f"❌ No numeric columns found for metric")
                 
+                # Strip spaces from column names
+                dimension_col_clean = dimension_col.strip()
+                metric_col_clean = metric_col.strip()
+                
                 result_df = df[[dimension_col, metric_col]].copy()
-                result_df.columns = [f'dimension_{dimension_col}', f'metric_{metric_col}']
+                result_df.columns = [f'dimension_{dimension_col_clean}', f'metric_{metric_col_clean}']
                 
                 # Apply aggregation
                 if aggregation:
@@ -544,10 +561,10 @@ class DataConnector:
                 else:
                     # Default aggregation for charts (sum)
                     print(f"📊 Applying default aggregation: sum")
-                    result_df = result_df.groupby(f'dimension_{dimension_col}')[f'metric_{metric_col}'].sum().reset_index()
+                    result_df = result_df.groupby(f'dimension_{dimension_col_clean}')[f'metric_{metric_col_clean}'].sum().reset_index()
                 
                 # Sort by fiscal year if dimension is FY-like
-                result_df = self.sort_fiscal_year_column(result_df, f'dimension_{dimension_col}')
+                result_df = self.sort_fiscal_year_column(result_df, f'dimension_{dimension_col_clean}')
                 
                 # Apply filters
                 if filters:
@@ -556,11 +573,19 @@ class DataConnector:
                 result_df = result_df.dropna()
                 if result_df.empty:
                     raise Exception(f"❌ No data remaining after applying filters and aggregation")
+                
+                # CRITICAL: Reset index before returning to ensure clean data
+                result_df = result_df.reset_index(drop=True)
+                
                 # Debugging output
                 try:
-                    print("🔎 get_data_for_chart_column_based - result_df (single-column case):")
-                    print(result_df.head(10).to_dict(orient='records'))
-                    print("🔎 dtypes:", result_df.dtypes.to_dict())
+                    print("🔎 get_data_for_chart_column_based - FINAL result_df (single-column case):")
+                    print(f"   Shape: {result_df.shape}")
+                    print(f"   Columns: {result_df.columns.tolist()}")
+                    print(f"   Index: {result_df.index.tolist()}")
+                    print(f"   First 10 rows:")
+                    print(result_df.head(10).to_string())
+                    print(f"   dtypes: {result_df.dtypes.to_dict()}")
                 except Exception:
                     print("🔎 get_data_for_chart_column_based - could not print result_df")
                 return result_df

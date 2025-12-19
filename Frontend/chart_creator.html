@@ -1,923 +1,1677 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chart Creator - Analytics Dashboard</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chart Creator - Gen-Dash Analytics</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+      :root {
+        --primary-color: #3f6ad8;
+        --primary-dark: #2948b1;
+        --secondary-color: #1ea1f2;
+        --success-color: #3ac47d;
+        --danger-color: #d92550;
+        --warning-color: #f7b924;
+        --dark: #1e2022;
+        --dark-light: #2c2f33;
+        --gray: #545454;
+        --gray-light: #e8e8e8;
+        --gray-lighter: #f5f6fa;
+        --white: #ffffff;
+        --shadow: 0 0.46875rem 2.1875rem rgba(59, 62, 102, 0.03),
+          0 0.9375rem 1.40625rem rgba(59, 62, 102, 0.03),
+          0 0.25rem 0.53125rem rgba(59, 62, 102, 0.05),
+          0 0.125rem 0.1875rem rgba(59, 62, 102, 0.03);
+        --shadow-hover: 0 0.5rem 2.5rem rgba(59, 62, 102, 0.1),
+          0 1rem 1.5rem rgba(59, 62, 102, 0.08);
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 30px;
-            color: white;
-            text-align: center;
-        }
+      /* Top Navigation Bar */
+      .top-nav {
+        background: var(--white);
+        box-shadow: var(--shadow);
+        padding: 0 30px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
+      .nav-brand .logo {
+        font-size: 1.8em;
+      }
 
-        .nav-buttons {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            display: flex;
-            gap: 15px;
-            border-bottom: 1px solid #dee2e6;
-        }
+      .nav-brand h1 {
+        font-size: 1.4em;
+        font-weight: 700;
+        color: var(--dark);
+      }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
+      .nav-brand span {
+        color: var(--gray);
+        font-size: 0.9em;
+        font-weight: 400;
+      }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
+      .nav-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9em;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
+      .btn-primary {
+        background: var(--primary-color);
+        color: var(--white);
+      }
 
-        .content {
-            padding: 30px;
-        }
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        box-shadow: var(--shadow-hover);
+      }
 
-        .form-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
+      .btn-outline {
+        background: transparent;
+        color: var(--gray);
+        border: 1px solid var(--gray-light);
+      }
 
-        .form-section h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
+      .btn-outline:hover {
+        background: var(--gray-lighter);
+      }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+      /* Split Screen Layout */
+      .split-container {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        height: calc(100vh - 70px);
+        overflow: hidden;
+      }
 
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #495057;
-        }
+      /* Left Panel - Controls */
+      .left-panel {
+        background: var(--white);
+        border-right: 1px solid var(--gray-light);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-        }
+      .panel-header {
+        padding: 24px 24px 16px 24px;
+        border-bottom: 1px solid var(--gray-light);
+        position: sticky;
+        top: 0;
+        background: var(--white);
+        z-index: 10;
+      }
 
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+      .panel-header h2 {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 4px;
+      }
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+      .panel-header p {
+        font-size: 0.85em;
+        color: var(--gray);
+      }
 
-        .example-queries {
-            background: #e7f3ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
+      .panel-content {
+        padding: 24px;
+        flex: 1;
+      }
 
-        .example-queries h3 {
-            font-size: 1em;
-            color: #0056b3;
-            margin-bottom: 10px;
-        }
+      /* Form Groups */
+      .form-group {
+        margin-bottom: 24px;
+      }
 
-        .example-btn {
-            background: white;
-            border: 1px solid #0056b3;
-            color: #0056b3;
-            padding: 8px 15px;
-            border-radius: 6px;
-            margin: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
+      .form-label {
+        display: block;
+        font-size: 0.85em;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-        .example-btn:hover {
-            background: #0056b3;
-            color: white;
-        }
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--gray-light);
+        border-radius: 6px;
+        font-size: 0.95em;
+        font-family: "Inter", sans-serif;
+        transition: all 0.2s ease;
+        background: var(--white);
+      }
 
-        .chart-types {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(63, 106, 216, 0.1);
+      }
 
-        .chart-type-option {
-            background: white;
-            padding: 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
+      .form-textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
 
-        .chart-type-option:hover {
-            border-color: #667eea;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
+      /* AI Suggestions */
+      .ai-suggestions {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border: 1px solid #667eea30;
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 12px;
+      }
 
-        .chart-type-option.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
+      .ai-suggestions-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
 
-        .chart-type-option .icon {
-            font-size: 2em;
-            margin-bottom: 5px;
-        }
+      .ai-suggestions-header .icon {
+        font-size: 1.2em;
+      }
 
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
+      .ai-suggestions-header span {
+        font-size: 0.85em;
+        font-weight: 600;
+        color: var(--primary-color);
+      }
 
-        .btn-generate {
-            flex: 1;
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+      .suggestion-chip {
+        display: inline-block;
+        background: var(--white);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        margin: 4px 4px 4px 0;
+        cursor: pointer;
+        border: 1px solid var(--gray-light);
+        transition: all 0.2s ease;
+      }
 
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.3);
-        }
+      .suggestion-chip:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateY(-1px);
+      }
 
-        .btn-clear {
-            background: #dc3545;
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+      /* Dataset Info Styles */
+      .dataset-section {
+        background: var(--white);
+        border: 1px solid var(--gray-light);
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
 
-        .btn-clear:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
+      .dataset-section h4 {
+        color: var(--primary-color);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95em;
+      }
 
-        .preview-section {
-            margin-top: 30px;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            display: none;
-        }
+      .table-info {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
 
-        .preview-section.show {
-            display: block;
-        }
+      .info-badge {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75em;
+        font-weight: 500;
+      }
 
-        .preview-section h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
+      .columns-group {
+        margin-bottom: 12px;
+      }
 
-        .chart-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+      .columns-group h5 {
+        color: var(--gray);
+        font-size: 0.8em;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+      }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #667eea;
-        }
+      .column-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
 
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
+      .column-tag {
+        background: var(--gray-lighter);
+        color: var(--dark);
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.75em;
+        font-family: "Courier New", monospace;
+        border: 1px solid var(--gray-light);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+      .column-tag:hover {
+        background: var(--primary-color);
+        color: var(--white);
+        border-color: var(--primary-color);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+      }
 
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 1px solid #f5c6cb;
-        }
+      .column-tag.numeric {
+        border-left: 3px solid var(--success-color);
+      }
 
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border: 1px solid #c3e6cb;
-        }
+      .column-tag.text {
+        border-left: 3px solid var(--secondary-color);
+      }
 
-        .download-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: center;
-        }
+      .column-tag.date {
+        border-left: 3px solid var(--warning-color);
+      }
 
-        .btn-download {
-            background: #007bff;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+      .type-icon {
+        font-size: 1em;
+      }
 
-        .btn-download:hover {
-            background: #0056b3;
-            transform: translateY(-2px);
-        }
+      .dataset-loading {
+        text-align: center;
+        padding: 20px;
+        color: var(--gray);
+      }
 
-        /* Processing Details Styles */
-        .processing-details {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
+      .dataset-error {
+        text-align: center;
+        padding: 20px;
+        color: var(--danger-color);
+      }
 
-        .processing-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            transition: opacity 0.3s;
-        }
+      /* Action Buttons */
+      .action-panel {
+        padding: 20px 24px;
+        border-top: 1px solid var(--gray-light);
+        background: var(--white);
+        display: flex;
+        gap: 12px;
+      }
 
-        .processing-header:hover {
-            opacity: 0.9;
-        }
+      .btn-generate {
+        flex: 1;
+        background: linear-gradient(
+          135deg,
+          var(--success-color) 0%,
+          #2d9a5e 100%
+        );
+        color: var(--white);
+        padding: 14px;
+        font-weight: 600;
+        font-size: 1em;
+      }
 
-        .processing-header .toggle-icon {
-            font-size: 1.2em;
-            transition: transform 0.3s;
-        }
+      .btn-generate:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-1px);
+      }
 
-        .processing-header.collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
+      .btn-clear {
+        background: var(--white);
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+        padding: 14px 24px;
+      }
 
-        .processing-content {
-            padding: 20px;
-            background: white;
-            max-height: 400px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
+      .btn-clear:hover {
+        background: var(--danger-color);
+        color: var(--white);
+      }
 
-        .processing-content.collapsed {
-            display: none;
-        }
+      /* Right Panel - Preview */
+      .right-panel {
+        background: transparent;
+        overflow-y: auto;
+        padding: 24px;
+      }
 
-        .log-line {
-            margin: 5px 0;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
+      .preview-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        background: var(--white);
+        padding: 8px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
 
-        .log-line.info {
-            background: #e7f3ff;
-            color: #004085;
-        }
+      .tab-btn {
+        flex: 1;
+        padding: 10px;
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.9em;
+        color: var(--gray);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
 
-        .log-line.success {
-            background: #d4edda;
-            color: #155724;
-        }
+      .tab-btn.active {
+        background: var(--primary-color);
+        color: var(--white);
+      }
 
-        .log-line.warning {
-            background: #fff3cd;
-            color: #856404;
-        }
+      .tab-btn:hover:not(.active) {
+        background: var(--gray-lighter);
+      }
 
-        .log-line.error {
-            background: #f8d7da;
-            color: #721c24;
-        }
+      /* Preview Cards */
+      .preview-card {
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 20px;
+        display: none;
+      }
 
-        .entities-section {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f1f3f5;
-            border-radius: 6px;
-        }
+      .preview-card.active {
+        display: block;
+      }
 
-        .entities-section h4 {
-            color: #495057;
-            margin-bottom: 10px;
-            font-size: 1em;
-        }
+      .card-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--gray-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .entity-item {
-            display: inline-block;
-            margin: 5px;
-            padding: 5px 12px;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 15px;
-            font-size: 0.85em;
-        }
+      .card-title {
+        font-weight: 600;
+        font-size: 1em;
+        color: var(--dark);
+      }
 
-        .entity-type {
-            font-weight: 600;
-            color: #667eea;
-            margin-right: 5px;
-        }
+      .card-actions {
+        display: flex;
+        gap: 8px;
+      }
 
-        .entity-value {
-            color: #495057;
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: var(--gray-lighter);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 1em;
+      }
+
+      .icon-btn:hover {
+        background: var(--primary-color);
+        color: var(--white);
+      }
+
+      .card-body {
+        padding: 20px;
+      }
+
+      /* Data Preview Table */
+      .data-table-wrapper {
+        overflow-x: auto;
+        max-height: 400px;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85em;
+      }
+
+      .data-table th {
+        background: var(--gray-lighter);
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--dark);
+        border-bottom: 2px solid var(--gray-light);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+
+      .data-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--gray-light);
+        color: var(--gray);
+      }
+
+      .data-table tr:hover {
+        background: var(--gray-lighter);
+      }
+
+      /* Multi-Chart Comparison */
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 20px;
+      }
+
+      .chart-wrapper {
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .chart-header {
+        padding: 12px 16px;
+        background: var(--gray-lighter);
+        border-bottom: 1px solid var(--gray-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .chart-title {
+        font-weight: 600;
+        font-size: 0.9em;
+        color: var(--dark);
+      }
+
+      .remove-chart-btn {
+        background: var(--danger-color);
+        color: var(--white);
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 0.8em;
+        transition: all 0.2s ease;
+      }
+
+      .remove-chart-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .chart-container {
+        padding: 16px;
+        min-height: 350px;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        color: var(--gray);
+      }
+
+      .empty-state-icon {
+        font-size: 4em;
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+
+      .empty-state h3 {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--dark);
+      }
+
+      .empty-state p {
+        font-size: 0.9em;
+        line-height: 1.6;
+      }
+
+      /* Loading States */
+      .loading {
+        text-align: center;
+        padding: 60px 20px;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--gray-light);
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 16px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
+
+      .loading-text {
+        font-size: 0.9em;
+        color: var(--gray);
+        font-weight: 500;
+      }
+
+      /* Messages */
+      .message {
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-size: 0.9em;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .message.success {
+        background: #d4f4dd;
+        color: #0e6027;
+        border: 1px solid #3ac47d50;
+      }
+
+      .message.error {
+        background: #ffe0e6;
+        color: #8b0a1f;
+        border: 1px solid #d9255050;
+      }
+
+      .message.info {
+        background: #e3f2fd;
+        color: #01579b;
+        border: 1px solid #1ea1f250;
+      }
+
+      /* Dataset Info Badge */
+      .dataset-badge {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--secondary-color) 100%
+        );
+        color: var(--white);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* Scrollbar Styling */
+      .left-panel::-webkit-scrollbar,
+      .right-panel::-webkit-scrollbar,
+      .data-table-wrapper::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      .left-panel::-webkit-scrollbar-track,
+      .right-panel::-webkit-scrollbar-track,
+      .data-table-wrapper::-webkit-scrollbar-track {
+        background: var(--gray-lighter);
+      }
+
+      .left-panel::-webkit-scrollbar-thumb,
+      .right-panel::-webkit-scrollbar-thumb,
+      .data-table-wrapper::-webkit-scrollbar-thumb {
+        background: var(--gray);
+        border-radius: 3px;
+      }
+
+      .left-panel::-webkit-scrollbar-thumb:hover,
+      .right-panel::-webkit-scrollbar-thumb:hover,
+      .data-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: var(--dark);
+      }
+
+      /* Add Chart Button for Comparison */
+      .add-chart-btn {
+        width: 100%;
+        padding: 40px;
+        border: 2px dashed var(--gray-light);
+        background: var(--white);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        color: var(--gray);
+        font-size: 0.9em;
+      }
+
+      .add-chart-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: var(--gray-lighter);
+      }
+
+      /* Stats Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat-card {
+        background: var(--gray-lighter);
+        padding: 12px;
+        border-radius: 6px;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.4em;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      .stat-label {
+        font-size: 0.75em;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Chart Creator</h1>
-            <p>Create beautiful charts from your natural language queries</p>
+  </head>
+  <body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <div class="nav-brand">
+        <div class="logo">📊</div>
+        <div>
+          <h1>Chart Creator</h1>
+          <span id="datasetBadge" class="dataset-badge" style="display: none">
+            <span>📁</span>
+            <span id="datasetName">Loading...</span>
+          </span>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="/home" class="btn btn-outline">🏠 Home</a>
+        <a href="/interactive-dashboard" class="btn btn-primary"
+          >📈 Dashboard</a
+        >
+      </div>
+    </nav>
+
+    <!-- Split Screen Layout -->
+    <div class="split-container">
+      <!-- Left Panel: Controls -->
+      <div class="left-panel">
+        <div class="panel-header">
+          <h2>Create Your Chart</h2>
+          <p>Quick and powerful chart generation</p>
         </div>
 
-        <div class="nav-buttons">
-            <a href="/home" class="btn btn-primary">🏠 Home</a>
-            <a href="/interactive-dashboard" class="btn btn-secondary">📈 Interactive Dashboard</a>
-            <button onclick="location.reload()" class="btn btn-secondary">🔄 Reset</button>
+        <div class="panel-content">
+          <!-- Dataset Selector -->
+          <div class="form-group">
+            <label class="form-label">📁 Dataset</label>
+            <select
+              id="datasetSelector"
+              class="form-select"
+              onchange="handleDatasetChange()"
+            >
+              <option value="">Loading datasets...</option>
+            </select>
+          </div>
+
+          <!-- Query Input -->
+          <div class="form-group">
+            <label class="form-label">💬 Your Query</label>
+            <textarea
+              id="queryInput"
+              class="form-textarea"
+              placeholder="Describe what you want to visualize&#10;Example: Click column names below to build your query"
+              oninput="handleQueryInput()"
+            ></textarea>
+
+            <!-- AI Suggestions -->
+            <div
+              id="aiSuggestions"
+              class="ai-suggestions"
+              style="display: none"
+            >
+              <div class="ai-suggestions-header">
+                <span class="icon">✨</span>
+                <span>AI Recommendations</span>
+              </div>
+              <div id="suggestionsContainer"></div>
+            </div>
+          </div>
+
+          <!-- Available Dataset Columns -->
+          <div class="form-group">
+            <label class="form-label">📋 Available Dataset Columns</label>
+            <p
+              style="font-size: 0.8em; color: var(--gray); margin-bottom: 12px"
+            >
+              Click any column to add to your query
+            </p>
+            <div id="datasetColumnsContainer">
+              <div class="dataset-loading">
+                <div style="font-size: 1.5em; margin-bottom: 8px">⏳</div>
+                <div>Loading dataset information...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Title (Optional) -->
+          <div class="form-group">
+            <label class="form-label">✏️ Custom Title (Optional)</label>
+            <input
+              type="text"
+              id="chartTitle"
+              class="form-input"
+              placeholder="Auto-generated if left blank"
+            />
+          </div>
         </div>
 
-        <div class="content">
-            <!-- Dataset Selector Section -->
-            <div class="form-section">
-                <h2>📁 Select Dataset</h2>
-                <div class="form-group">
-                    <label for="datasetSelector">Choose which dataset to work with:</label>
-                    <select id="datasetSelector" onchange="handleDatasetChange()">
-                        <option value="">Loading datasets...</option>
-                    </select>
-                </div>
-                <div id="datasetInfo" style="margin-top: 15px; padding: 15px; background: #e7f3ff; border-radius: 8px; display: none;">
-                    <h4 style="color: #004085; margin-bottom: 10px;">Current Dataset Info:</h4>
-                    <p id="datasetDetails" style="color: #004085; margin: 0;"></p>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h2>1. Enter Your Query</h2>
-                <div class="form-group">
-                    <label for="queryInput">What would you like to visualize?</label>
-                    <textarea id="queryInput" placeholder="Example: Show me the top 5 departments by total sales"></textarea>
-                </div>
-
-                <div class="example-queries">
-                    <h3>💡 Example Queries:</h3>
-                    <button class="example-btn" onclick="setQuery('Show me the top 5 departments by total sales')">Top 5 departments by sales</button>
-                    <button class="example-btn" onclick="setQuery('Compare revenue across all departments')">Compare revenue by department</button>
-                    <button class="example-btn" onclick="setQuery('Show monthly sales trend for 2024')">Monthly sales trend</button>
-                    <button class="example-btn" onclick="setQuery('Display the distribution of product categories')">Product distribution</button>
-                    <button class="example-btn" onclick="setQuery('Show me customer count by region')">Customers by region</button>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h2>2. Choose Chart Type</h2>
-                <div class="chart-types">
-                    <div class="chart-type-option" data-type="bar" onclick="selectChartType('bar')">
-                        <div class="icon">📊</div>
-                        <div>Bar Chart</div>
-                    </div>
-                    <div class="chart-type-option" data-type="line" onclick="selectChartType('line')">
-                        <div class="icon">📈</div>
-                        <div>Line Chart</div>
-                    </div>
-                    <div class="chart-type-option" data-type="pie" onclick="selectChartType('pie')">
-                        <div class="icon">🥧</div>
-                        <div>Pie Chart</div>
-                    </div>
-                    <div class="chart-type-option" data-type="scatter" onclick="selectChartType('scatter')">
-                        <div class="icon">⚫</div>
-                        <div>Scatter Plot</div>
-                    </div>
-                    <div class="chart-type-option" data-type="area" onclick="selectChartType('area')">
-                        <div class="icon">🗻</div>
-                        <div>Area Chart</div>
-                    </div>
-                    <div class="chart-type-option selected" data-type="auto" onclick="selectChartType('auto')">
-                        <div class="icon">✨</div>
-                        <div>Auto Select</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h2>3. Chart Details (Optional)</h2>
-                <div class="form-group">
-                    <label for="chartTitle">Chart Title</label>
-                    <input type="text" id="chartTitle" placeholder="Leave blank for auto-generated title">
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn-generate" onclick="generateChart()">🎨 Generate Chart</button>
-                <button class="btn-clear" onclick="clearForm()">🗑️ Clear</button>
-            </div>
-
-            <div id="messageArea"></div>
-
-            <div class="preview-section" id="previewSection">
-                <h2>Chart Preview</h2>
-                <div id="chartContainer" class="chart-container"></div>
-                
-                <!-- Processing Details Section -->
-                <div class="processing-details" id="processingDetails" style="display: none;">
-                    <div class="processing-header" onclick="toggleProcessingDetails()">
-                        <span>🔍 Processing Details & Parameters</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="processing-content" id="processingContent">
-                        <!-- Logs will be inserted here -->
-                    </div>
-                </div>
-                
-                <div class="download-buttons">
-                    <button class="btn-download" onclick="downloadChart('png')">💾 Download PNG</button>
-                    <button class="btn-download" onclick="downloadChart('svg')">💾 Download SVG</button>
-                    <button class="btn-download" onclick="saveToSession()">📋 Save to Session</button>
-                </div>
-            </div>
+        <!-- Action Panel -->
+        <div class="action-panel">
+          <button class="btn btn-generate" onclick="generateChart()">
+            ✨ Generate Chart
+          </button>
+          <button class="btn btn-clear" onclick="clearForm()">🗑️</button>
         </div>
+      </div>
+
+      <!-- Right Panel: Preview -->
+      <div class="right-panel">
+        <!-- Message Area -->
+        <div id="messageArea"></div>
+
+        <!-- Preview Tabs -->
+        <div class="preview-tabs">
+          <button
+            class="tab-btn active"
+            data-tab="chart"
+            onclick="switchTab('chart')"
+          >
+            📊 Chart Preview
+          </button>
+          <button class="tab-btn" data-tab="data" onclick="switchTab('data')">
+            📋 Data Preview
+          </button>
+          <button
+            class="tab-btn"
+            data-tab="compare"
+            onclick="switchTab('compare')"
+          >
+            ⚖️ Compare Charts
+          </button>
+        </div>
+
+        <!-- Chart Tab -->
+        <div id="chartTab" class="preview-card active">
+          <div class="card-header">
+            <div class="card-title" id="chartCardTitle">Chart Preview</div>
+            <div class="card-actions">
+              <button
+                class="icon-btn"
+                onclick="downloadChart('png')"
+                title="Download PNG"
+              >
+                💾
+              </button>
+              <button
+                class="icon-btn"
+                onclick="downloadChart('svg')"
+                title="Download SVG"
+              >
+                📄
+              </button>
+              <button
+                class="icon-btn"
+                onclick="addToComparison()"
+                title="Add to Comparison"
+              >
+                ➕
+              </button>
+              <button
+                class="icon-btn"
+                onclick="saveToSession()"
+                title="Save to Session"
+              >
+                💼
+              </button>
+            </div>
+          </div>
+          <div class="card-body" id="chartPreviewBody">
+            <div class="empty-state">
+              <div class="empty-state-icon">📊</div>
+              <h3>Ready to Create</h3>
+              <p>
+                Enter your query and click "Generate Chart" to see your
+                visualization
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Tab -->
+        <div id="dataTab" class="preview-card">
+          <div class="card-header">
+            <div class="card-title">Data Preview</div>
+            <div class="card-actions">
+              <button
+                class="icon-btn"
+                onclick="refreshDataPreview()"
+                title="Refresh"
+              >
+                🔄
+              </button>
+              <button
+                class="icon-btn"
+                onclick="exportDataPreview()"
+                title="Export CSV"
+              >
+                📥
+              </button>
+            </div>
+          </div>
+          <div class="card-body" id="dataPreviewBody">
+            <div class="empty-state">
+              <div class="empty-state-icon">📋</div>
+              <h3>No Data Yet</h3>
+              <p>Generate a chart first to see the underlying data</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compare Tab -->
+        <div id="compareTab" class="preview-card">
+          <div class="card-header">
+            <div class="card-title">Chart Comparison</div>
+            <div class="card-actions">
+              <button
+                class="icon-btn"
+                onclick="clearComparison()"
+                title="Clear All"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="comparisonGrid" class="comparison-grid">
+              <div class="empty-state">
+                <div class="empty-state-icon">⚖️</div>
+                <h3>Start Comparing</h3>
+                <p>
+                  Generate charts and click "Add to Comparison" to compare
+                  side-by-side
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
-        let selectedChartType = 'auto';
-        let currentChartData = null;
+      let currentChartData = null;
+      let currentDataPreview = null;
+      let comparisonCharts = [];
+      let selectedTemplate = null;
+      let aiSuggestionsCache = [];
 
-        function setQuery(query) {
-            document.getElementById('queryInput').value = query;
+      // Initialize
+      window.addEventListener("load", async () => {
+        try {
+          const response = await fetch("/api/check-session");
+          const data = await response.json();
+
+          if (!data.authenticated) {
+            window.location.href = "/";
+          } else {
+            await loadAvailableDatasets();
+          }
+        } catch (error) {
+          console.error("Session check failed:", error);
+          window.location.href = "/";
+        }
+      });
+
+      // Dataset Management
+      async function loadAvailableDatasets() {
+        try {
+          const response = await fetch("/api/get-available-datasets");
+          const result = await response.json();
+
+          if (result.success) {
+            const selector = document.getElementById("datasetSelector");
+            selector.innerHTML = "";
+
+            const datasets = result.datasets;
+            const currentDataset = result.current_dataset;
+
+            for (const [datasetName, datasetInfo] of Object.entries(datasets)) {
+              const option = document.createElement("option");
+              option.value = datasetName;
+              option.textContent = `${datasetInfo.display_name} (${datasetInfo.table_count} tables)`;
+
+              if (datasetName === currentDataset) {
+                option.selected = true;
+              }
+
+              selector.appendChild(option);
+            }
+
+            updateDatasetBadge(datasets[currentDataset]);
+          }
+        } catch (error) {
+          console.error("Error loading datasets:", error);
+          showMessage("Failed to load datasets", "error");
+        }
+      }
+
+      async function handleDatasetChange() {
+        const selector = document.getElementById("datasetSelector");
+        const selectedDataset = selector.value;
+
+        if (!selectedDataset) return;
+
+        try {
+          const response = await fetch("/api/switch-dataset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dataset_name: selectedDataset }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showMessage(`Switched to ${selectedDataset}`, "success");
+
+            const datasetsResponse = await fetch("/api/get-available-datasets");
+            const datasetsResult = await datasetsResponse.json();
+
+            if (datasetsResult.success) {
+              updateDatasetBadge(datasetsResult.datasets[selectedDataset]);
+            }
+
+            clearForm();
+          } else {
+            showMessage("Failed to switch dataset", "error");
+          }
+        } catch (error) {
+          console.error("Error switching dataset:", error);
+          showMessage("Error switching dataset", "error");
+        }
+      }
+
+      function updateDatasetBadge(datasetInfo) {
+        const badge = document.getElementById("datasetBadge");
+        const name = document.getElementById("datasetName");
+
+        if (datasetInfo) {
+          name.textContent = datasetInfo.display_name;
+          badge.style.display = "inline-flex";
+        }
+      }
+
+      // Query Input Handlers
+      function handleQueryInput() {
+        const query = document.getElementById("queryInput").value.trim();
+
+        if (query.length > 10) {
+          // Show AI suggestions based on query
+          generateAISuggestions(query);
+        } else {
+          document.getElementById("aiSuggestions").style.display = "none";
+        }
+      }
+
+      function generateAISuggestions(query) {
+        const suggestions = [];
+        const queryLower = query.toLowerCase();
+
+        if (queryLower.includes("top") || queryLower.includes("best")) {
+          suggestions.push({ type: "bar", text: "Use Bar Chart for Rankings" });
+        }
+        if (
+          queryLower.includes("trend") ||
+          queryLower.includes("over time") ||
+          queryLower.includes("monthly")
+        ) {
+          suggestions.push({ type: "line", text: "Use Line Chart for Trends" });
+        }
+        if (
+          queryLower.includes("distribution") ||
+          queryLower.includes("percentage") ||
+          queryLower.includes("share")
+        ) {
+          suggestions.push({
+            type: "pie",
+            text: "Use Pie Chart for Distribution",
+          });
+        }
+        if (
+          queryLower.includes("compare") ||
+          queryLower.includes("versus") ||
+          queryLower.includes("vs")
+        ) {
+          suggestions.push({
+            type: "bar",
+            text: "Use Bar Chart for Comparison",
+          });
         }
 
-        function selectChartType(type) {
-            selectedChartType = type;
-            document.querySelectorAll('.chart-type-option').forEach(option => {
-                option.classList.remove('selected');
+        if (suggestions.length > 0) {
+          const container = document.getElementById("suggestionsContainer");
+          container.innerHTML = suggestions
+            .map((s) => `<span class="suggestion-chip">${s.text}</span>`)
+            .join("");
+          document.getElementById("aiSuggestions").style.display = "block";
+        }
+      }
+
+      // Load Dataset Information
+      async function loadDatasetInfo() {
+        try {
+          const response = await fetch("/api/get-dataset-info");
+          const data = await response.json();
+
+          if (data.success && data.dataset_info) {
+            displayDatasetInfo(data.dataset_info);
+          } else {
+            document.getElementById("datasetColumnsContainer").innerHTML =
+              '<div class="dataset-error">Failed to load dataset information</div>';
+          }
+        } catch (error) {
+          console.error("Error loading dataset info:", error);
+          document.getElementById("datasetColumnsContainer").innerHTML =
+            '<div class="dataset-error">Error loading dataset information</div>';
+        }
+      }
+
+      // Display Dataset Information
+      function displayDatasetInfo(datasetInfo) {
+        const container = document.getElementById("datasetColumnsContainer");
+        let html = "";
+
+        datasetInfo.tables.forEach((table) => {
+          html += `
+            <div class="dataset-section">
+              <h4>
+                <span>📊</span> ${table.display_name}
+              </h4>
+              
+              <div class="table-info">
+                <span class="info-badge">📝 ${table.row_count.toLocaleString()} rows</span>
+                <span class="info-badge">📋 ${
+                  table.all_columns.length
+                } columns</span>
+              </div>
+          `;
+
+          // Numeric columns
+          if (table.numeric_columns && table.numeric_columns.length > 0) {
+            html += `
+              <div class="columns-group">
+                <h5><span class="type-icon">🔢</span> Numeric (${table.numeric_columns.length})</h5>
+                <div class="column-tags">
+            `;
+            table.numeric_columns.forEach((col) => {
+              html += `<span class="column-tag numeric" onclick="copyToQuery('${col}')" title="Click to add to query">${col}</span>`;
             });
-            document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+            html += `
+                </div>
+              </div>
+            `;
+          }
+
+          // Text columns
+          if (table.text_columns && table.text_columns.length > 0) {
+            html += `
+              <div class="columns-group">
+                <h5><span class="type-icon">📝</span> Text (${table.text_columns.length})</h5>
+                <div class="column-tags">
+            `;
+            table.text_columns.forEach((col) => {
+              html += `<span class="column-tag text" onclick="copyToQuery('${col}')" title="Click to add to query">${col}</span>`;
+            });
+            html += `
+                </div>
+              </div>
+            `;
+          }
+
+          // Date columns
+          if (table.date_columns && table.date_columns.length > 0) {
+            html += `
+              <div class="columns-group">
+                <h5><span class="type-icon">📅</span> Date (${table.date_columns.length})</h5>
+                <div class="column-tags">
+            `;
+            table.date_columns.forEach((col) => {
+              html += `<span class="column-tag date" onclick="copyToQuery('${col}')" title="Click to add to query">${col}</span>`;
+            });
+            html += `
+                </div>
+              </div>
+            `;
+          }
+
+          html += "</div>";
+        });
+
+        container.innerHTML = html;
+      }
+
+      // Copy column name to query input
+      function copyToQuery(columnName) {
+        const queryInput = document.getElementById("queryInput");
+        const currentQuery = queryInput.value.trim();
+
+        // Add column name to existing query or start new query
+        if (currentQuery) {
+          queryInput.value = currentQuery + " " + columnName;
+        } else {
+          queryInput.value = columnName;
         }
 
-        function clearForm() {
-            document.getElementById('queryInput').value = '';
-            document.getElementById('chartTitle').value = '';
-            selectChartType('auto');
-            document.getElementById('previewSection').classList.remove('show');
-            document.getElementById('processingDetails').style.display = 'none';
-            document.getElementById('messageArea').innerHTML = '';
+        queryInput.focus();
+
+        // Show feedback
+        showMessage(`Added "${columnName}" to query`, "success");
+      }
+
+      // Chart Generation
+      async function generateChart() {
+        const query = document.getElementById("queryInput").value.trim();
+        if (!query) {
+          showMessage("Please enter a query", "error");
+          return;
         }
 
-        function toggleProcessingDetails() {
-            const content = document.getElementById('processingContent');
-            const header = document.querySelector('.processing-header');
-            
-            content.classList.toggle('collapsed');
-            header.classList.toggle('collapsed');
-        }
+        const chartTitle = document.getElementById("chartTitle").value.trim();
 
-        function formatLogLine(line) {
-            // Classify log lines by emoji/content and apply styling
-            if (line.includes('❌') || line.includes('Error') || line.includes('Failed')) {
-                return `<div class="log-line error">${line}</div>`;
-            } else if (line.includes('⚠️') || line.includes('Warning')) {
-                return `<div class="log-line warning">${line}</div>`;
-            } else if (line.includes('✅') || line.includes('Success') || line.includes('Selected')) {
-                return `<div class="log-line success">${line}</div>`;
-            } else if (line.includes('📊') || line.includes('📋') || line.includes('🔍') || line.includes('🎯')) {
-                return `<div class="log-line info">${line}</div>`;
-            } else if (line.trim()) {
-                return `<div class="log-line">${line}</div>`;
-            }
-            return '';
-        }
-
-        function displayProcessingLogs(logs, entities) {
-            const processingDetails = document.getElementById('processingDetails');
-            const processingContent = document.getElementById('processingContent');
-            
-            if (!logs && !entities) {
-                processingDetails.style.display = 'none';
-                return;
-            }
-            
-            let htmlContent = '';
-            
-            // Display logs
-            if (logs) {
-                const logLines = logs.split('\n');
-                logLines.forEach(line => {
-                    htmlContent += formatLogLine(line);
-                });
-            }
-            
-            // Display extracted entities if available
-            if (entities && Object.keys(entities).length > 0) {
-                htmlContent += '<div class="entities-section">';
-                htmlContent += '<h4>📝 Extracted Entities from Query:</h4>';
-                
-                for (const [entityType, values] of Object.entries(entities)) {
-                    if (values && values.length > 0) {
-                        values.forEach(value => {
-                            htmlContent += `<span class="entity-item">
-                                <span class="entity-type">${entityType}:</span>
-                                <span class="entity-value">${value}</span>
-                            </span>`;
-                        });
-                    }
-                }
-                
-                htmlContent += '</div>';
-            }
-            
-            processingContent.innerHTML = htmlContent;
-            processingDetails.style.display = 'block';
-            
-            // Expand by default
-            processingContent.classList.remove('collapsed');
-            document.querySelector('.processing-header').classList.remove('collapsed');
-        }
-
-        async function generateChart() {
-            const query = document.getElementById('queryInput').value.trim();
-            if (!query) {
-                showMessage('Please enter a query', 'error');
-                return;
-            }
-
-            const chartTitle = document.getElementById('chartTitle').value.trim();
-
-            // Show loading
-            document.getElementById('previewSection').classList.add('show');
-            document.getElementById('chartContainer').innerHTML = `
+        // Show loading in chart preview
+        switchTab("chart");
+        const chartBody = document.getElementById("chartPreviewBody");
+        chartBody.innerHTML = `
                 <div class="loading">
                     <div class="loading-spinner"></div>
-                    <p>Generating your chart...</p>
+                    <div class="loading-text">Analyzing query and generating chart...</div>
                 </div>
             `;
 
-            try {
-                const response = await fetch('/api/generate-single-chart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: query,
-                        chart_type: selectedChartType,
-                        title: chartTitle || null
-                    })
-                });
+        try {
+          const response = await fetch("/api/generate-single-chart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              query: query,
+              chart_type: "auto",
+              title: chartTitle || null,
+            }),
+          });
 
-                const result = await response.json();
+          const result = await response.json();
 
-                if (response.ok && result.success) {
-                    currentChartData = result.chart_data;
-                    renderChart(result.chart_data);
-                    showMessage('Chart generated successfully!', 'success');
-                    
-                    // Display processing logs and entities
-                    displayProcessingLogs(result.processing_logs, result.extracted_entities);
-                } else {
-                    throw new Error(result.error || 'Failed to generate chart');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage(`Error: ${error.message}`, 'error');
-                document.getElementById('previewSection').classList.remove('show');
-                document.getElementById('processingDetails').style.display = 'none';
-            }
-        }
+          console.log("📊 Chart Generation Response:", result);
 
-        function renderChart(chartData) {
-            const container = document.getElementById('chartContainer');
-            container.innerHTML = '';
-            
-            const config = {
-                responsive: true,
-                displayModeBar: true,
-                modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
-                displaylogo: false
-            };
+          if (response.ok && result.success) {
+            console.log("✅ Chart data received:", result.chart_data);
+            currentChartData = result.chart_data;
+            renderChart(result.chart_data, "chartPreviewBody");
 
-            Plotly.newPlot(container, chartData.data, chartData.layout, config);
-        }
-
-        async function downloadChart(format) {
-            if (!currentChartData) {
-                showMessage('No chart to download', 'error');
-                return;
-            }
-
-            const container = document.getElementById('chartContainer');
-            const filename = `chart_${Date.now()}`;
-
-            if (format === 'png') {
-                Plotly.downloadImage(container, {
-                    format: 'png',
-                    width: 1200,
-                    height: 800,
-                    filename: filename
-                });
-            } else if (format === 'svg') {
-                Plotly.downloadImage(container, {
-                    format: 'svg',
-                    width: 1200,
-                    height: 800,
-                    filename: filename
-                });
-            }
-
-            showMessage(`Chart downloaded as ${format.toUpperCase()}`, 'success');
-        }
-
-        async function saveToSession() {
-            if (!currentChartData) {
-                showMessage('No chart to save', 'error');
-                return;
-            }
-
-            try {
-                const query = document.getElementById('queryInput').value.trim();
-                const response = await fetch('/api/save-chart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: query,
-                        chart_data: currentChartData
-                    })
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    showMessage('Chart saved to your session! View it in the Interactive Dashboard.', 'success');
-                } else {
-                    throw new Error(result.error || 'Failed to save chart');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage(`Error saving chart: ${error.message}`, 'error');
-            }
-        }
-
-        function showMessage(message, type) {
-            const messageArea = document.getElementById('messageArea');
-            const className = type === 'error' ? 'error-message' : 'success-message';
-            messageArea.innerHTML = `<div class="${className}">${message}</div>`;
-            
-            // Auto-hide success messages after 5 seconds
-            if (type === 'success') {
-                setTimeout(() => {
-                    messageArea.innerHTML = '';
-                }, 5000);
-            }
-        }
-
-        // Load available datasets
-        async function loadAvailableDatasets() {
-            console.log('🔄 Loading available datasets...');
-            try {
-                const response = await fetch('/api/get-available-datasets');
-                const result = await response.json();
-                
-                console.log('📊 Datasets response:', result);
-                
-                if (result.success) {
-                    const selector = document.getElementById('datasetSelector');
-                    
-                    if (!selector) {
-                        console.error('❌ Dataset selector element not found!');
-                        return;
-                    }
-                    
-                    selector.innerHTML = '';
-                    
-                    const datasets = result.datasets;
-                    const currentDataset = result.current_dataset;
-                    
-                    console.log(`✅ Found ${Object.keys(datasets).length} datasets`);
-                    console.log(`📍 Current dataset: ${currentDataset}`);
-                    
-                    // Populate dropdown
-                    for (const [datasetName, datasetInfo] of Object.entries(datasets)) {
-                        const option = document.createElement('option');
-                        option.value = datasetName;
-                        option.textContent = `${datasetInfo.display_name} (${datasetInfo.table_count} tables)`;
-                        
-                        if (datasetName === currentDataset) {
-                            option.selected = true;
-                        }
-                        
-                        selector.appendChild(option);
-                        console.log(`  ✓ Added dataset: ${datasetName}`);
-                    }
-                    
-                    // Show dataset info
-                    updateDatasetInfo(currentDataset, datasets[currentDataset]);
-                    showMessage(`✅ Loaded ${Object.keys(datasets).length} dataset(s)`, 'success');
-                } else {
-                    console.error('❌ Failed to load datasets:', result.error);
-                    showMessage('Failed to load datasets', 'error');
-                }
-            } catch (error) {
-                console.error('❌ Error loading datasets:', error);
-                showMessage('Error loading datasets', 'error');
-            }
-        }
-
-        // Handle dataset change
-        async function handleDatasetChange() {
-            const selector = document.getElementById('datasetSelector');
-            const selectedDataset = selector.value;
-            
-            if (!selectedDataset) return;
-            
-            try {
-                showMessage('Switching dataset...', 'success');
-                
-                const response = await fetch('/api/switch-dataset', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        dataset_name: selectedDataset
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showMessage(`Successfully switched to ${selectedDataset}`, 'success');
-                    
-                    // Reload dataset info
-                    const datasetsResponse = await fetch('/api/get-available-datasets');
-                    const datasetsResult = await datasetsResponse.json();
-                    
-                    if (datasetsResult.success) {
-                        updateDatasetInfo(selectedDataset, datasetsResult.datasets[selectedDataset]);
-                    }
-                    
-                    // Clear any existing chart
-                    currentChartData = null;
-                    document.getElementById('previewSection').classList.remove('show');
-                    document.getElementById('queryInput').value = '';
-                } else {
-                    showMessage(`Failed to switch dataset: ${result.message}`, 'error');
-                }
-            } catch (error) {
-                console.error('Error switching dataset:', error);
-                showMessage('Error switching dataset', 'error');
-            }
-        }
-
-        // Update dataset info display
-        function updateDatasetInfo(datasetName, datasetInfo) {
-            const infoDiv = document.getElementById('datasetInfo');
-            const detailsP = document.getElementById('datasetDetails');
-            
-            if (datasetInfo) {
-                const tables = datasetInfo.tables.join(', ');
-                detailsP.innerHTML = `
-                    <strong>Dataset:</strong> ${datasetInfo.display_name}<br>
-                    <strong>Tables:</strong> ${tables}<br>
-                    <strong>Total Tables:</strong> ${datasetInfo.table_count}
-                `;
-                infoDiv.style.display = 'block';
+            // Update data preview
+            if (result.data_preview) {
+              console.log("📋 Data preview received:", result.data_preview);
+              currentDataPreview = result.data_preview;
+              updateDataPreview(result.data_preview);
             } else {
-                infoDiv.style.display = 'none';
+              console.log("⚠️ No data preview in response");
             }
+
+            document.getElementById("chartCardTitle").textContent =
+              chartTitle ||
+              result.chart_data.layout.title.text ||
+              "Chart Preview";
+
+            showMessage("Chart generated successfully!", "success");
+          } else {
+            console.error("❌ Chart generation failed:", result.error);
+            throw new Error(result.error || "Failed to generate chart");
+          }
+        } catch (error) {
+          console.error("❌ Error generating chart:", error);
+          showMessage(error.message, "error");
+          chartBody.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>Generation Failed</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+        }
+      }
+
+      function renderChart(chartData, containerId) {
+        console.log("🎨 Rendering chart in container:", containerId);
+        console.log("📊 Chart data structure:", {
+          hasData: !!chartData.data,
+          hasLayout: !!chartData.layout,
+          dataLength: chartData.data ? chartData.data.length : 0,
+        });
+
+        const container = document.getElementById(containerId);
+        if (!container) {
+          console.error("❌ Container not found:", containerId);
+          return;
         }
 
-        // Check session on load
-        window.addEventListener('load', async () => {
-            console.log('🚀 Chart Creator page loaded...');
-            try {
-                const response = await fetch('/api/check-session');
-                const data = await response.json();
-                
-                console.log('🔐 Session check:', data);
-                
-                if (!data.authenticated) {
-                    console.log('❌ Not authenticated, redirecting to login...');
-                    window.location.href = '/';
-                } else {
-                    console.log('✅ Authenticated, loading datasets...');
-                    // Load available datasets
-                    await loadAvailableDatasets();
-                }
-            } catch (error) {
-                console.error('❌ Session check failed:', error);
-                window.location.href = '/';
-            }
+        container.innerHTML =
+          '<div style="min-height: 450px;" id="' +
+          containerId +
+          '_plot"></div>';
+
+        const config = {
+          responsive: true,
+          displayModeBar: true,
+          modeBarButtonsToRemove: ["pan2d", "lasso2d", "select2d"],
+          displaylogo: false,
+        };
+
+        try {
+          Plotly.newPlot(
+            containerId + "_plot",
+            chartData.data,
+            chartData.layout,
+            config
+          );
+          console.log("✅ Chart rendered successfully");
+        } catch (error) {
+          console.error("❌ Error rendering Plotly chart:", error);
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">❌</div>
+              <h3>Rendering Error</h3>
+              <p>Failed to render chart: ${error.message}</p>
+            </div>
+          `;
+        }
+      }
+
+      // Data Preview
+      async function updateDataPreview(dataPreview) {
+        if (!dataPreview || !dataPreview.columns || !dataPreview.data) {
+          return;
+        }
+
+        const dataBody = document.getElementById("dataPreviewBody");
+
+        // Create stats
+        const stats = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${dataPreview.data.length}</div>
+                        <div class="stat-label">Rows</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${
+                          dataPreview.columns.length
+                        }</div>
+                        <div class="stat-label">Columns</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${
+                          dataPreview.data.length * dataPreview.columns.length
+                        }</div>
+                        <div class="stat-label">Cells</div>
+                    </div>
+                </div>
+            `;
+
+        // Create table
+        let tableHTML =
+          '<div class="data-table-wrapper"><table class="data-table"><thead><tr>';
+
+        dataPreview.columns.forEach((col) => {
+          tableHTML += `<th>${col}</th>`;
         });
+        tableHTML += "</tr></thead><tbody>";
+
+        dataPreview.data.forEach((row) => {
+          tableHTML += "<tr>";
+          dataPreview.columns.forEach((col) => {
+            tableHTML += `<td>${
+              row[col] !== null && row[col] !== undefined ? row[col] : "-"
+            }</td>`;
+          });
+          tableHTML += "</tr>";
+        });
+
+        tableHTML += "</tbody></table></div>";
+
+        dataBody.innerHTML = stats + tableHTML;
+      }
+
+      async function refreshDataPreview() {
+        if (currentDataPreview) {
+          showMessage("Data refreshed", "info");
+        } else {
+          showMessage("Generate a chart first", "error");
+        }
+      }
+
+      async function exportDataPreview() {
+        if (!currentDataPreview) {
+          showMessage("No data to export", "error");
+          return;
+        }
+
+        // Convert to CSV
+        const csv = [
+          currentDataPreview.columns.join(","),
+          ...currentDataPreview.data.map((row) =>
+            currentDataPreview.columns.map((col) => row[col]).join(",")
+          ),
+        ].join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `data_export_${Date.now()}.csv`;
+        a.click();
+
+        showMessage("Data exported successfully", "success");
+      }
+
+      // Multi-Chart Comparison
+      function addToComparison() {
+        if (!currentChartData) {
+          showMessage("No chart to add", "error");
+          return;
+        }
+
+        if (comparisonCharts.length >= 3) {
+          showMessage("Maximum 3 charts for comparison", "error");
+          return;
+        }
+
+        const chartTitle =
+          document.getElementById("chartCardTitle").textContent;
+        comparisonCharts.push({
+          data: currentChartData,
+          title: chartTitle,
+          id: Date.now(),
+        });
+
+        updateComparisonView();
+        showMessage("Chart added to comparison", "success");
+      }
+
+      function updateComparisonView() {
+        const grid = document.getElementById("comparisonGrid");
+
+        if (comparisonCharts.length === 0) {
+          grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚖️</div>
+                        <h3>Start Comparing</h3>
+                        <p>Generate charts and click "Add to Comparison" to compare side-by-side</p>
+                    </div>
+                `;
+          return;
+        }
+
+        grid.innerHTML = comparisonCharts
+          .map(
+            (chart) => `
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <div class="chart-title">${chart.title}</div>
+                        <button class="remove-chart-btn" onclick="removeFromComparison(${chart.id})">×</button>
+                    </div>
+                    <div class="chart-container" id="compare_${chart.id}"></div>
+                </div>
+            `
+          )
+          .join("");
+
+        // Render charts
+        comparisonCharts.forEach((chart) => {
+          const container = document.getElementById(`compare_${chart.id}`);
+          const config = {
+            responsive: true,
+            displayModeBar: false,
+            displaylogo: false,
+          };
+          Plotly.newPlot(container, chart.data.data, chart.data.layout, config);
+        });
+      }
+
+      function removeFromComparison(chartId) {
+        comparisonCharts = comparisonCharts.filter((c) => c.id !== chartId);
+        updateComparisonView();
+        showMessage("Chart removed from comparison", "info");
+      }
+
+      function clearComparison() {
+        if (comparisonCharts.length === 0) return;
+
+        if (confirm("Clear all comparison charts?")) {
+          comparisonCharts = [];
+          updateComparisonView();
+          showMessage("Comparison cleared", "info");
+        }
+      }
+
+      // Tab Switching
+      function switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll(".tab-btn").forEach((btn) => {
+          btn.classList.remove("active");
+          if (btn.dataset.tab === tabName) {
+            btn.classList.add("active");
+          }
+        });
+
+        // Update tab content
+        document.querySelectorAll(".preview-card").forEach((card) => {
+          card.classList.remove("active");
+        });
+
+        const activeCard = {
+          chart: "chartTab",
+          data: "dataTab",
+          compare: "compareTab",
+        }[tabName];
+
+        document.getElementById(activeCard).classList.add("active");
+      }
+
+      // Download & Save
+      async function downloadChart(format) {
+        if (!currentChartData) {
+          showMessage("No chart to download", "error");
+          return;
+        }
+
+        const container = document.getElementById("chartPreviewBody_plot");
+        const filename = `chart_${Date.now()}`;
+
+        Plotly.downloadImage(container, {
+          format: format,
+          width: 1200,
+          height: 800,
+          filename: filename,
+        });
+
+        showMessage(`Chart downloaded as ${format.toUpperCase()}`, "success");
+      }
+
+      async function saveToSession() {
+        if (!currentChartData) {
+          showMessage("No chart to save", "error");
+          return;
+        }
+
+        try {
+          const query = document.getElementById("queryInput").value.trim();
+          const response = await fetch("/api/save-chart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              query: query,
+              chart_data: currentChartData,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            showMessage(
+              "Chart saved to session! View in Dashboard.",
+              "success"
+            );
+          } else {
+            throw new Error(result.error || "Failed to save chart");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showMessage("Error saving chart", "error");
+        }
+      }
+
+      // Clear Form
+      function clearForm() {
+        document.getElementById("queryInput").value = "";
+        document.getElementById("chartTitle").value = "";
+        document.getElementById("aiSuggestions").style.display = "none";
+
+        document.querySelectorAll(".template-card").forEach((card) => {
+          card.classList.remove("active");
+        });
+
+        selectedTemplate = null;
+        currentChartData = null;
+        currentDataPreview = null;
+
+        // Reset chart preview
+        document.getElementById("chartPreviewBody").innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <h3>Ready to Create</h3>
+                    <p>Enter your query and click "Generate Chart" to see your visualization</p>
+                </div>
+            `;
+
+        // Reset data preview
+        document.getElementById("dataPreviewBody").innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>No Data Yet</h3>
+                    <p>Generate a chart first to see the underlying data</p>
+                </div>
+            `;
+
+        document.getElementById("messageArea").innerHTML = "";
+      }
+
+      // Message Display
+      function showMessage(message, type) {
+        const messageArea = document.getElementById("messageArea");
+        const iconMap = {
+          success: "✅",
+          error: "❌",
+          info: "ℹ️",
+        };
+
+        messageArea.innerHTML = `
+                <div class="message ${type}">
+                    <span>${iconMap[type] || "ℹ️"}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+
+        if (type === "success" || type === "info") {
+          setTimeout(() => {
+            messageArea.innerHTML = "";
+          }, 5000);
+        }
+      }
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load dataset columns information
+        loadDatasetInfo();
+      });
     </script>
-</body>
+  </body>
 </html>

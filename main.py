@@ -1652,10 +1652,21 @@ async def generate_single_chart(
             print(log_msg)
             log_buffer.write(log_msg + "\n")
         
+        print(f"\n{'='*60}")
+        print(f"🎨 CHART CREATOR - Processing Query: {modified_query}")
+        print(f"{'='*60}\n")
+        
         # Capture stdout during processing
         with redirect_stdout(log_buffer):
             # Process query using NLU pipeline
             result = ds.nlu_pipeline.process_query(modified_query)
+        
+        # Print captured logs to terminal for debugging
+        captured_output = log_buffer.getvalue()
+        if captured_output:
+            print("📋 Captured Processing Logs:")
+            print(captured_output)
+            print("="*60)
         
         if not result or not result[0]:
             return JSONResponse({
@@ -1673,6 +1684,27 @@ async def generate_single_chart(
             fig.update_layout(title=title)
         
         if fig:
+            # Helper function to convert numpy/pandas types to native Python types
+            def convert_to_json_serializable(obj):
+                """Convert numpy/pandas types to JSON serializable Python types"""
+                import numpy as np
+                import pandas as pd
+                
+                if isinstance(obj, (np.integer, np.int64, np.int32)):
+                    return int(obj)
+                elif isinstance(obj, (np.floating, np.float64, np.float32)):
+                    return float(obj)
+                elif isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                elif isinstance(obj, pd.Timestamp):
+                    return obj.isoformat()
+                elif isinstance(obj, (pd.Series, pd.Index)):
+                    return obj.tolist()
+                elif pd.isna(obj):
+                    return None
+                else:
+                    return obj
+            
             # Convert Plotly figure to JSON-compatible format
             import plotly.io as pio
             chart_json = pio.to_json(fig)
@@ -1684,9 +1716,63 @@ async def generate_single_chart(
             # Get processing logs
             processing_logs = log_buffer.getvalue()
             
+            # Extract data preview from the figure
+            data_preview = None
+            try:
+                # Get the data from the Plotly figure
+                if fig.data and len(fig.data) > 0:
+                    trace = fig.data[0]
+                    
+                    # Extract columns and data based on chart type
+                    columns = []
+                    rows = []
+                    
+                    # Handle different chart types
+                    if hasattr(trace, 'x') and hasattr(trace, 'y'):
+                        # Bar, Line, Scatter charts
+                        x_data = [convert_to_json_serializable(x) for x in trace.x] if trace.x is not None else []
+                        y_data = [convert_to_json_serializable(y) for y in trace.y] if trace.y is not None else []
+                        
+                        # Get axis titles or use defaults
+                        x_label = fig.layout.xaxis.title.text if fig.layout.xaxis.title else 'X'
+                        y_label = fig.layout.yaxis.title.text if fig.layout.yaxis.title else 'Y'
+                        
+                        columns = [str(x_label), str(y_label)]
+                        
+                        # Create rows with converted values
+                        for i in range(min(len(x_data), len(y_data))):
+                            rows.append({
+                                str(x_label): x_data[i],
+                                str(y_label): y_data[i]
+                            })
+                    
+                    elif hasattr(trace, 'labels') and hasattr(trace, 'values'):
+                        # Pie charts
+                        labels = [convert_to_json_serializable(lbl) for lbl in trace.labels] if trace.labels is not None else []
+                        values = [convert_to_json_serializable(val) for val in trace.values] if trace.values is not None else []
+                        
+                        columns = ['Category', 'Value']
+                        
+                        for i in range(min(len(labels), len(values))):
+                            rows.append({
+                                'Category': labels[i],
+                                'Value': values[i]
+                            })
+                    
+                    if columns and rows:
+                        data_preview = {
+                            'columns': columns,
+                            'data': rows
+                        }
+            except Exception as e:
+                print(f"⚠️ Could not extract data preview: {e}")
+                import traceback
+                traceback.print_exc()
+            
             return JSONResponse({
                 "success": True,
                 "chart_data": chart_data,
+                "data_preview": data_preview,
                 "query": query,
                 "processing_logs": processing_logs,
                 "extracted_entities": entities
