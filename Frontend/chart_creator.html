@@ -1352,6 +1352,20 @@
             throw new Error("Failed to load dataset information");
           }
 
+          // Extract chart data from currentChartData
+          let chartData = null;
+          if (
+            currentChartData &&
+            currentChartData.data &&
+            currentChartData.data[0]
+          ) {
+            chartData = {
+              x: currentChartData.data[0].x || [],
+              y: currentChartData.data[0].y || [],
+              type: currentChartData.data[0].type || "bar",
+            };
+          }
+
           // Generate explanation for single chart
           const explainResponse = await fetch("/api/explain-dashboard", {
             method: "POST",
@@ -1363,9 +1377,11 @@
                 {
                   query: currentChartQuery,
                   timestamp: new Date().toLocaleString(),
+                  chart_data: chartData, // Include actual chart data
                 },
               ],
               title: "Chart Analysis",
+              force_chart_only: true, // Force chart-only mode for individual chart analysis
             }),
           });
 

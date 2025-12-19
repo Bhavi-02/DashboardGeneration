@@ -1935,6 +1935,7 @@ async def explain_dashboard_api(
         
         dashboard_id = request_data.get('dashboard_id')
         charts_config = request_data.get('charts_config')
+        force_chart_only = request_data.get('force_chart_only', False)
         
         if not charts_config and not dashboard_id:
             return JSONResponse({
@@ -1969,7 +1970,7 @@ async def explain_dashboard_api(
         
         # Generate explanations
         explainer = get_dashboard_explainer()
-        result = explainer.explain_dashboard(dashboard_config)
+        result = explainer.explain_dashboard(dashboard_config, force_chart_only=force_chart_only)
         
         return JSONResponse(result)
         

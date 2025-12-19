@@ -1,5 +1,5 @@
 """
-Dashboard Explainability Module using RAG
+Dashboard Explainability Module using AI/LLM
 Provides intelligent insights and explanations for generated dashboards
 """
 
@@ -8,6 +8,33 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 import json
 from datetime import datetime
+
+# Import LLM for intelligent explanations
+try:
+    from langchain_openai import ChatOpenAI
+    from langchain_core.prompts import PromptTemplate
+    from langchain_core.output_parsers import StrOutputParser
+    from dotenv import load_dotenv
+    
+    load_dotenv()
+    LLM_AVAILABLE = True
+    
+    # Initialize LLM for chart explanations
+    chart_llm = ChatOpenAI(
+        model=os.getenv("GENERATIVE_MODEL", "anthropic/claude-3-haiku"),
+        openai_api_key=os.getenv("OPENROUTER_API_KEY"),
+        openai_api_base="https://openrouter.ai/api/v1",
+        temperature=0.3,  # Slightly creative but still focused
+        max_tokens=800,   # Longer responses for detailed explanations
+        top_p=0.95,
+        default_headers={"HTTP-Referer": "http://localhost"}
+    )
+    print("✅ LLM initialized for chart explanations")
+    
+except Exception as e:
+    print(f"⚠️ LLM not available for chart explanations: {e}")
+    LLM_AVAILABLE = False
+    chart_llm = None
 
 # Import RAG components - with error handling
 try:
@@ -199,25 +226,18 @@ class DashboardExplainer:
             print(f"❌ Error initializing RAG system: {e}")
             return False
     
-    def explain_dashboard(self, dashboard_config: Dict[str, Any]) -> Dict[str, Any]:
+    def explain_dashboard(self, dashboard_config: Dict[str, Any], force_chart_only: bool = False) -> Dict[str, Any]:
         """
         Generate comprehensive explanation for a dashboard
         
         Args:
             dashboard_config: Dictionary containing dashboard charts and metadata
+            force_chart_only: If True, use chart-only mode even if documents are loaded
             
         Returns:
             Dictionary with explanations for each chart and overall insights
         """
         try:
-            if not self.vectorstore:
-                return {
-                    "success": False,
-                    "error": "RAG system not initialized. Please upload company profile and dataset first."
-                }
-            
-            print("🔍 Generating dashboard explanations...")
-            
             # Extract charts from config
             charts = dashboard_config.get('charts', [])
             
@@ -226,6 +246,24 @@ class DashboardExplainer:
                     "success": False,
                     "error": "No charts found in dashboard configuration"
                 }
+            
+            # Check if we should use chart-only mode
+            has_documents = bool(self.company_docs or self.dataset_docs)
+            
+            if force_chart_only or not has_documents:
+                # Force chart-only mode or no documents provided
+                mode_reason = "forced by request" if force_chart_only else "no documents provided"
+                print(f"📊 Generating chart-only explanations ({mode_reason})...")
+                return self._explain_charts_only(dashboard_config, charts)
+            
+            # Documents provided - use RAG + chart insights
+            if not self.vectorstore:
+                return {
+                    "success": False,
+                    "error": "RAG system not initialized. Please initialize with documents first."
+                }
+            
+            print("🔍 Generating RAG-enhanced dashboard explanations...")
             
             # Create chart documents for RAG context
             chart_docs = self._create_chart_documents(charts)
@@ -262,12 +300,7 @@ class DashboardExplainer:
                 chart_type = self._infer_chart_type(chart)
                 
                 # Parse measure and dimension from query
-                measure = ""
-                dimension = ""
-                if ' by ' in query.lower():
-                    parts = query.split(' by ', 1)
-                    measure = parts[0].replace('Show ', '').replace('show ', '').strip()
-                    dimension = parts[1].strip()
+                measure, dimension = self._parse_query_components(query)
                 
                 # Get the RAG-generated explanation
                 rag_explanation = answers[i] if i < len(answers) else ""
@@ -352,6 +385,345 @@ class DashboardExplainer:
                 "success": False,
                 "error": f"Error generating explanations: {str(e)}"
             }
+    
+    def _explain_charts_only(self, dashboard_config: Dict[str, Any], charts: List[Dict]) -> Dict[str, Any]:
+        """
+        Generate explanations based solely on chart analysis (no RAG/documents)
+        
+        Args:
+            dashboard_config: Dashboard configuration
+            charts: List of chart configurations
+            
+        Returns:
+            Dictionary with chart explanations and insights
+        """
+        print("📊 Analyzing charts without document context...")
+        
+        chart_explanations = []
+        
+        for i, chart in enumerate(charts):
+            query = chart.get('query', f'Chart {i+1}')
+            chart_type = self._infer_chart_type(chart)
+            chart_data = chart.get('chart_data')  # Get actual chart data if available
+            
+            # Parse measure and dimension from query
+            measure, dimension = self._parse_query_components(query)
+            
+            # Build chart-focused explanation with actual data
+            full_explanation = self._generate_chart_only_explanation(
+                query, chart_type, measure, dimension, chart_data
+            )
+            
+            explanation = {
+                "chart_id": i + 1,
+                "chart_title": query,
+                "chart_type": chart_type,
+                "chart_type_display": chart_type.title() + " Chart" if chart_type != 'unknown' else "Visualization",
+                "x_axis": dimension if dimension else "Category",
+                "y_axis": measure if measure else "Value",
+                "query": query,
+                "explanation": full_explanation,
+                "insights": self._extract_chart_insights(query, chart_type, measure, dimension, chart_data)
+            }
+            chart_explanations.append(explanation)
+        
+        # Generate overall insights from chart patterns
+        overall_insights = self._generate_overall_chart_insights(charts)
+        
+        return {
+            "success": True,
+            "timestamp": datetime.now().isoformat(),
+            "dashboard_title": dashboard_config.get('title', 'Analytics Dashboard'),
+            "chart_explanations": chart_explanations,
+            "overall_insights": overall_insights,
+            "data_sources": {
+                "company_profile": "Not provided",
+                "dataset": "Chart data only",
+                "charts": f"{len(charts)} generated chart(s)"
+            },
+            "mode": "chart_only"
+        }
+    
+    def _generate_chart_only_explanation(self, query: str, chart_type: str, 
+                                          measure: str, dimension: str, chart_data: Dict[str, Any] = None) -> str:
+        """
+        Generate intelligent AI-powered explanation for a chart
+        Uses LLM to analyze the chart query and actual data values
+        """
+        if not LLM_AVAILABLE or not chart_llm:
+            raise Exception("LLM is required for chart explanations. Please configure OPENROUTER_API_KEY.")
+        
+        # Prepare data summary if available
+        data_context = ""
+        if chart_data and isinstance(chart_data, dict):
+            x_values = chart_data.get('x', [])
+            y_values = chart_data.get('y', [])
+            
+            if x_values and y_values:
+                # Create data preview
+                data_context = f"\n\nACTUAL CHART DATA:\n"
+                data_context += f"Categories ({dimension or 'X'}): {x_values}\n"
+                data_context += f"Values ({measure or 'Y'}): {y_values}\n"
+                
+                # Add statistical insights
+                if y_values:
+                    try:
+                        y_nums = [float(y) for y in y_values if y is not None]
+                        if y_nums:
+                            data_context += f"\nData Statistics:\n"
+                            data_context += f"- Minimum: {min(y_nums):,.0f}\n"
+                            data_context += f"- Maximum: {max(y_nums):,.0f}\n"
+                            data_context += f"- Total Data Points: {len(y_nums)}\n"
+                            
+                            # Trend analysis
+                            if len(y_nums) >= 2:
+                                start_val = y_nums[0]
+                                end_val = y_nums[-1]
+                                change_pct = ((end_val - start_val) / start_val * 100) if start_val != 0 else 0
+                                data_context += f"- Change from Start to End: {change_pct:+.1f}%\n"
+                    except (ValueError, TypeError):
+                        pass
+        
+        # Create prompt for LLM
+        prompt_template = """You are a data visualization expert. Analyze this chart with ACTUAL DATA and provide accurate insights.
+
+Chart Query: {query}
+Chart Type: {chart_type}
+Measure (Y-axis): {measure}
+Dimension (X-axis): {dimension}{data_context}
+
+CRITICAL: Base your analysis on the ACTUAL DATA PROVIDED above. Do NOT make assumptions or generic statements.
+
+Generate a structured explanation using HTML formatting for web display:
+
+<h3>Chart Type & Purpose</h3>
+<p>[2-3 sentences about this specific chart and why it's effective for THIS data]</p>
+
+<h3>Axes & Relationship</h3>
+<p><strong>Y-Axis (Vertical):</strong> {measure} - [What this specific metric represents]</p>
+<p><strong>X-Axis (Horizontal):</strong> {dimension} - [What this dimension represents]</p>
+<p><strong>Relationship:</strong> [Describe the ACTUAL relationship shown in the data - trends, peaks, declines]</p>
+
+<h3>How to Interpret</h3>
+<ul>
+<li>[How to read THIS specific chart with THIS data]</li>
+<li>[What the ACTUAL values show - reference specific data points]</li>
+<li>[How to identify the REAL trends in this data]</li>
+<li>[What the changes/comparisons mean based on ACTUAL numbers]</li>
+</ul>
+
+<h3>Key Insights to Look For</h3>
+<ul>
+<li><strong>Trends:</strong> [Describe ACTUAL trends from the data - be specific about increases, decreases, peaks]</li>
+<li><strong>Outliers:</strong> [Identify any ACTUAL unusual values from the data]</li>
+<li><strong>Comparisons:</strong> [Compare ACTUAL data points - highest, lowest, changes]</li>
+<li><strong>Patterns:</strong> [Describe REAL patterns visible in the data]</li>
+</ul>
+
+<h3>Business Value</h3>
+<p>[2-3 sentences about what THIS SPECIFIC data tells stakeholders and what actions they should consider based on the ACTUAL trends]</p>
+
+IMPORTANT: Use ONLY HTML tags. NO markdown. Reference ACTUAL data values and trends. Be truthful about what the data shows."""
+
+        prompt = PromptTemplate(
+            template=prompt_template,
+            input_variables=["query", "chart_type", "measure", "dimension", "data_context"]
+        )
+        
+        chain = prompt | chart_llm | StrOutputParser()
+        
+        explanation = chain.invoke({
+            "query": query,
+            "chart_type": chart_type or "visualization",
+            "measure": measure or "values",
+            "dimension": dimension or "categories",
+            "data_context": data_context
+        })
+        
+        return explanation.strip()
+    
+    def _extract_chart_insights(self, query: str, chart_type: str, 
+                                measure: str, dimension: str, chart_data: Dict[str, Any] = None) -> List[str]:
+        """
+        Extract actionable insights using LLM with actual data
+        """
+        if not LLM_AVAILABLE or not chart_llm:
+            raise Exception("LLM is required for insight extraction. Please configure OPENROUTER_API_KEY.")
+        
+        # Prepare data summary
+        data_summary = ""
+        if chart_data and isinstance(chart_data, dict):
+            x_values = chart_data.get('x', [])
+            y_values = chart_data.get('y', [])
+            if x_values and y_values:
+                data_summary = f"\nActual Data: {list(zip(x_values, y_values))}\n"
+        
+        prompt_template = """Based on this chart with ACTUAL DATA, provide 3-4 specific, actionable insights:
+
+Chart Query: {query}
+Measure: {measure}
+Dimension: {dimension}
+Chart Type: {chart_type}{data_summary}
+
+CRITICAL: Use the ACTUAL DATA above. Reference specific values, trends, and patterns you see.
+
+Generate concise insights that are:
+- Based on REAL data values (mention specific numbers or trends)
+- Actionable (what stakeholders should analyze or do)
+- Business-focused
+- One clear sentence each
+
+Format as bullet points without numbering. Keep each insight to 1-2 lines maximum."""
+
+        prompt = PromptTemplate(
+            template=prompt_template,
+            input_variables=["query", "measure", "dimension", "chart_type", "data_summary"]
+        )
+        
+        chain = prompt | chart_llm | StrOutputParser()
+        
+        result = chain.invoke({
+            "query": query,
+            "measure": measure or "values",
+            "dimension": dimension or "categories",
+            "chart_type": chart_type or "visualization",
+            "data_summary": data_summary
+        })
+        
+        # Parse insights from response
+        insights = [line.strip().lstrip('•-* ') for line in result.split('\n') if line.strip()]
+        return insights[:4]  # Return max 4 insights
+    
+    def _generate_overall_chart_insights(self, charts: List[Dict]) -> Dict[str, str]:
+        """
+        Generate overall insights using LLM based on chart collection
+        """
+        if not LLM_AVAILABLE or not chart_llm:
+            raise Exception("LLM is required for overall insights. Please configure OPENROUTER_API_KEY.")
+        
+        # Create summary of all charts WITH ACTUAL DATA
+        charts_summary = []
+        for i, chart in enumerate(charts, 1):
+            query = chart.get('query', f'Chart {i}')
+            chart_data = chart.get('chart_data', {})
+            
+            # Extract actual data if available
+            data_info = ""
+            if chart_data and isinstance(chart_data, dict):
+                x_values = chart_data.get('x', [])
+                y_values = chart_data.get('y', [])
+                
+                if x_values and y_values:
+                    # Convert to string representation
+                    x_str = ', '.join([str(x) for x in x_values[:10]])  # First 10 values
+                    y_str = ', '.join([str(y) for y in y_values[:10]])
+                    
+                    # Calculate statistics
+                    if y_values:
+                        min_val = min(y_values)
+                        max_val = max(y_values)
+                        avg_val = sum(y_values) / len(y_values)
+                        
+                        # Calculate trend
+                        if len(y_values) >= 2:
+                            first_val = y_values[0]
+                            last_val = y_values[-1]
+                            change_pct = ((last_val - first_val) / first_val * 100) if first_val != 0 else 0
+                            
+                            data_info = f"\n   Data: {x_str}\n   Values: {y_str}\n   Range: {min_val:,.0f} to {max_val:,.0f}, Avg: {avg_val:,.0f}\n   Overall Change: {change_pct:+.1f}%"
+            
+            chart_summary = f"{i}. {query}{data_info}"
+            charts_summary.append(chart_summary)
+        
+        charts_text = "\n".join(charts_summary)
+        
+        prompt_template = """Analyze this dashboard with {num_charts} chart(s) and provide well-formatted insights based on the ACTUAL DATA provided:
+
+Charts in this dashboard WITH REAL DATA:
+{charts_text}
+
+CRITICAL INSTRUCTIONS:
+- Use the ACTUAL DATA VALUES, trends, and statistics provided above
+- Reference SPECIFIC NUMBERS (e.g., "peaked at 433k in FY 2024-25")
+- Identify REAL PATTERNS (if data shows decline, say decline - not "steady increase")
+- Base ALL insights on the data shown, NOT generic assumptions
+- If Overall Change is negative, acknowledge the decline
+- If values show a peak then drop, mention that pattern specifically
+
+Generate insights using HTML formatting for web display:
+
+<strong>KEY FINDINGS</strong>
+<p>[2-3 clear sentences summarizing what this dashboard reveals based on ACTUAL data trends and values shown]</p>
+
+<strong>TRENDS</strong>
+<ul>
+<li>[Trend 1: Specific pattern from the REAL data - mention actual values or percentages]</li>
+<li>[Trend 2: Another pattern visible in the data - reference specific numbers]</li>
+<li>[Trend 3: Additional data-driven insight with concrete values]</li>
+</ul>
+
+<strong>RECOMMENDATIONS</strong>
+<ul>
+<li>[Action 1: Specific recommendation based on the ACTUAL trends observed]</li>
+<li>[Action 2: Another actionable step addressing real data patterns]</li>
+<li>[Action 3: Strategic action based on what the data actually shows]</li>
+</ul>
+
+<strong>RISKS & OPPORTUNITIES</strong>
+<ul>
+<li><strong>Opportunities:</strong> [Based on positive trends in real data]</li>
+<li><strong>Risks:</strong> [Based on concerning patterns in actual data]</li>
+<li><strong>Focus Areas:</strong> [Where to concentrate efforts based on data insights]</li>
+</ul>
+
+IMPORTANT: 
+- Use ONLY HTML tags (strong, p, ul, li). NO markdown symbols like **, *, or ##.
+- Reference SPECIFIC VALUES from the data provided
+- If data shows decline/drop, say so - don't claim "steady increase"
+- Use concise, business-focused language. Each point should be 1-2 lines max."""
+
+        prompt = PromptTemplate(
+            template=prompt_template,
+            input_variables=["num_charts", "charts_text"]
+        )
+        
+        chain = prompt | chart_llm | StrOutputParser()
+        
+        result = chain.invoke({
+            "num_charts": len(charts),
+            "charts_text": charts_text
+        })
+        
+        # Parse the response
+        sections = {
+            "key_findings": "",
+            "trends": "",
+            "recommendations": "",
+            "risks_opportunities": ""
+        }
+        
+        current_section = None
+        for line in result.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            
+            if 'KEY FINDINGS' in line.upper():
+                current_section = 'key_findings'
+            elif 'TRENDS' in line.upper():
+                current_section = 'trends'
+            elif 'RECOMMENDATIONS' in line.upper():
+                current_section = 'recommendations'
+            elif 'RISKS' in line.upper() or 'OPPORTUNITIES' in line.upper():
+                current_section = 'risks_opportunities'
+            elif current_section:
+                sections[current_section] += line + "\n"
+        
+        # Clean up sections
+        for key in sections:
+            sections[key] = sections[key].strip()
+        
+        return sections
     
     def _create_chart_documents(self, charts: List[Dict]) -> List[Document]:
         """
@@ -486,12 +858,7 @@ class DashboardExplainer:
             query = chart.get('query', f'Chart {i+1}')
             
             # Parse the query to extract measure and dimension
-            measure = ""
-            dimension = ""
-            if ' by ' in query.lower():
-                parts = query.split(' by ', 1)
-                measure = parts[0].replace('Show ', '').replace('show ', '').strip()
-                dimension = parts[1].strip()
+            measure, dimension = self._parse_query_components(query)
             
             # Infer chart type
             chart_type = self._infer_chart_type(chart)
@@ -547,17 +914,67 @@ class DashboardExplainer:
         
         return insights[:3]  # Return top 3 insights
     
+    def _parse_query_components(self, query: str) -> tuple:
+        """
+        Safely parse measure and dimension from query (case-insensitive)
+        
+        Args:
+            query: Natural language query string
+            
+        Returns:
+            Tuple of (measure, dimension)
+        """
+        import re
+        
+        measure = ""
+        dimension = ""
+        
+        # Case-insensitive search for ' by '
+        match = re.search(r'\s+by\s+', query, re.IGNORECASE)
+        if match:
+            # Split at the matched position
+            split_pos = match.start()
+            measure = query[:split_pos].replace('Show ', '').replace('show ', '').strip()
+            dimension = query[split_pos + len(match.group()):].strip()
+        
+        return measure, dimension
+    
     def explain_single_chart(self, chart_config: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generate explanation for a single chart
         """
         try:
+            # Check if documents are available
+            has_documents = bool(self.company_docs or self.dataset_docs)
+            
+            if not has_documents:
+                # No documents - use chart-only explanation
+                print("📊 Generating chart-only explanation (no documents)...")
+                query = chart_config.get('query', 'Chart')
+                chart_type = self._infer_chart_type(chart_config)
+                
+                measure, dimension = self._parse_query_components(query)
+                
+                explanation = self._generate_chart_only_explanation(
+                    query, chart_type, measure, dimension
+                )
+                
+                return {
+                    "success": True,
+                    "chart_title": chart_config.get('title', 'Chart'),
+                    "explanation": explanation,
+                    "insights": self._extract_chart_insights(query, chart_type, measure, dimension),
+                    "mode": "chart_only"
+                }
+            
+            # Documents available - use RAG
             if not self.vectorstore:
                 return {
                     "success": False,
                     "error": "RAG system not initialized"
                 }
             
+            print("🔍 Generating RAG-enhanced explanation...")
             questions = self._generate_chart_questions([chart_config])
             answers = process_questions_with_rag(self.vectorstore,
                                                 self.company_docs + self.dataset_docs if self.company_docs and self.dataset_docs else [],
@@ -567,7 +984,8 @@ class DashboardExplainer:
                 "success": True,
                 "chart_title": chart_config.get('title', 'Chart'),
                 "explanation": answers[0] if answers else "No explanation available",
-                "insights": self._extract_insights(answers[0] if answers else "")
+                "insights": self._extract_insights(answers[0] if answers else ""),
+                "mode": "rag_enhanced"
             }
             
         except Exception as e:
@@ -581,12 +999,31 @@ class DashboardExplainer:
         Generate comparative insights across multiple charts
         """
         try:
+            # Check if documents are available
+            has_documents = bool(self.company_docs or self.dataset_docs)
+            
+            if not has_documents:
+                # No documents - generate chart-based comparative insights
+                print("📊 Generating comparative insights from charts only...")
+                overall_insights = self._generate_overall_chart_insights(charts)
+                
+                return {
+                    "success": True,
+                    "comparative_analysis": overall_insights.get("key_findings", ""),
+                    "overall_performance": overall_insights.get("trends", ""),
+                    "patterns": overall_insights.get("risks_opportunities", ""),
+                    "complete_story": overall_insights.get("recommendations", ""),
+                    "mode": "chart_only"
+                }
+            
+            # Documents available - use RAG
             if not self.vectorstore:
                 return {
                     "success": False,
                     "error": "RAG system not initialized"
                 }
             
+            print("🔍 Generating RAG-enhanced comparative insights...")
             # Generate comparative questions
             questions = [
                 "Compare the key metrics across all visualizations. What relationships exist between them?",
@@ -604,7 +1041,8 @@ class DashboardExplainer:
                 "comparative_analysis": answers[0] if len(answers) > 0 else "",
                 "overall_performance": answers[1] if len(answers) > 1 else "",
                 "patterns": answers[2] if len(answers) > 2 else "",
-                "complete_story": answers[3] if len(answers) > 3 else ""
+                "complete_story": answers[3] if len(answers) > 3 else "",
+                "mode": "rag_enhanced"
             }
             
         except Exception as e:
