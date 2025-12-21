@@ -1,152 +1,85 @@
-import torch
-from transformers import DistilBertTokenizerFast, DistilBertForTokenClassification
-import pickle
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from charts.chart_generator import ChartGenerator
+from nlu.smart_query_parser import SmartQueryParser
 
 class NLUChartPipeline:
     """Complete pipeline from natural language query to chart generation"""
     
-    def __init__(self, ner_model_path='ner_model', ner_encoder_path='ner_label_encoder.pkl'):
+    def __init__(self, use_llm=True):
         """Initialize the NLU and chart generation pipeline"""
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.ner_model = None
-        self.ner_tokenizer = None
-        self.ner_label_encoder = None
         self.chart_generator = ChartGenerator()
         
-        # Load NER model
-        self.load_ner_model(ner_model_path, ner_encoder_path)
-        
-    def load_ner_model(self, model_path, encoder_path):
-        """Load the trained NER model"""
-        try:
-            print("🤖 Loading NER model...")
-            self.ner_model = DistilBertForTokenClassification.from_pretrained(model_path)
-            self.ner_tokenizer = DistilBertTokenizerFast.from_pretrained(model_path)
-            
-            with open(encoder_path, 'rb') as f:
-                self.ner_label_encoder = pickle.load(f)
-            
-            self.ner_model.to(self.device)
-            self.ner_model.eval()
-            print("✅ NER model loaded successfully!")
-            
-        except Exception as e:
-            print(f"❌ Error loading NER model: {e}")
-            raise
-    
-    def predict_entities(self, text):
-        """Extract entities from text using NER model"""
-        tokens = text.split()
-        
-        encoding = self.ner_tokenizer(
-            tokens,
-            is_split_into_words=True,
-            max_length=128,
-            padding='max_length',
-            truncation=True,
-            return_tensors='pt'
-        )
-        
-        input_ids = encoding['input_ids'].to(self.device)
-        attention_mask = encoding['attention_mask'].to(self.device)
-        
-        with torch.no_grad():
-            outputs = self.ner_model(input_ids=input_ids, attention_mask=attention_mask)
-            predictions = torch.argmax(outputs.logits, dim=2)
-        
-        word_ids = encoding.word_ids()
-        predicted_labels = []
-        
-        for i, word_id in enumerate(word_ids):
-            if word_id is not None and word_id < len(tokens):
-                label_id = predictions[0][i].cpu().numpy()
-                label = self.ner_label_encoder.inverse_transform([label_id])[0]
-                # Ensure the list is long enough before assignment
-                while len(predicted_labels) <= word_id:
-                    predicted_labels.append('O')
-                predicted_labels[word_id] = label
-        
-        while len(predicted_labels) < len(tokens):
-            predicted_labels.append('O')
-        
-        return tokens, predicted_labels[:len(tokens)]
-    
-    def extract_structured_entities(self, tokens, labels):
-        """Convert token-level labels to structured entities"""
-        entities = {
-            'METRIC': [],
-            'DIMENSION': [], 
-            'CHART_TYPE': [],
-            'FILTER': [],
-            'AGGREGATION': []
-        }
-        
-        current_entity = None
-        current_tokens = []
-        current_type = None
-        
-        for token, label in zip(tokens, labels):
-            if label.startswith('B-'):
-                # Save previous entity
-                if current_entity:
-                    entities[current_type].append(' '.join(current_tokens))
-                
-                # Start new entity
-                current_type = label[2:]
-                current_tokens = [token]
-                current_entity = True
-                
-            elif label.startswith('I-') and current_entity and label[2:] == current_type:
-                # Continue current entity
-                current_tokens.append(token)
-                
-            else:
-                # End current entity
-                if current_entity:
-                    entities[current_type].append(' '.join(current_tokens))
-                current_entity = None
-                current_tokens = []
-                current_type = None
-        
-        # Don't forget the last entity
-        if current_entity:
-            entities[current_type].append(' '.join(current_tokens))
-        
-        return entities
+        # Initialize smart query parser (replaces NER model)
+        self.smart_parser = SmartQueryParser(use_llm=use_llm)
+        print("✅ Smart Query Parser initialized (Fuzzy + LLM hybrid)")
     
     def process_query(self, query):
-        """Complete processing: NLU -> Entity Extraction -> Chart Generation"""
+        """Complete processing: Smart Parser -> Entity Extraction -> Chart Generation"""
         print(f"\n📝 Processing Query: {query}")
         print("=" * 60)
         
-        # Step 1: Extract entities using NER
-        print("🔍 Step 1: Extracting entities...")
-        tokens, labels = self.predict_entities(query)
-        entities = self.extract_structured_entities(tokens, labels)
+        # Step 1: Get available columns from data connector
+        print("🔍 Step 1: Extracting available columns...")
+        columns_info = self.chart_generator.data_connector.extract_all_columns_info()
+        
+        # Flatten all columns from all tables
+        all_columns = []
+        for table_name, info in columns_info.items():
+            all_columns.extend(info['all_columns'])
+        
+        print(f"   Found {len(all_columns)} columns across {len(columns_info)} tables")
+        
+        # Extract sample data (head 5) for LLM context
+        column_samples = {}
+        try:
+            for table_name, df in self.chart_generator.data_connector.cached_data.items():
+                for col in df.columns:
+                    if col not in column_samples:  # Avoid duplicates across tables
+                        # Get first 5 non-null unique values
+                        samples = df[col].dropna().unique()[:5].tolist()
+                        column_samples[col] = samples
+        except Exception as e:
+            print(f"   ⚠️ Could not extract sample data: {e}")
+            column_samples = None
+        
+        # Step 2: Parse query using smart parser with sample data
+        print("🤖 Step 2: Parsing query with smart parser...")
+        entities = self.smart_parser.parse_query(query, all_columns, column_samples)
+        
+        # Convert to old entity format for backward compatibility
+        entities_compatible = {
+            'METRIC': [entities['metric']] if entities['metric'] else [],
+            'DIMENSION': [entities['dimension']] if entities['dimension'] else [],
+            'CHART_TYPE': [entities['chart_type']] if entities['chart_type'] else ['bar'],
+            'AGGREGATION': [entities['aggregation']] if entities['aggregation'] else ['sum'],
+            'FILTER': entities.get('filters', [])
+        }
         
         # Print extracted entities
         print("📋 Extracted Entities:")
-        for entity_type, entity_list in entities.items():
+        for entity_type, entity_list in entities_compatible.items():
             if entity_list:
-                print(f"   {entity_type:12}: {', '.join(entity_list)}")
+                print(f"   {entity_type:12}: {', '.join(str(e) for e in entity_list)}")
             else:
                 print(f"   {entity_type:12}: None")
         
-        # Step 2: Generate chart
-        print("\n📊 Step 2: Generating chart...")
+        print(f"   Confidence  : {entities.get('match_confidence', 0)}%")
+        
+        # Step 3: Generate chart
+        print("\n📊 Step 3: Generating chart...")
         try:
-            fig = self.chart_generator.generate_chart(entities, query)
+            fig = self.chart_generator.generate_chart(entities_compatible, query)
             print("✅ Chart generated successfully!")
-            return fig, entities, tokens, labels
+            return fig, entities_compatible, None, None
             
         except Exception as e:
             print(f"❌ Error generating chart: {e}")
-            return None, entities, tokens, labels
+            import traceback
+            traceback.print_exc()
+            return None, entities_compatible, None, None
     
     def save_and_show_chart(self, fig, filename=None, show=True, save_format='html'):
         """Save and/or display the generated chart"""
@@ -185,7 +118,7 @@ class NLUChartPipeline:
                     continue
                 
                 # Process query
-                fig, entities, tokens, labels = self.process_query(query)
+                fig, entities, _, _ = self.process_query(query)
                 
                 if fig:
                     chart_count += 1
@@ -212,7 +145,7 @@ def main():
         if len(sys.argv) > 1:
             # Command line mode
             query = " ".join(sys.argv[1:])
-            fig, entities, tokens, labels = pipeline.process_query(query)
+            fig, entities, _, _ = pipeline.process_query(query)
             
             if fig:
                 pipeline.save_and_show_chart(fig, "generated_chart", show=True)
@@ -222,7 +155,7 @@ def main():
             
     except Exception as e:
         print(f"❌ Error initializing pipeline: {e}")
-        print("Make sure you have trained the NER model first!")
+        print("Make sure the OPENROUTER_API_KEY is set in .env for LLM fallback!")
 
 if __name__ == "__main__":
     main()

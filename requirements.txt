@@ -17,6 +17,10 @@ pydantic[email]
 python-dotenv
 requests
 
+# Smart Query Parser Dependencies
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.21.1
+
 # RAG System Dependencies
 langchain
 langchain-community
