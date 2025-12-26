@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -355,3 +356,362 @@
   </div>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Guide - Analytics Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .guide-container {
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .guide-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .guide-header h1 {
+      color: #667eea;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .guide-header p {
+      color: #666;
+      font-size: 1.1em;
+    }
+    
+    .guide-section {
+      margin-bottom: 40px;
+      padding: 25px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .guide-section h2 {
+      color: #667eea;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .guide-section h3 {
+      color: #764ba2;
+      font-size: 1.3em;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    
+    .guide-section p {
+      line-height: 1.8;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .guide-section ul {
+      margin-left: 20px;
+      line-height: 2;
+    }
+    
+    .guide-section ul li {
+      margin-bottom: 10px;
+    }
+    
+    .feature-box {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #667eea;
+    }
+    
+    .back-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: transform 0.3s;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .role-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 15px 0;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .role-card h4 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    
+    .success-box {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-banner">
+    <div class="fancy-title">📖 User Guide</div>
+    <p>Everything you need to know about the Analytics Dashboard</p>
+  </div>
+
+  <div class="guide-container">
+    <div class="guide-header">
+      <h1>📚 Complete User Guide</h1>
+      <p>Master the Analytics Dashboard system</p>
+    </div>
+
+    <!-- Getting Started -->
+    <div class="guide-section">
+      <h2>🚀 Getting Started</h2>
+      <p>
+        Welcome to the Analytics Dashboard! This comprehensive guide will help you navigate 
+        the system and make the most of its powerful features.
+      </p>
+      
+      <h3>System Requirements</h3>
+      <ul>
+        <li>Modern web browser (Chrome, Firefox, Safari, or Edge)</li>
+        <li>Stable internet connection</li>
+        <li>Valid user account with appropriate role permissions</li>
+      </ul>
+
+      <h3>First Time Setup</h3>
+      <div class="feature-box">
+        <ol>
+          <li><strong>Registration:</strong> Click "Register here" on the login page</li>
+          <li><strong>Fill Details:</strong> Provide your full name, email, username, and password</li>
+          <li><strong>Select Role:</strong> Choose your role (Admin, Analyst, Departmental, or Viewer)</li>
+          <li><strong>Department:</strong> If you're a Departmental user, select your department</li>
+          <li><strong>Login:</strong> Use your credentials to access the dashboard</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- User Roles -->
+    <div class="guide-section">
+      <h2>👥 User Roles & Permissions</h2>
+      <p>
+        The system uses Role-Based Access Control (RBAC) to ensure data security and appropriate access levels.
+      </p>
+
+      <div class="role-card">
+        <h4>🔧 Admin</h4>
+        <p><strong>Full System Access</strong></p>
+        <ul>
+          <li>Create, edit, and delete dashboards</li>
+          <li>Manage user accounts and permissions</li>
+          <li>Access all departments' data</li>
+          <li>Configure system settings</li>
+          <li>Export data in all formats</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <h4>📊 Analyst</h4>
+        <p><strong>Advanced Analytics</strong></p>
+        <ul>
+          <li>Create and edit dashboards</li>
+          <li>Access cross-departmental data</li>
+          <li>Use advanced chart types and analytics</li>
+          <li>Share dashboards with team members</li>
+          <li>Export data for external analysis</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <h4>🏢 Departmental</h4>
+        <p><strong>Department-Specific Access</strong></p>
+        <ul>
+          <li>Create dashboards for your department</li>
+          <li>View only department-specific data</li>
+          <li>Share within department</li>
+          <li>Export department reports</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <h4>👁️ Viewer</h4>
+        <p><strong>Read-Only Access</strong></p>
+        <ul>
+          <li>View shared dashboards</li>
+          <li>Filter and interact with charts</li>
+          <li>Export viewed dashboards (if permitted)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Dashboard Features -->
+    <div class="guide-section">
+      <h2>📊 Dashboard Features</h2>
+      
+      <h3>Interactive Dashboard Builder</h3>
+      <p>
+        Create custom dashboards using natural language queries. The AI-powered system understands 
+        your requests and generates appropriate visualizations.
+      </p>
+      
+      <div class="feature-box">
+        <strong>Supported Chart Types:</strong>
+        <ul>
+          <li>📊 Bar Charts - Compare categories</li>
+          <li>📈 Line Charts - Show trends over time</li>
+          <li>🥧 Pie Charts - Display proportions</li>
+          <li>📉 Scatter Plots - Show correlations</li>
+          <li>📊 Histograms - Display distributions</li>
+          <li>🔥 Heatmaps - Show intensity patterns</li>
+        </ul>
+      </div>
+
+      <h3>Natural Language Processing</h3>
+      <p>
+        Simply describe what you want to see in plain English. The system will interpret 
+        your query and create the appropriate visualization.
+      </p>
+      
+      <div class="success-box">
+        <strong>✅ Example Queries:</strong>
+        <ul>
+          <li>"Show sales by region"</li>
+          <li>"Create a line chart of monthly revenue"</li>
+          <li>"Display top 10 products by profit"</li>
+          <li>"Show employee count per department as a pie chart"</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Data Export -->
+    <div class="guide-section">
+      <h2>📥 Data Export Options</h2>
+      <p>
+        Export your dashboards and data in various formats for further analysis or sharing.
+      </p>
+
+      <div class="feature-box">
+        <strong>Available Export Formats:</strong>
+        <ul>
+          <li><strong>HTML:</strong> Standalone interactive dashboard</li>
+          <li><strong>Excel (.xlsx):</strong> Multiple sheets with all chart data</li>
+          <li><strong>CSV:</strong> Individual files for each chart</li>
+          <li><strong>JSON:</strong> Structured data for API integration</li>
+        </ul>
+      </div>
+
+      <h3>Integration with BI Tools</h3>
+      <p>
+        Export data in formats compatible with Tableau, Power BI, and other business intelligence tools.
+      </p>
+    </div>
+
+    <!-- Security & Privacy -->
+    <div class="guide-section">
+      <h2>🔒 Security & Privacy</h2>
+      
+      <div class="warning-box">
+        <strong>⚠️ Security Best Practices:</strong>
+        <ul>
+          <li>Use strong, unique passwords (minimum 8 characters)</li>
+          <li>Never share your login credentials</li>
+          <li>Log out after each session, especially on shared devices</li>
+          <li>Report any suspicious activity to administrators</li>
+        </ul>
+      </div>
+
+      <h3>Data Protection</h3>
+      <ul>
+        <li>All passwords are securely encrypted</li>
+        <li>Role-based access ensures data compartmentalization</li>
+        <li>Session management prevents unauthorized access</li>
+        <li>Audit logs track all user activities</li>
+      </ul>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="guide-section">
+      <h2>🔧 Troubleshooting</h2>
+      
+      <h3>Common Issues</h3>
+      
+      <div class="feature-box">
+        <strong>Can't log in?</strong>
+        <ul>
+          <li>Verify username/email and password are correct</li>
+          <li>Ensure correct role is selected</li>
+          <li>Clear browser cache and cookies</li>
+          <li>Contact administrator if account is locked</li>
+        </ul>
+      </div>
+
+      <div class="feature-box">
+        <strong>Dashboard not generating?</strong>
+        <ul>
+          <li>Check if you have permission to access the data</li>
+          <li>Ensure your query is clear and specific</li>
+          <li>Try refreshing the page</li>
+          <li>Check internet connection</li>
+        </ul>
+      </div>
+
+      <div class="feature-box">
+        <strong>Charts not displaying?</strong>
+        <ul>
+          <li>Refresh your browser</li>
+          <li>Check if data source is available</li>
+          <li>Clear browser cache</li>
+          <li>Try a different browser</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tips & Best Practices -->
+    <div class="guide-section">
+      <h2>💡 Tips & Best Practices</h2>
+      
+      <ul>
+        <li><strong>Be Specific:</strong> Clear queries produce better results</li>
+        <li><strong>Start Simple:</strong> Begin with basic charts, then add complexity</li>
+        <li><strong>Save Regularly:</strong> Save your work frequently to avoid data loss</li>
+        <li><strong>Use Filters:</strong> Apply filters to focus on relevant data</li>
+        <li><strong>Name Dashboards:</strong> Use descriptive names for easy retrieval</li>
+        <li><strong>Document Changes:</strong> Add descriptions when saving dashboards</li>
+      </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="page.html" class="back-button">← Back to Login</a>
+    </div>
+  </div>
+</body>
+</html>
+>>>>>>> chart-creator

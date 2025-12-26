@@ -1,0 +1,548 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Dhruv</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            :root {
+                --primary: #3f6ad8;
+                --secondary: #764ba2;
+                --background: #f8fafc;
+                --surface: #ffffff;
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --accent: #06b6d4;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --error: #ef4444;
+                --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                
+                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                
+                --border-radius: 12px;
+                --border-radius-lg: 16px;
+            }
+            
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: var(--background);
+                color: var(--text-primary);
+                line-height: 1.6;
+                overflow-x: hidden;
+            }
+            
+            .architect-dashboard {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            /* Header Styles */
+            .dashboard-header {
+                background: var(--gradient);
+                padding: 2rem 0;
+                box-shadow: var(--shadow-lg);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .dashboard-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="20" fill="url(%23grid)"/></svg>');
+                opacity: 0.3;
+            }
+            
+            .header-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+                position: relative;
+                z-index: 2;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .dashboard-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: white;
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .title-icon {
+                font-size: 2rem;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            }
+            
+            .dashboard-subtitle {
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                font-weight: 400;
+            }
+            
+            .header-actions {
+                display: flex;
+                gap: 1rem;
+            }
+            
+            .action-btn {
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border-radius: var(--border-radius);
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .action-btn:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            
+            /* Stats Section */
+            .stats-section {
+                padding: 2rem 0;
+                background: var(--surface);
+            }
+            
+            .stats-grid {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+            
+            .stat-card {
+                background: white;
+                padding: 2rem;
+                border-radius: var(--border-radius-lg);
+                box-shadow: var(--shadow-md);
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                border-left: 4px solid var(--primary);
+            }
+            
+            .stat-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-xl);
+            }
+            
+            .stat-card.primary { border-left-color: var(--primary); }
+            .stat-card.success { border-left-color: var(--success); }
+            .stat-card.warning { border-left-color: var(--warning); }
+            .stat-card.info { border-left-color: var(--accent); }
+            
+            .stat-value {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 0.5rem;
+            }
+            
+            .stat-label {
+                color: var(--text-secondary);
+                font-weight: 500;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            .stat-icon {
+                position: absolute;
+                top: 1.5rem;
+                right: 1.5rem;
+                font-size: 2rem;
+                opacity: 0.3;
+            }
+            
+            /* Charts Section */
+            .charts-section {
+                flex: 1;
+                padding: 2rem 0;
+                background: var(--background);
+            }
+            
+            .charts-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+            }
+            
+            .grid-layout {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+                gap: 2rem;
+            }
+            
+            .masonry-layout {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                gap: 2rem;
+                grid-template-rows: masonry;
+            }
+            
+            .single-row-layout {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+            }
+            
+            .chart-card {
+                background: white;
+                border-radius: var(--border-radius-lg);
+                box-shadow: var(--shadow-md);
+                overflow: hidden;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+            }
+            
+            .chart-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-xl);
+            }
+            
+            .chart-header {
+                padding: 1.5rem 2rem 1rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: linear-gradient(135deg, rgba(63, 106, 216, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            }
+            
+            .chart-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin: 0;
+            }
+            
+            .chart-actions {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            .chart-action {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 1.2rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+            }
+            
+            .chart-action:hover {
+                background: rgba(63, 106, 216, 0.1);
+                color: var(--primary);
+            }
+            
+            .chart-content {
+                padding: 1rem;
+                min-height: 400px;
+            }
+            
+            .chart-footer {
+                padding: 1rem 2rem;
+                background: rgba(0, 0, 0, 0.02);
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+            }
+            
+            .chart-type {
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 0.25rem 0.75rem;
+                background: var(--primary);
+                color: white;
+                border-radius: 20px;
+                font-size: 0.75rem;
+            }
+            
+            /* Footer */
+            .dashboard-footer {
+                background: var(--text-primary);
+                color: rgba(255, 255, 255, 0.8);
+                padding: 2rem 0;
+                text-align: center;
+            }
+            
+            .footer-content p {
+                margin: 0.5rem 0;
+                font-size: 0.9rem;
+            }
+            
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .header-content {
+                    flex-direction: column;
+                    gap: 1.5rem;
+                    text-align: center;
+                }
+                
+                .dashboard-title {
+                    font-size: 2rem;
+                }
+                
+                .stats-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 1rem;
+                }
+                
+                .chart-card {
+                    margin: 0 -1rem;
+                    border-radius: 0;
+                }
+                
+                .grid-layout,
+                .masonry-layout,
+                .single-row-layout {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+            }
+            
+            /* Animations */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .chart-card {
+                animation: fadeInUp 0.6s ease forwards;
+            }
+            
+            .stat-card {
+                animation: fadeInUp 0.4s ease forwards;
+            }
+            
+            /* Plotly overrides */
+            .plotly-graph-div {
+                width: 100% !important;
+                height: 100% !important;
+            }
+            
+            .modebar {
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            
+            .chart-content:hover .modebar {
+                opacity: 1;
+            }
+        </style>
+        
+</head>
+<body>
+    <div class="architect-dashboard">
+        <!-- Header Section -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-main">
+                    <h1 class="dashboard-title">
+                        <span class="title-icon">📊</span>
+                        Analytics Dashboard - Dhruv
+                    </h1>
+                    <p class="dashboard-subtitle">Real-time analytics and insights</p>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" onclick="refreshDashboard()">
+                        <span>🔄</span> Refresh
+                    </button>
+                    <button class="action-btn" onclick="exportDashboard()">
+                        <span>📥</span> Export
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                
+            <div class="stat-card primary">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Total Charts</div>
+                <div class="stat-icon">📊</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Metrics Analyzed</div>
+                <div class="stat-icon">📈</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Dimensions</div>
+                <div class="stat-icon">🎯</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-value">19:07:43</div>
+                <div class="stat-label">Last Updated</div>
+                <div class="stat-icon">🕒</div>
+            </div>
+        
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <main class="charts-section">
+            <div class="charts-container single-row-layout">
+                
+            <div class="chart-card" data-chart-id="chart_1">
+                <div class="chart-header">
+                    <h3 class="chart-title">Quantity by Fy</h3>
+                    <div class="chart-actions">
+                        <button class="chart-action" onclick="toggleFullscreen('chart_1')" title="Fullscreen">
+                            ⛶
+                        </button>
+                        <button class="chart-action" onclick="downloadChart('chart_1')" title="Download">
+                            ⬇
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <div>                            <div id="chart-chart_1" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("chart-chart_1")) {                    Plotly.newPlot(                        "chart-chart_1",                        [{"hovertemplate":"\u003cb\u003e%{x}\u003c\u002fb\u003e\u003cbr\u003eQuantity: %{y:,.0f}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#3498DB","width":3},"marker":{"color":"#E74C3C","line":{"color":"white","width":2},"size":8},"mode":"lines+markers","name":"Quantity","x":["2018-19","2019-20","2020-21","2021-22","2022-23","2023-24","2024-25","2025-26"],"y":[51330,103699,166787,229354,218183,303775,433198,206904],"type":"scatter"}],                        {"font":{"color":"#34495E","family":"Arial"},"height":500,"margin":{"b":60,"l":60,"r":60,"t":80},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"title":{"font":{"color":"#2C3E50","family":"Arial Black","size":20},"text":"Quantity by FY","x":0.5,"xanchor":"center"},"xaxis":{"linecolor":"#BDC3C7","linewidth":2,"showgrid":false,"title":{"text":"Fy"}},"yaxis":{"gridcolor":"#ECF0F1","gridwidth":1,"linecolor":"#BDC3C7","linewidth":2,"showgrid":true,"title":{"text":"Quantity"}}},                        {"displayModeBar": true, "displaylogo": false, "modeBarButtonsToRemove": ["lasso2d", "select2d", "autoScale2d"], "responsive": true}                    )                };            </script>        </div>
+                </div>
+                <div class="chart-footer">
+                    <span class="chart-type">Unknown</span>
+                    <span class="chart-timestamp">2025-12-19 19:07:36</span>
+                </div>
+            </div>
+            
+            <div class="chart-card" data-chart-id="chart_2">
+                <div class="chart-header">
+                    <h3 class="chart-title">Quantity Analysis</h3>
+                    <div class="chart-actions">
+                        <button class="chart-action" onclick="toggleFullscreen('chart_2')" title="Fullscreen">
+                            ⛶
+                        </button>
+                        <button class="chart-action" onclick="downloadChart('chart_2')" title="Download">
+                            ⬇
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <div>                            <div id="chart-chart_2" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("chart-chart_2")) {                    Plotly.newPlot(                        "chart-chart_2",                        [{"hovertemplate":"\u003cb\u003e%{x}\u003c\u002fb\u003e\u003cbr\u003eQuantity: %{y:,.0f}\u003cbr\u003e\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":["#3498DB","#E74C3C","#2ECC71","#F39C12","#9B59B6","#1ABC9C","#34495E","#3498DB"],"line":{"color":"white","width":1}},"x":["2018-19","2019-20","2020-21","2021-22","2022-23","2023-24","2024-25","2025-26"],"y":[51330,103699,166787,229354,218183,303775,433198,206904],"type":"bar"}],                        {"font":{"color":"#34495E","family":"Arial"},"height":500,"margin":{"b":120,"l":60,"r":60,"t":80},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","showlegend":false,"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"title":{"font":{"color":"#2C3E50","family":"Arial Black","size":20},"text":"Quantity by FY bar","x":0.5,"xanchor":"center"},"xaxis":{"linecolor":"#BDC3C7","linewidth":2,"showgrid":false,"tickangle":-45,"title":{"text":"Fy"}},"yaxis":{"gridcolor":"#ECF0F1","gridwidth":1,"linecolor":"#BDC3C7","linewidth":2,"showgrid":true,"title":{"text":"Quantity"}}},                        {"displayModeBar": true, "displaylogo": false, "modeBarButtonsToRemove": ["lasso2d", "select2d", "autoScale2d"], "responsive": true}                    )                };            </script>        </div>
+                </div>
+                <div class="chart-footer">
+                    <span class="chart-type">Unknown</span>
+                    <span class="chart-timestamp">2025-12-19 19:07:41</span>
+                </div>
+            </div>
+            
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <p>🚀 Powered by ArchitectUI Dashboard • Generated: 2025-12-19 19:07:43</p>
+                <p>Dashboard ID: 2c84a16d • Theme: Modern</p>
+            </div>
+        </footer>
+    </div>
+
+    
+        <script>
+            // Dashboard functionality
+            function refreshDashboard() {
+                location.reload();
+            }
+            
+            function exportDashboard() {
+                window.print();
+            }
+            
+            function toggleFullscreen(chartId) {
+                const chartCard = document.querySelector(`[data-chart-id="${chartId}"]`);
+                if (chartCard.requestFullscreen) {
+                    chartCard.requestFullscreen();
+                } else if (chartCard.webkitRequestFullscreen) {
+                    chartCard.webkitRequestFullscreen();
+                } else if (chartCard.mozRequestFullScreen) {
+                    chartCard.mozRequestFullScreen();
+                }
+            }
+            
+            function downloadChart(chartId) {
+                const plotlyDiv = document.querySelector(`#chart-${chartId}`);
+                if (plotlyDiv) {
+                    Plotly.downloadImage(plotlyDiv, {
+                        format: 'png',
+                        width: 1200,
+                        height: 800,
+                        filename: `chart-${chartId}`
+                    });
+                }
+            }
+            
+            // Initialize dashboard
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('ArchitectUI Dashboard loaded successfully');
+                
+                // Add smooth scrolling
+                document.documentElement.style.scrollBehavior = 'smooth';
+                
+                // Stagger animation for chart cards
+                const chartCards = document.querySelectorAll('.chart-card');
+                chartCards.forEach((card, index) => {
+                    card.style.animationDelay = `${index * 0.1}s`;
+                });
+                
+                // Responsive plotly charts
+                window.addEventListener('resize', function() {
+                    const plotlyDivs = document.querySelectorAll('.plotly-graph-div');
+                    plotlyDivs.forEach(div => {
+                        Plotly.Plots.resize(div);
+                    });
+                });
+            });
+        </script>
+        
+</body>
+</html>

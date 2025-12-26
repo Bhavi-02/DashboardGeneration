@@ -302,7 +302,12 @@ class ArchitectUIDashboard:
                     elif hasattr(trace_dict[key], 'tolist'):
                         try:
                             trace_dict[key] = trace_dict[key].tolist()
+<<<<<<< HEAD
                         except:
+=======
+                        except (AttributeError, TypeError) as e:
+                            # Keep original value if conversion fails
+>>>>>>> chart-creator
                             pass
                 new_traces.append(trace_dict)
             

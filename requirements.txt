@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 torch 
 transformers 
 scikit-learn 
@@ -33,3 +34,45 @@ zipfile36
 beautifulsoup4
 lxml
 httpx
+=======
+torch 
+transformers 
+scikit-learn 
+numpy 
+pandas 
+tqdm
+plotly
+openpyxl
+fastapi
+uvicorn[standard]
+pymysql
+sqlalchemy
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+pydantic[email]
+python-dotenv
+requests
+
+# Smart Query Parser Dependencies
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.21.1
+
+# RAG System Dependencies
+langchain
+langchain-community
+langchain-openai
+langchain-core
+langchain-text-splitters
+faiss-cpu
+pymupdf
+python-docx
+python-pptx
+pillow
+pytesseract
+zipfile36
+beautifulsoup4
+lxml
+httpx
+rank_bm25
+>>>>>>> chart-creator

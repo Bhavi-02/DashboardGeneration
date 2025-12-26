@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -324,3 +325,331 @@
   </div>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contact Support - Analytics Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .contact-container {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .contact-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .contact-header h1 {
+      color: #667eea;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .contact-header p {
+      color: #666;
+      font-size: 1.1em;
+    }
+    
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .contact-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      transition: transform 0.3s;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .contact-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .contact-card .icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+    
+    .contact-card h3 {
+      font-size: 1.5em;
+      margin-bottom: 15px;
+    }
+    
+    .contact-card p {
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+    
+    .contact-card a {
+      color: white;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    
+    .contact-card a:hover {
+      opacity: 0.8;
+    }
+    
+    .support-hours {
+      background: #f0f4ff;
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .support-hours h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .hours-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .hour-item {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .hour-item strong {
+      color: #667eea;
+    }
+    
+    .faq-section {
+      margin-bottom: 30px;
+    }
+    
+    .faq-section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .faq-item {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border-left: 4px solid #764ba2;
+    }
+    
+    .faq-item h4 {
+      color: #764ba2;
+      margin-bottom: 10px;
+    }
+    
+    .faq-item p {
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    .back-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: transform 0.3s;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .emergency-contact {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .emergency-contact h3 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-banner">
+    <div class="fancy-title">💬 Contact Support</div>
+    <p>We're here to help you succeed</p>
+  </div>
+
+  <div class="contact-container">
+    <div class="contact-header">
+      <h1>📞 Get in Touch</h1>
+      <p>Our support team is ready to assist you</p>
+    </div>
+
+    <!-- Emergency Contact -->
+    <div class="emergency-contact">
+      <h3>🚨 Emergency Support</h3>
+      <p>For critical system issues or security concerns</p>
+      <p style="font-size: 1.3em; font-weight: bold; margin-top: 10px;">
+        📱 Emergency Hotline: +91 1234567890-HELP
+      </p>
+      <p>Available 24/7</p>
+    </div>
+
+    <!-- Contact Cards -->
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="icon">📧</div>
+        <h3>Email Support</h3>
+        <p>Get detailed assistance via email</p>
+        <p><strong>General Inquiries:</strong></p>
+        <p><a href="mailto:support@analytics-dashboard.com">support@analytics-dashboard.com</a></p>
+        <p style="margin-top: 15px;"><strong>Technical Issues:</strong></p>
+        <p><a href="mailto:tech@analytics-dashboard.com">tech@analytics-dashboard.com</a></p>
+        <p style="margin-top: 10px; font-size: 0.9em;">Response time: 24-48 hours</p>
+      </div>
+
+      <div class="contact-card">
+        <div class="icon">📞</div>
+        <h3>Phone Support</h3>
+        <p>Speak directly with our support team</p>
+        <p><strong>Main Support Line:</strong></p>
+        <p style="font-size: 1.2em; font-weight: bold;">+91 1234567890-HELP</p>
+        <p style="margin-top: 15px;"><strong>Hours:</strong></p>
+        <p>Monday - Friday: 9:00 AM - 6:00 PM IST</p>
+        <p>Saturday: 10:00 AM - 4:00 PM IST</p>
+      </div>
+
+      <div class="contact-card">
+        <div class="icon">💬</div>
+        <h3>Live Chat</h3>
+        <p>Get instant help through our chat system</p>
+        <p style="margin-top: 15px;">Available on all dashboard pages</p>
+        <p>Click the chat icon in the bottom-right corner</p>
+        <p style="margin-top: 15px; font-size: 0.9em;">Average response: &lt; 5 minutes</p>
+      </div>
+    </div>
+
+    <!-- Support Hours -->
+    <div class="support-hours">
+      <h2>🕐 Support Hours</h2>
+      <div class="hours-grid">
+        <div class="hour-item">
+          <strong>Email Support</strong>
+          <p>Monitored 24/7</p>
+          <p>Response within 24-48 hours</p>
+        </div>
+        <div class="hour-item">
+          <strong>Phone Support</strong>
+          <p>Monday - Friday: 9 AM - 6 PM IST</p>
+          <p>Saturday: 10 AM - 4 PM IST</p>
+        </div>
+        <div class="hour-item">
+          <strong>Live Chat</strong>
+          <p>Monday - Saturday: 9 AM - 8 PM IST</p>
+          <p>Sunday: 12 PM - 6 PM IST</p>
+        </div>
+        <div class="hour-item">
+          <strong>Emergency Line</strong>
+          <p>Available 24/7/365</p>
+          <p>For critical issues only</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section">
+      <h2>❓ Frequently Asked Questions</h2>
+      
+      <div class="faq-item">
+        <h4>Q: How do I reset my password?</h4>
+        <p>
+          Contact your administrator or email support@analytics-dashboard.com with your username 
+          and registered email. Our team will send you a password reset link within 24 hours.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Q: I can't access certain dashboards. What should I do?</h4>
+        <p>
+          Dashboard access is role-based. If you believe you should have access but don't, 
+          contact your system administrator to review your permissions. Admin users can manage 
+          access levels for all users.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Q: How do I export my dashboard data?</h4>
+        <p>
+          Navigate to your saved dashboard, click the "Export" button, and choose your preferred 
+          format (HTML, Excel, CSV, or JSON). Export permissions depend on your user role.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Q: Can I request new features?</h4>
+        <p>
+          Absolutely! We welcome feature requests. Email your suggestions to 
+          features@analytics-dashboard.com with a detailed description of the functionality 
+          you'd like to see.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Q: What browsers are supported?</h4>
+        <p>
+          The Analytics Dashboard works best on the latest versions of Chrome, Firefox, Safari, 
+          and Microsoft Edge. For optimal performance, ensure JavaScript is enabled and your 
+          browser is up to date.
+        </p>
+      </div>
+    </div>
+
+    <!-- Additional Contact Information -->
+    <div class="support-hours">
+      <h2>🏢 Office Location</h2>
+      <p style="text-align: center; line-height: 1.8;">
+        <strong>Analytics Dashboard Inc.</strong><br>
+        123 Data Street, Suite 456<br>
+        Analytics City, AC 78901<br>
+        United States
+      </p>
+    </div>
+
+    <div class="support-hours" style="margin-top: 20px;">
+      <h2>🌐 Online Resources</h2>
+      <p style="text-align: center; line-height: 2;">
+        <strong>Documentation:</strong> <a href="user_guide.html" style="color: #667eea;">User Guide</a><br>
+        <strong>Video Tutorials:</strong> <a href="#" style="color: #667eea;">YouTube Channel</a><br>
+        <strong>Community Forum:</strong> <a href="#" style="color: #667eea;">community.analytics-dashboard.com</a><br>
+        <strong>Status Page:</strong> <a href="#" style="color: #667eea;">status.analytics-dashboard.com</a>
+      </p>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="page.html" class="back-button">← Back to Login</a>
+    </div>
+  </div>
+</body>
+</html>
+>>>>>>> chart-creator

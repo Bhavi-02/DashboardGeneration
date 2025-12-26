@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -179,3 +180,186 @@
     </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departmental Dashboard - Analytics Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: #00f2fe;
+            font-size: 28px;
+        }
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logout-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+        .dashboard-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .role-badge {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .dept-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .access-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+        }
+        .access-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        .access-card.departmental { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .access-card.viewer { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .access-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .access-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        .welcome-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .welcome-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .welcome-section p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🏢 Departmental Dashboard</h1>
+        </div>
+        <div class="user-info">
+            <span class="dept-badge" id="userDept">DEPARTMENT</span>
+            <span class="role-badge" id="userRole">DEPARTMENTAL</span>
+            <span id="userName">Loading...</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="welcome-section">
+            <h2>Welcome, <span id="fullName">User</span>!</h2>
+            <p>As a <strong>Departmental User</strong> for <strong id="deptName">your department</strong>, you can access department-specific metrics and viewer reports. Monitor your department's performance and view comprehensive analytics.</p>
+        </div>
+
+        <h2 style="margin-bottom: 20px; color: #333;">🎯 Access Your Dashboards</h2>
+        
+        <div class="access-grid">
+            <a href="/dashboard/departmental" class="access-card departmental">
+                <div class="icon">🏢</div>
+                <h3>Departmental View</h3>
+                <p>Department-specific metrics and performance tracking</p>
+            </a>
+            
+            <a href="/dashboard/viewer" class="access-card viewer">
+                <div class="icon">👁️</div>
+                <h3>Viewer Dashboard</h3>
+                <p>Read-only access to reports and visualizations</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Fetch user session info and display
+        fetch('/api/session-info')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userName').textContent = data.username;
+                document.getElementById('fullName').textContent = data.full_name;
+                document.getElementById('userRole').textContent = data.role.toUpperCase();
+                if (data.department) {
+                    document.getElementById('userDept').textContent = data.department.toUpperCase();
+                    document.getElementById('deptName').textContent = data.department;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching session:', error);
+                window.location.href = '/page.html';
+            });
+
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/page.html';
+                });
+        }
+    </script>
+</body>
+</html>
+>>>>>>> chart-creator

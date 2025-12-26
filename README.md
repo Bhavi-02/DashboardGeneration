@@ -2,6 +2,11 @@
 
 A comprehensive, AI-powered dashboard generation and visualization platform built with FastAPI, featuring advanced NLP capabilities, role-based access control, and interactive data exploration tools.
 
+<<<<<<< HEAD
+=======
+---
+
+>>>>>>> chart-creator
 ## Table of Contents
 
 - [Overview](#overview)
@@ -23,9 +28,15 @@ A comprehensive, AI-powered dashboard generation and visualization platform buil
 
 Gen-Dash is an enterprise-grade dashboard generation platform that leverages natural language processing, retrieval-augmented generation, and machine learning to enable non-technical users to create professional, interactive data visualizations from complex datasets.
 
+<<<<<<< HEAD
 **Current Version:** 1.0.0  
 **Build Status:** Active Development  
 **Last Updated:** December 2025
+=======
+**Current Version:** 1.1.0  
+**Build Status:** Production Ready  
+**Last Updated:** December 19, 2025
+>>>>>>> chart-creator
 
 ## Key Features
 
