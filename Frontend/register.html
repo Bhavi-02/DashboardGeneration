@@ -1,360 +1,249 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <form method="POST" action="http://localhost:8000/register"></form>
-  <meta charset="UTF-8" />
-  <title>Analytics Dashboard Registration</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="#" />
-</head>
-<body>
-  <div class="top-banner">
-    <div class="fancy-title">Analytics Dashboard</div>
-    <p>Create your account for real-time analytics</p>
-  </div>
-  <div class="login-container">
-    <form method="POST" action="/register">
-      <h3 class="login-heading">Create New Account</h3>
-      
-      <div class="mb-3">
-        <label for="full_name" class="form-label">👤 Full Name</label>
-        <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Enter your full name" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="email" class="form-label">📧 Email Address</label>
-        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="username" class="form-label">🆔 Username</label>
-        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="password" class="form-label">🔒 Password</label>
-        <input type="password" class="form-control" id="password" name="password" placeholder="Create a strong password" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="confirmPassword" class="form-label">🔒 Confirm Password</label>
-        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required />
-      </div>
-      
-      <div class="mb-4">
-        <label for="role" class="form-label">👤 Role</label>
-        <select class="form-select" id="role" name="role" required>
-          <option value="">Choose your role</option>
-          <option value="Admin">🔧 Admin</option>
-          <option value="Analyst">📊 Analyst</option>
-          <option value="Departmental">🏢 Departmental</option>
-          <option value="Viewer">👁️ Viewer</option>
-        </select>
-      </div>
-      
-      <div class="mb-4 department-selection" id="departmentDiv" style="display: none;">
-        <label for="department" class="form-label">🏢 Department</label>
-        <select class="form-select" id="department" name="department">
-          <option value="">Select your department</option>
-          <option value="Sales">💰 Sales</option>
-          <option value="Marketing">📢 Marketing</option>
-          <option value="Finance">💼 Finance</option>
-          <option value="Human Resources">👥 Human Resources</option>
-          <option value="IT">💻 Information Technology</option>
-          <option value="Operations">⚙️ Operations</option>
-        </select>
-      </div>
-      
-      <div class="mb-4">
-        <label class="form-label checkbox-container">
-          <input type="checkbox" id="terms" name="terms" required />
-          <span class="checkmark"></span>
-          I agree to the <a href="#" class="terms-link">Terms & Conditions</a> and <a href="#" class="terms-link">Privacy Policy</a>
-        </label>
-      </div>
-      
-      <button type="submit" class="btn-primary mb-2">Create Account</button>
-      
-      <div class="text-center mb-3">
-        <p class="login-link">Already have an account? <a href="page.html" class="auth-link">Login here</a></p>
-      </div>
-      
-      <div class="dashboard-actions">
-        <button type="button" class="action-btn" onclick="window.location.href='analytics_demo.html'">📊 View Demo</button>
-        <button type="button" class="action-btn" onclick="window.location.href='user_guide.html'">📖 Help Center</button>
-        <button type="button" class="action-btn" onclick="window.location.href='contact_support.html'">💬 Contact Us</button>
-      </div>
-    </form>
-  </div>
+    <meta charset="UTF-8" />
+    <title>Analytics Dashboard Registration</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="#" />
+  </head>
+  <body>
+    <div class="top-banner">
+      <div class="fancy-title">Analytics Dashboard</div>
+      <p>Create your account for real-time analytics</p>
+    </div>
+    <div class="login-container">
+      <form method="POST" action="/register">
+        <h3 class="login-heading">Create New Account</h3>
 
-  <script>
-    // Show/hide department selection based on role
-    document.getElementById('role').addEventListener('change', function() {
-      const departmentDiv = document.getElementById('departmentDiv');
-      const departmentSelect = document.getElementById('department');
-      
-      if (this.value === 'Departmental') {
-        departmentDiv.style.display = 'block';
-        departmentSelect.required = true;
-        setTimeout(() => {
-          departmentDiv.classList.add('show');
-        }, 10);
-      } else {
-        departmentDiv.classList.remove('show');
-        departmentSelect.required = false;
-        departmentSelect.value = '';
-        setTimeout(() => {
-          if (!departmentDiv.classList.contains('show')) {
-            departmentDiv.style.display = 'none';
-          }
-        }, 300);
-      }
-    });
+        <div class="mb-3">
+          <label for="full_name" class="form-label">👤 Full Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="full_name"
+            name="full_name"
+            placeholder="Enter your full name"
+            required
+          />
+        </div>
 
-    // Password validation
-    function validatePassword() {
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const passwordField = document.getElementById('password');
-      const confirmField = document.getElementById('confirmPassword');
-      
-      // Reset styles
-      passwordField.style.borderColor = '';
-      confirmField.style.borderColor = '';
-      
-      if (password && confirmPassword) {
-        if (password !== confirmPassword) {
-          confirmField.style.borderColor = '#e74c3c';
-          return false;
+        <div class="mb-3">
+          <label for="email" class="form-label">📧 Email Address</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            placeholder="Enter your email address"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="username" class="form-label">🆔 Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            placeholder="Choose a username"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">🔒 Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            placeholder="Create a strong password"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label"
+            >🔒 Confirm Password</label
+          >
+          <input
+            type="password"
+            class="form-control"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Confirm your password"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="role" class="form-label">👤 Role</label>
+          <select class="form-select" id="role" name="role" required>
+            <option value="">Choose your role</option>
+            <option value="Admin">🔧 Admin</option>
+            <option value="Analyst">📊 Analyst</option>
+            <option value="Departmental">🏢 Departmental</option>
+            <option value="Viewer">👁️ Viewer</option>
+          </select>
+        </div>
+
+        <div
+          class="mb-4 department-selection"
+          id="departmentDiv"
+          style="display: none"
+        >
+          <label for="department" class="form-label">🏢 Department</label>
+          <select class="form-select" id="department" name="department">
+            <option value="">Select your department</option>
+            <option value="Sales">💰 Sales</option>
+            <option value="Marketing">📢 Marketing</option>
+            <option value="Finance">💼 Finance</option>
+            <option value="Human Resources">👥 Human Resources</option>
+            <option value="IT">💻 Information Technology</option>
+            <option value="Operations">⚙️ Operations</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label checkbox-container">
+            <input type="checkbox" id="terms" name="terms" required />
+            <span class="checkmark"></span>
+            I agree to the
+            <a href="#" class="terms-link">Terms & Conditions</a> and
+            <a href="#" class="terms-link">Privacy Policy</a>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary mb-2">Create Account</button>
+
+        <div class="text-center mb-3">
+          <p class="login-link">
+            Already have an account?
+            <a href="page.html" class="auth-link">Login here</a>
+          </p>
+        </div>
+
+        <div class="dashboard-actions">
+          <button
+            type="button"
+            class="action-btn"
+            onclick="window.location.href='analytics_demo.html'"
+          >
+            📊 View Demo
+          </button>
+          <button
+            type="button"
+            class="action-btn"
+            onclick="window.location.href='user_guide.html'"
+          >
+            📖 Help Center
+          </button>
+          <button
+            type="button"
+            class="action-btn"
+            onclick="window.location.href='contact_support.html'"
+          >
+            💬 Contact Us
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Show/hide department selection based on role
+      document.getElementById("role").addEventListener("change", function () {
+        const departmentDiv = document.getElementById("departmentDiv");
+        const departmentSelect = document.getElementById("department");
+
+        if (this.value === "Departmental") {
+          departmentDiv.style.display = "block";
+          departmentSelect.required = true;
+          setTimeout(() => {
+            departmentDiv.classList.add("show");
+          }, 10);
         } else {
-          confirmField.style.borderColor = '#27ae60';
-          return true;
+          departmentDiv.classList.remove("show");
+          departmentSelect.required = false;
+          departmentSelect.value = "";
+          setTimeout(() => {
+            if (!departmentDiv.classList.contains("show")) {
+              departmentDiv.style.display = "none";
+            }
+          }, 300);
         }
-      }
-      return true;
-    }
+      });
 
-    // Real-time password confirmation
-    document.getElementById('confirmPassword').addEventListener('input', validatePassword);
-    document.getElementById('password').addEventListener('input', validatePassword);
+      // Password validation
+      function validatePassword() {
+        const password = document.getElementById("password").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+        const passwordField = document.getElementById("password");
+        const confirmField = document.getElementById("confirmPassword");
 
-    // Form validation
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const role = document.getElementById('role').value;
-      const department = document.getElementById('department').value;
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const terms = document.getElementById('terms').checked;
-      
-      if (role === 'Departmental' && !department) {
-        e.preventDefault();
-        alert('Please select your department.');
-        document.getElementById('department').focus();
-        return;
-      }
-      
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        alert('Passwords do not match. Please check and try again.');
-        document.getElementById('confirmPassword').focus();
-        return;
-      }
-      
-      if (password.length < 6) {
-        e.preventDefault();
-        alert('Password must be at least 6 characters long.');
-        document.getElementById('password').focus();
-        return;
-      }
-      
-      if (!terms) {
-        e.preventDefault();
-        alert('Please agree to the Terms & Conditions to proceed.');
-        document.getElementById('terms').focus();
-        return;
-      }
-    });
-  </script>
-</body>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <form method="POST" action="http://localhost:8000/register"></form>
-  <meta charset="UTF-8" />
-  <title>Analytics Dashboard Registration</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="#" />
-</head>
-<body>
-  <div class="top-banner">
-    <div class="fancy-title">Analytics Dashboard</div>
-    <p>Create your account for real-time analytics</p>
-  </div>
-  <div class="login-container">
-    <form method="POST" action="/register">
-      <h3 class="login-heading">Create New Account</h3>
-      
-      <div class="mb-3">
-        <label for="full_name" class="form-label">👤 Full Name</label>
-        <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Enter your full name" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="email" class="form-label">📧 Email Address</label>
-        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="username" class="form-label">🆔 Username</label>
-        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="password" class="form-label">🔒 Password</label>
-        <input type="password" class="form-control" id="password" name="password" placeholder="Create a strong password" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="confirmPassword" class="form-label">🔒 Confirm Password</label>
-        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required />
-      </div>
-      
-      <div class="mb-4">
-        <label for="role" class="form-label">👤 Role</label>
-        <select class="form-select" id="role" name="role" required>
-          <option value="">Choose your role</option>
-          <option value="Admin">🔧 Admin</option>
-          <option value="Analyst">📊 Analyst</option>
-          <option value="Departmental">🏢 Departmental</option>
-          <option value="Viewer">👁️ Viewer</option>
-        </select>
-      </div>
-      
-      <div class="mb-4 department-selection" id="departmentDiv" style="display: none;">
-        <label for="department" class="form-label">🏢 Department</label>
-        <select class="form-select" id="department" name="department">
-          <option value="">Select your department</option>
-          <option value="Sales">💰 Sales</option>
-          <option value="Marketing">📢 Marketing</option>
-          <option value="Finance">💼 Finance</option>
-          <option value="Human Resources">👥 Human Resources</option>
-          <option value="IT">💻 Information Technology</option>
-          <option value="Operations">⚙️ Operations</option>
-        </select>
-      </div>
-      
-      <div class="mb-4">
-        <label class="form-label checkbox-container">
-          <input type="checkbox" id="terms" name="terms" required />
-          <span class="checkmark"></span>
-          I agree to the <a href="#" class="terms-link">Terms & Conditions</a> and <a href="#" class="terms-link">Privacy Policy</a>
-        </label>
-      </div>
-      
-      <button type="submit" class="btn-primary mb-2">Create Account</button>
-      
-      <div class="text-center mb-3">
-        <p class="login-link">Already have an account? <a href="page.html" class="auth-link">Login here</a></p>
-      </div>
-      
-      <div class="dashboard-actions">
-        <button type="button" class="action-btn" onclick="window.location.href='analytics_demo.html'">📊 View Demo</button>
-        <button type="button" class="action-btn" onclick="window.location.href='user_guide.html'">📖 Help Center</button>
-        <button type="button" class="action-btn" onclick="window.location.href='contact_support.html'">💬 Contact Us</button>
-      </div>
-    </form>
-  </div>
+        // Reset styles
+        passwordField.style.borderColor = "";
+        confirmField.style.borderColor = "";
 
-  <script>
-    // Show/hide department selection based on role
-    document.getElementById('role').addEventListener('change', function() {
-      const departmentDiv = document.getElementById('departmentDiv');
-      const departmentSelect = document.getElementById('department');
-      
-      if (this.value === 'Departmental') {
-        departmentDiv.style.display = 'block';
-        departmentSelect.required = true;
-        setTimeout(() => {
-          departmentDiv.classList.add('show');
-        }, 10);
-      } else {
-        departmentDiv.classList.remove('show');
-        departmentSelect.required = false;
-        departmentSelect.value = '';
-        setTimeout(() => {
-          if (!departmentDiv.classList.contains('show')) {
-            departmentDiv.style.display = 'none';
+        if (password && confirmPassword) {
+          if (password !== confirmPassword) {
+            confirmField.style.borderColor = "#e74c3c";
+            return false;
+          } else {
+            confirmField.style.borderColor = "#27ae60";
+            return true;
           }
-        }, 300);
-      }
-    });
-
-    // Password validation
-    function validatePassword() {
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const passwordField = document.getElementById('password');
-      const confirmField = document.getElementById('confirmPassword');
-      
-      // Reset styles
-      passwordField.style.borderColor = '';
-      confirmField.style.borderColor = '';
-      
-      if (password && confirmPassword) {
-        if (password !== confirmPassword) {
-          confirmField.style.borderColor = '#e74c3c';
-          return false;
-        } else {
-          confirmField.style.borderColor = '#27ae60';
-          return true;
         }
+        return true;
       }
-      return true;
-    }
 
-    // Real-time password confirmation
-    document.getElementById('confirmPassword').addEventListener('input', validatePassword);
-    document.getElementById('password').addEventListener('input', validatePassword);
+      // Real-time password confirmation
+      document
+        .getElementById("confirmPassword")
+        .addEventListener("input", validatePassword);
+      document
+        .getElementById("password")
+        .addEventListener("input", validatePassword);
 
-    // Form validation
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const role = document.getElementById('role').value;
-      const department = document.getElementById('department').value;
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const terms = document.getElementById('terms').checked;
-      
-      if (role === 'Departmental' && !department) {
-        e.preventDefault();
-        alert('Please select your department.');
-        document.getElementById('department').focus();
-        return;
-      }
-      
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        alert('Passwords do not match. Please check and try again.');
-        document.getElementById('confirmPassword').focus();
-        return;
-      }
-      
-      if (password.length < 6) {
-        e.preventDefault();
-        alert('Password must be at least 6 characters long.');
-        document.getElementById('password').focus();
-        return;
-      }
-      
-      if (!terms) {
-        e.preventDefault();
-        alert('Please agree to the Terms & Conditions to proceed.');
-        document.getElementById('terms').focus();
-        return;
-      }
-    });
-  </script>
-</body>
->>>>>>> chart-creator
+      // Form validation
+      document.querySelector("form").addEventListener("submit", function (e) {
+        const role = document.getElementById("role").value;
+        const department = document.getElementById("department").value;
+        const password = document.getElementById("password").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+        const terms = document.getElementById("terms").checked;
+
+        if (role === "Departmental" && !department) {
+          e.preventDefault();
+          alert("Please select your department.");
+          document.getElementById("department").focus();
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          e.preventDefault();
+          alert("Passwords do not match. Please check and try again.");
+          document.getElementById("confirmPassword").focus();
+          return;
+        }
+
+        if (password.length < 6) {
+          e.preventDefault();
+          alert("Password must be at least 6 characters long.");
+          document.getElementById("password").focus();
+          return;
+        }
+
+        if (!terms) {
+          e.preventDefault();
+          alert("Please agree to the Terms & Conditions to proceed.");
+          document.getElementById("terms").focus();
+          return;
+        }
+      });
+    </script>
+  </body>
 </html>

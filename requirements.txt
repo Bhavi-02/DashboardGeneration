@@ -1,40 +1,3 @@
-<<<<<<< HEAD
-torch 
-transformers 
-scikit-learn 
-numpy 
-pandas 
-tqdm
-plotly
-openpyxl
-fastapi
-uvicorn[standard]
-pymysql
-sqlalchemy
-python-jose[cryptography]
-passlib[bcrypt]
-python-multipart
-pydantic[email]
-python-dotenv
-requests
-
-# RAG System Dependencies
-langchain
-langchain-community
-langchain-openai
-langchain-core
-langchain-text-splitters
-faiss-cpu
-pymupdf
-python-docx
-python-pptx
-pillow
-pytesseract
-zipfile36
-beautifulsoup4
-lxml
-httpx
-=======
 torch 
 transformers 
 scikit-learn 
@@ -75,4 +38,3 @@ beautifulsoup4
 lxml
 httpx
 rank_bm25
->>>>>>> chart-creator

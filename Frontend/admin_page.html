@@ -1,263 +1,160 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Panel - Full Control</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
-            background: white;
-            border-radius: 15px;
-            padding: 20px 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.3s;
-            text-decoration: none;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        .content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        h1 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .feature-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        .feature-box h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .feature-box p {
-            color: #666;
-            line-height: 1.6;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .header {
+        background: white;
+        border-radius: 15px;
+        padding: 20px 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .btn-group {
+        display: flex;
+        gap: 10px;
+      }
+      .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.3s;
+        text-decoration: none;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .content {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+      h1 {
+        color: #667eea;
+        margin-bottom: 20px;
+      }
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+      .feature-box {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+      }
+      .feature-box h3 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .feature-box p {
+        color: #666;
+        line-height: 1.6;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="header">
-        <h2 style="color: #667eea;">🔧 Admin Panel</h2>
-        <div class="btn-group">
-            <a href="/interactive-dashboard" class="btn">📊 Dashboard Builder</a>
-            <a href="/dashboard-explainer" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🔍 Explain Dashboard with AI</a>
-            <a href="/home" class="btn">← Back to Home</a>
-            <button class="btn" onclick="logout()">Logout</button>
-        </div>
+      <h2 style="color: #667eea">🔧 Admin Panel</h2>
+      <div class="btn-group">
+        <a href="/interactive-dashboard" class="btn">📊 Dashboard Builder</a>
+        <a
+          href="/dashboard-explainer"
+          class="btn"
+          style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+          >🔍 Explain Dashboard with AI</a
+        >
+        <a href="/home" class="btn">← Back to Home</a>
+        <button class="btn" onclick="logout()">Logout</button>
+      </div>
     </div>
 
     <div class="content">
-        <h1>Administrator Control Panel</h1>
-        <p>Welcome to the Admin Panel. Here you have full control over the system.</p>
+      <h1>Administrator Control Panel</h1>
+      <p>
+        Welcome to the Admin Panel. Here you have full control over the system.
+      </p>
 
-        <div class="feature-grid">
-            <div class="feature-box">
-                <h3>👥 User Management</h3>
-                <p>Create, edit, and manage user accounts. Assign roles and permissions.</p>
-            </div>
-            <div class="feature-box">
-                <h3>⚙️ System Settings</h3>
-                <p>Configure system-wide settings, preferences, and integrations.</p>
-            </div>
-            <div class="feature-box">
-                <h3>📊 All Analytics</h3>
-                <p>Access all analytics dashboards and comprehensive reports.</p>
-            </div>
-            <div class="feature-box">
-                <h3>🔒 Security Controls</h3>
-                <p>Manage security settings, audit logs, and access controls.</p>
-            </div>
-            <div class="feature-box">
-                <h3>🏢 Department Management</h3>
-                <p>Oversee all departments and their configurations.</p>
-            </div>
-            <div class="feature-box">
-                <h3>📈 Performance Monitoring</h3>
-                <p>Monitor system performance and usage statistics.</p>
-            </div>
-            <div class="feature-box" style="border-left-color: #f5576c;">
-                <h3>🔍 Dashboard Explainability</h3>
-                <p>Use AI-powered RAG to get intelligent insights and explanations for your dashboards.</p>
-                <a href="/dashboard-explainer" style="display: inline-block; margin-top: 10px; padding: 8px 15px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; text-decoration: none; border-radius: 20px;">Open Explainer</a>
-            </div>
+      <div class="feature-grid">
+        <div class="feature-box">
+          <h3>👥 User Management</h3>
+          <p>
+            Create, edit, and manage user accounts. Assign roles and
+            permissions.
+          </p>
         </div>
+        <div class="feature-box">
+          <h3>⚙️ System Settings</h3>
+          <p>Configure system-wide settings, preferences, and integrations.</p>
+        </div>
+        <div class="feature-box">
+          <h3>📊 All Analytics</h3>
+          <p>Access all analytics dashboards and comprehensive reports.</p>
+        </div>
+        <div class="feature-box">
+          <h3>🔒 Security Controls</h3>
+          <p>Manage security settings, audit logs, and access controls.</p>
+        </div>
+        <div class="feature-box">
+          <h3>🏢 Department Management</h3>
+          <p>Oversee all departments and their configurations.</p>
+        </div>
+        <div class="feature-box">
+          <h3>📈 Performance Monitoring</h3>
+          <p>Monitor system performance and usage statistics.</p>
+        </div>
+        <div class="feature-box" style="border-left-color: #f5576c">
+          <h3>🔍 Dashboard Explainability</h3>
+          <p>
+            Use AI-powered RAG to get intelligent insights and explanations for
+            your dashboards.
+          </p>
+          <a
+            href="/dashboard-explainer"
+            style="
+              display: inline-block;
+              margin-top: 10px;
+              padding: 8px 15px;
+              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+              color: white;
+              text-decoration: none;
+              border-radius: 20px;
+            "
+            >Open Explainer</a
+          >
+        </div>
+      </div>
     </div>
 
     <script>
-        function logout() {
-            fetch('/logout', { method: 'POST' })
-                .then(() => window.location.href = '/page.html');
-        }
+      function logout() {
+        fetch("/logout", { method: "POST" }).then(
+          () => (window.location.href = "/page.html")
+        );
+      }
     </script>
-</body>
+  </body>
 </html>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Full Control</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
-            background: white;
-            border-radius: 15px;
-            padding: 20px 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.3s;
-            text-decoration: none;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        .content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        h1 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .feature-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        .feature-box h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .feature-box p {
-            color: #666;
-            line-height: 1.6;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h2 style="color: #667eea;">🔧 Admin Panel</h2>
-        <div class="btn-group">
-            <a href="/interactive-dashboard" class="btn">📊 Dashboard Builder</a>
-            <a href="/dashboard-explainer" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🔍 Explain Dashboard with AI</a>
-            <a href="/home" class="btn">← Back to Home</a>
-            <button class="btn" onclick="logout()">Logout</button>
-        </div>
-    </div>
-
-    <div class="content">
-        <h1>Administrator Control Panel</h1>
-        <p>Welcome to the Admin Panel. Here you have full control over the system.</p>
-
-        <div class="feature-grid">
-            <div class="feature-box">
-                <h3>👥 User Management</h3>
-                <p>Create, edit, and manage user accounts. Assign roles and permissions.</p>
-            </div>
-            <div class="feature-box">
-                <h3>⚙️ System Settings</h3>
-                <p>Configure system-wide settings, preferences, and integrations.</p>
-            </div>
-            <div class="feature-box">
-                <h3>📊 All Analytics</h3>
-                <p>Access all analytics dashboards and comprehensive reports.</p>
-            </div>
-            <div class="feature-box">
-                <h3>🔒 Security Controls</h3>
-                <p>Manage security settings, audit logs, and access controls.</p>
-            </div>
-            <div class="feature-box">
-                <h3>🏢 Department Management</h3>
-                <p>Oversee all departments and their configurations.</p>
-            </div>
-            <div class="feature-box">
-                <h3>📈 Performance Monitoring</h3>
-                <p>Monitor system performance and usage statistics.</p>
-            </div>
-            <div class="feature-box" style="border-left-color: #f5576c;">
-                <h3>🔍 Dashboard Explainability</h3>
-                <p>Use AI-powered RAG to get intelligent insights and explanations for your dashboards.</p>
-                <a href="/dashboard-explainer" style="display: inline-block; margin-top: 10px; padding: 8px 15px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; text-decoration: none; border-radius: 20px;">Open Explainer</a>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function logout() {
-            fetch('/logout', { method: 'POST' })
-                .then(() => window.location.href = '/page.html');
-        }
-    </script>
-</body>
-</html>
->>>>>>> chart-creator

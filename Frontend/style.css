@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 * {
   margin: 0;
   padding: 0;
@@ -8,7 +7,8 @@
 body {
   background: radial-gradient(circle at 50% 35%, #7d70fa 0%, #5936b4 100%);
   min-height: 100vh;
-  font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  font-family: "Segoe UI", "Inter", -apple-system, BlinkMacSystemFont, Arial,
+    sans-serif;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -30,7 +30,14 @@ body {
   font-size: 2.85rem;
   font-weight: 900;
   line-height: 1.2;
-  background: linear-gradient(90deg, #ffffff 0%, #e1f5fe 25%, #bbdefb 50%, #90caf9 75%, #64b5f6 100%);
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #e1f5fe 25%,
+    #bbdefb 50%,
+    #90caf9 75%,
+    #64b5f6 100%
+  );
   color: #ffffff; /* Strong fallback color */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -49,10 +56,8 @@ body {
 @supports not (-webkit-background-clip: text) {
   .fancy-title {
     color: #ffffff !important;
-    text-shadow: 
-      0 0 10px rgba(255, 255, 255, 0.8),
-      0 0 20px rgba(100, 181, 246, 0.6),
-      0 0 30px rgba(100, 181, 246, 0.4);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+      0 0 20px rgba(100, 181, 246, 0.6), 0 0 30px rgba(100, 181, 246, 0.4);
   }
 }
 
@@ -104,7 +109,8 @@ body {
   letter-spacing: 0.3px;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
   width: 100%;
   padding: 12px 16px;
   border: 2px solid #e8e5f5;
@@ -116,7 +122,8 @@ body {
   font-family: inherit;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   outline: none;
   border-color: #7051ec;
   box-shadow: 0 0 0 3px rgba(112, 81, 236, 0.1);
@@ -207,7 +214,7 @@ body {
 
 /* Additional styling for better visual effects */
 .login-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -231,9 +238,15 @@ body {
 
 /* Loading animation for login button */
 @keyframes pulse {
-  0% { box-shadow: 0 8px 25px rgba(112, 81, 236, 0.3); }
-  50% { box-shadow: 0 8px 25px rgba(112, 81, 236, 0.5); }
-  100% { box-shadow: 0 8px 25px rgba(112, 81, 236, 0.3); }
+  0% {
+    box-shadow: 0 8px 25px rgba(112, 81, 236, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 25px rgba(112, 81, 236, 0.5);
+  }
+  100% {
+    box-shadow: 0 8px 25px rgba(112, 81, 236, 0.3);
+  }
 }
 
 .btn-primary:focus {
@@ -365,381 +378,10 @@ body {
     font-size: 1.9rem;
   }
 
-  .form-control, .form-select, .btn-primary {
+  .form-control,
+  .form-select,
+  .btn-primary {
     padding: 10px 14px;
     font-size: 0.95rem;
   }
 }
-=======
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: radial-gradient(circle at 50% 35%, #7d70fa 0%, #5936b4 100%);
-  min-height: 100vh;
-  font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.top-banner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.fancy-title {
-  font-size: 2.85rem;
-  font-weight: 900;
-  line-height: 1.2;
-  background: linear-gradient(90deg, #ffffff 0%, #e1f5fe 25%, #bbdefb 50%, #90caf9 75%, #64b5f6 100%);
-  color: #ffffff; /* Strong fallback color */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -1px;
-  margin-bottom: 0.5rem;
-  text-align: center;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  word-spacing: 0.1em;
-  display: block;
-  width: 100%;
-}
-
-/* Fallback for browsers that don't support background-clip: text */
-@supports not (-webkit-background-clip: text) {
-  .fancy-title {
-    color: #ffffff !important;
-    text-shadow: 
-      0 0 10px rgba(255, 255, 255, 0.8),
-      0 0 20px rgba(100, 181, 246, 0.6),
-      0 0 30px rgba(100, 181, 246, 0.4);
-  }
-}
-
-.top-banner p {
-  color: #e1dbf2;
-  font-size: 1.22rem;
-  margin-top: 0;
-  margin-bottom: 0;
-  text-align: center;
-  letter-spacing: 0.2px;
-}
-
-.login-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  max-width: 420px;
-  width: 100%;
-  padding: 40px 35px;
-  margin: 0 auto;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(80, 85, 130, 0.25);
-  position: relative;
-  z-index: 2;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.login-heading {
-  color: #9079eb;
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.mb-3 {
-  margin-bottom: 20px;
-}
-
-.mb-4 {
-  margin-bottom: 25px;
-}
-
-.form-label {
-  display: block;
-  font-weight: 600;
-  color: #5339ca;
-  font-size: 0.95rem;
-  margin-bottom: 8px;
-  letter-spacing: 0.3px;
-}
-
-.form-control, .form-select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e8e5f5;
-  border-radius: 12px;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  transition: all 0.3s ease;
-  font-family: inherit;
-}
-
-.form-control:focus, .form-select:focus {
-  outline: none;
-  border-color: #7051ec;
-  box-shadow: 0 0 0 3px rgba(112, 81, 236, 0.1);
-  background: #fff;
-}
-
-.form-control::placeholder {
-  color: #a8a3c7;
-  font-weight: 400;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #7051ec 0%, #5ad2ea 100%);
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-weight: 600;
-  font-size: 1.1rem;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(112, 81, 236, 0.3);
-  text-transform: uppercase;
-  font-family: inherit;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(112, 81, 236, 0.4);
-  background: linear-gradient(135deg, #5a3fd8 0%, #4bc4e0 100%);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 5px 15px rgba(112, 81, 236, 0.3);
-}
-
-.w-100 {
-  width: 100%;
-}
-
-.mb-2 {
-  margin-bottom: 15px;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.dashboard-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 25px;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  flex: 1;
-  text-align: center;
-  border-radius: 12px;
-  background: linear-gradient(145deg, #f8f6ff, #ede8ff);
-  color: #634ccc;
-  padding: 12px 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(230, 230, 250, 0.4);
-  font-size: 0.9rem;
-  border: none;
-  margin-bottom: 4px;
-  min-width: 115px;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid rgba(99, 76, 204, 0.1);
-}
-
-.action-btn:hover {
-  background: linear-gradient(145deg, #eadeca, #ddd0f7);
-  color: #412e7a;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(230, 230, 250, 0.6);
-}
-
-.action-btn:active {
-  transform: translateY(0);
-}
-
-/* Additional styling for better visual effects */
-.login-container::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(135deg, #7051ec, #5ad2ea, #b04bfc);
-  border-radius: 22px;
-  z-index: -1;
-  opacity: 0.1;
-}
-
-.form-control:hover {
-  border-color: #9b87f5;
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.form-select:hover {
-  border-color: #9b87f5;
-  background: rgba(255, 255, 255, 0.95);
-}
-
-/* Loading animation for login button */
-@keyframes pulse {
-  0% { box-shadow: 0 8px 25px rgba(112, 81, 236, 0.3); }
-  50% { box-shadow: 0 8px 25px rgba(112, 81, 236, 0.5); }
-  100% { box-shadow: 0 8px 25px rgba(112, 81, 236, 0.3); }
-}
-
-.btn-primary:focus {
-  animation: pulse 2s infinite;
-  outline: none;
-}
-
-/* Department selection animation */
-.department-selection {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
-  overflow: hidden;
-  max-height: 0;
-}
-
-.department-selection.show {
-  opacity: 1;
-  transform: translateY(0);
-  max-height: 100px;
-  margin-bottom: 20px;
-}
-
-/* Highlight department field when visible */
-.department-selection.show .form-select {
-  border-color: #7051ec;
-  box-shadow: 0 0 0 2px rgba(112, 81, 236, 0.1);
-}
-
-/* Registration page specific styles */
-.checkbox-container {
-  display: flex;
-  align-items: flex-start;
-  cursor: pointer;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  gap: 10px;
-}
-
-.checkbox-container input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  cursor: pointer;
-  accent-color: #7051ec;
-}
-
-.checkbox-container .checkmark {
-  min-width: 18px;
-  height: 18px;
-}
-
-.terms-link {
-  color: #7051ec;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.terms-link:hover {
-  color: #5a3fd8;
-  text-decoration: underline;
-}
-
-.login-link {
-  color: #666;
-  font-size: 0.95rem;
-  margin: 0;
-}
-
-.auth-link {
-  color: #7051ec;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.auth-link:hover {
-  color: #5a3fd8;
-  text-decoration: underline;
-}
-
-/* Password validation visual feedback */
-.form-control[style*="border-color: rgb(231, 76, 60)"] {
-  border-color: #e74c3c !important;
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
-}
-
-.form-control[style*="border-color: rgb(39, 174, 96)"] {
-  border-color: #27ae60 !important;
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1) !important;
-}
-
-/* Responsive design */
-@media (max-width: 600px) {
-  body {
-    padding: 15px;
-  }
-
-  .login-container {
-    max-width: 100%;
-    padding: 30px 25px;
-  }
-
-  .fancy-title {
-    font-size: 2.2rem;
-  }
-
-  .top-banner p {
-    font-size: 1.1rem;
-  }
-
-  .dashboard-actions {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .action-btn {
-    min-width: auto;
-  }
-}
-
-@media (max-width: 400px) {
-  .login-container {
-    padding: 25px 20px;
-  }
-
-  .fancy-title {
-    font-size: 1.9rem;
-  }
-
-  .form-control, .form-select, .btn-primary {
-    padding: 10px 14px;
-    font-size: 0.95rem;
-  }
-}
->>>>>>> chart-creator
