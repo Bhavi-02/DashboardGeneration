@@ -495,14 +495,238 @@ class ChartGenerator:
         
         return fig
     
+    def create_area_chart(self, data, metric, dimension, title=None):
+        """Create a beautiful area chart from real data (supports multi-series with stacked areas)"""
+        if data is None or data.empty:
+            raise Exception("❌ No data available for area chart generation")
+        
+        # Reset index to ensure we're not plotting index values
+        data = data.reset_index(drop=True)
+        
+        # Check if this is multi-series data (3 columns: dimension, group_by, metric)
+        is_multi_series = len(data.columns) == 3 and 'group_by_' in data.columns[1]
+        
+        if is_multi_series:
+            # Multi-series area chart: Column 0 = dimension (X), Column 1 = group_by (areas), Column 2 = metric (Y)
+            dimension_col = data.columns[0]
+            group_by_col = data.columns[1]
+            metric_col = data.columns[2]
+            
+            print(f"\n🔍 DEBUG create_area_chart (MULTI-SERIES STACKED):")
+            print(f"   Data shape: {data.shape}")
+            print(f"   Dimension (X-axis): {dimension_col}")
+            print(f"   Group By (areas): {group_by_col}")
+            print(f"   Metric (Y-axis): {metric_col}")
+            print(f"   Unique categories: {data[group_by_col].nunique()}")
+            
+            import plotly.graph_objects as go
+            fig = go.Figure()
+            
+            # Get unique categories for grouping
+            categories = data[group_by_col].unique()
+            colors = self.color_palettes['professional']
+            
+            # Create one area per category (stacked)
+            for idx, category in enumerate(categories):
+                category_data = data[data[group_by_col] == category].sort_values(dimension_col)
+                
+                color = colors[idx % len(colors)]
+                
+                fig.add_trace(go.Scatter(
+                    x=category_data[dimension_col].tolist(),
+                    y=category_data[metric_col].tolist(),
+                    mode='lines',
+                    name=str(category),
+                    line=dict(width=0.5, color=color),
+                    fill='tonexty' if idx > 0 else 'tozeroy',  # Stack areas
+                    fillcolor=color,
+                    hovertemplate=f'<b>{category}</b><br>' +
+                                 '%{x}<br>' +
+                                 f'{metric.title()}: %{{y:,.0f}}<br>' +
+                                 '<extra></extra>'
+                ))
+            
+            print(f"   ✅ Created {len(categories)} stacked areas for multi-series chart")
+            
+            fig.update_layout(
+                title={
+                    'text': title or f"{metric.title()} Trend by {dimension.title()} (stacked)",
+                    'x': 0.5,
+                    'xanchor': 'center',
+                    'font': {'size': 20, 'color': '#2C3E50', 'family': 'Arial Black'}
+                },
+                xaxis_title=dimension.title(),
+                yaxis_title=metric.title(),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font={'family': 'Arial', 'color': '#34495E'},
+                height=500,
+                margin=dict(t=80, l=60, r=60, b=60),
+                template='plotly_white',
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="left",
+                    x=1.02
+                ),
+                hovermode='x unified'
+            )
+            
+        else:
+            # Single-series area chart: Column 0 = dimension (X), Column 1 = metric (Y)
+            metric_col = data.columns[1]
+            dimension_col = data.columns[0]
+            
+            print(f"\n🔍 DEBUG create_area_chart (SINGLE-SERIES):")
+            print(f"   Data shape: {data.shape}")
+            print(f"   Dimension column: {dimension_col}")
+            print(f"   Metric column: {metric_col}")
+            
+            # Extract values explicitly
+            x_values = data[dimension_col].tolist()
+            y_values = data[metric_col].tolist()
+            
+            import plotly.graph_objects as go
+            fig = go.Figure()
+            
+            fig.add_trace(go.Scatter(
+                x=x_values,
+                y=y_values,
+                mode='lines',
+                name=metric.title(),
+                line=dict(width=2, color='#3498DB'),
+                fill='tozeroy',
+                fillcolor='rgba(52, 152, 219, 0.3)',
+                hovertemplate='<b>%{x}</b><br>' +
+                             f'{metric.title()}: %{{y:,.0f}}<br>' +
+                             '<extra></extra>'
+            ))
+            
+            fig.update_layout(
+                title={
+                    'text': title or f"{metric.title()} Trend by {dimension.title()}",
+                    'x': 0.5,
+                    'xanchor': 'center',
+                    'font': {'size': 20, 'color': '#2C3E50', 'family': 'Arial Black'}
+                },
+                xaxis_title=dimension.title(),
+                yaxis_title=metric.title(),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font={'family': 'Arial', 'color': '#34495E'},
+                height=500,
+                margin=dict(t=80, l=60, r=60, b=60),
+                template='plotly_white',
+                showlegend=False
+            )
+        
+        # Enhance gridlines
+        fig.update_xaxes(
+            showgrid=False,
+            linecolor='#BDC3C7',
+            linewidth=2
+        )
+        fig.update_yaxes(
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='#ECF0F1',
+            linecolor='#BDC3C7',
+            linewidth=2
+        )
+        
+        return fig
+    
     def create_pie_chart(self, data, metric, dimension, title=None):
-        """Create a beautiful pie chart from real data with enhanced colors"""
+        """Create a beautiful pie chart from real data with enhanced colors (supports multi-series with subplots)"""
         if data is None or data.empty:
             raise Exception("❌ No data available for pie chart generation")
         
         # Reset index to ensure we're not plotting index values
         data = data.reset_index(drop=True)
         
+        # Check if this is multi-series data (3 columns: dimension, group_by, metric)
+        is_multi_series = len(data.columns) == 3 and 'group_by_' in data.columns[1]
+        
+        if is_multi_series:
+            # Multi-series pie chart: Create subplots for each group
+            dimension_col = data.columns[0]
+            group_by_col = data.columns[1]
+            metric_col = data.columns[2]
+            
+            print(f"\n🔍 DEBUG create_pie_chart (MULTI-SERIES SUBPLOTS):")
+            print(f"   Data shape: {data.shape}")
+            print(f"   Dimension: {dimension_col}")
+            print(f"   Group By: {group_by_col}")
+            print(f"   Metric: {metric_col}")
+            
+            from plotly.subplots import make_subplots
+            import plotly.graph_objects as go
+            
+            categories = data[group_by_col].unique()
+            num_categories = len(categories)
+            
+            # Limit to 4 subplots for readability
+            if num_categories > 4:
+                print(f"   ⚠️  Limiting to top 4 categories (out of {num_categories})")
+                # Get top 4 categories by total metric value
+                top_categories = data.groupby(group_by_col)[metric_col].sum().nlargest(4).index.tolist()
+                data = data[data[group_by_col].isin(top_categories)]
+                categories = top_categories
+                num_categories = 4
+            
+            # Create subplots (2 columns max)
+            cols = min(2, num_categories)
+            rows = (num_categories + cols - 1) // cols
+            
+            fig = make_subplots(
+                rows=rows, cols=cols,
+                specs=[[{'type': 'pie'}] * cols for _ in range(rows)],
+                subplot_titles=[str(cat) for cat in categories]
+            )
+            
+            colors = self.color_palettes['modern']
+            
+            for idx, category in enumerate(categories):
+                row = idx // cols + 1
+                col = idx % cols + 1
+                
+                category_data = data[data[group_by_col] == category]
+                labels = category_data[dimension_col].tolist()
+                values = category_data[metric_col].tolist()
+                
+                fig.add_trace(
+                    go.Pie(
+                        labels=labels,
+                        values=values,
+                        name=str(category),
+                        marker=dict(colors=colors, line=dict(color='white', width=2)),
+                        hovertemplate='<b>%{label}</b><br>' +
+                                     f'{metric.title()}: %{{value:,.0f}}<br>' +
+                                     'Percentage: %{percent}<br>' +
+                                     '<extra></extra>'
+                    ),
+                    row=row, col=col
+                )
+            
+            fig.update_layout(
+                title={
+                    'text': title or f"{metric.title()} Distribution by {dimension.title()} (grouped by {group_by_col.replace('group_by_', '')})",
+                    'x': 0.5,
+                    'xanchor': 'center',
+                    'font': {'size': 20, 'color': '#2C3E50', 'family': 'Arial Black'}
+                },
+                font={'family': 'Arial', 'color': '#34495E', 'size': 12},
+                height=300 * rows,
+                showlegend=False,
+                template='plotly_white'
+            )
+            
+            print(f"   ✅ Created {num_categories} pie chart subplots")
+            return fig
+        
+        # Single-series pie chart (original logic)
         # Handle case where pie chart has only one metric (single column data)
         if len(data.columns) == 1:
             print("📊 Pie chart with single metric - using row index as dimension")
@@ -575,13 +799,64 @@ class ChartGenerator:
         return fig
     
     def create_scatter_plot(self, data, metrics, dimension, title=None):
-        """Create a scatter plot for comparing metrics"""
+        """Create a scatter plot for comparing metrics (supports multi-series with colored groups)"""
         if data is None or data.empty:
             raise Exception("❌ No data available for scatter plot generation")
         
         # Reset index to ensure we're not plotting index values
         data = data.reset_index(drop=True)
+        
+        # Check if this is multi-series data (3 columns: dimension, group_by, metric)
+        is_multi_series = len(data.columns) == 3 and 'group_by_' in data.columns[1]
+        
+        if is_multi_series:
+            # For multi-series scatter, use dimension as X, metric as Y, color by group_by
+            dimension_col = data.columns[0]
+            group_by_col = data.columns[1]
+            metric_col = data.columns[2]
             
+            print(f"\n🔍 DEBUG create_scatter_plot (MULTI-SERIES):")
+            print(f"   Data shape: {data.shape}")
+            print(f"   X-axis (dimension): {dimension_col}")
+            print(f"   Y-axis (metric): {metric_col}")
+            print(f"   Color by: {group_by_col}")
+            
+            import plotly.express as px
+            
+            fig = px.scatter(
+                data,
+                x=dimension_col,
+                y=metric_col,
+                color=group_by_col,
+                size=metric_col,
+                title=title or f"{metrics} by {dimension} (grouped by {group_by_col.replace('group_by_', '')})",
+                color_discrete_sequence=self.color_palettes['vibrant']
+            )
+            
+            fig.update_layout(
+                xaxis_title=dimension.title(),
+                yaxis_title=metrics if isinstance(metrics, str) else metrics[0] if metrics else 'Value',
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font={'family': 'Arial', 'color': '#34495E'},
+                height=500,
+                margin=dict(t=80, l=60, r=60, b=60),
+                template='plotly_white',
+                showlegend=True,
+                legend=dict(
+                    title=group_by_col.replace('group_by_', '').title(),
+                    orientation="v",
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="left",
+                    x=1.02
+                )
+            )
+            
+            print(f"   ✅ Created multi-series scatter plot with {data[group_by_col].nunique()} groups")
+            return fig
+        
+        # Single-series scatter plot (original logic)
         # For scatter plot, we need at least 2 numeric columns
         numeric_cols = data.select_dtypes(include=['number']).columns.tolist()
         
@@ -1054,10 +1329,8 @@ class ChartGenerator:
             elif 'line' in chart_type_lower:
                 return self.create_line_chart(data, actual_metric, actual_dimension, title)
             elif 'area' in chart_type_lower:
-                # For area chart, use line chart with filled area
-                fig = self.create_line_chart(data, actual_metric, actual_dimension, title)
-                fig.update_traces(fill='tozeroy')
-                return fig
+                # Use dedicated area chart method with proper multi-series support
+                return self.create_area_chart(data, actual_metric, actual_dimension, title)
             elif 'pie' in chart_type_lower:
                 return self.create_pie_chart(data, actual_metric, actual_dimension, title)
             elif 'scatter' in chart_type_lower:
