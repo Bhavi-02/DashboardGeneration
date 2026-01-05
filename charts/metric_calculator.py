@@ -85,33 +85,60 @@ class MetricCalculator:
             
         Returns:
             DataFrame with added 'YoY_Growth_Pct' column
+        
+        Note: Handles both single-series and multi-series (grouped) data
         """
         result_df = data.copy()
         
-        # Sort by time dimension to ensure correct ordering
-        result_df = self._sort_by_time_dimension(result_df, time_col)
+        # Check if this is multi-series data (has group_by column)
+        group_by_cols = [col for col in result_df.columns if col.startswith('group_by_')]
         
-        # Calculate year-over-year change
-        result_df['Previous_Value'] = result_df[metric_col].shift(1)
-        
-        # Calculate growth percentage
-        # Handle division by zero: if previous value is 0, set growth to NaN
-        result_df['YoY_Growth_Pct'] = result_df.apply(
-            lambda row: ((row[metric_col] - row['Previous_Value']) / row['Previous_Value'] * 100) 
-            if row['Previous_Value'] != 0 and pd.notna(row['Previous_Value'])
-            else np.nan,
-            axis=1
-        )
-        
-        # Remove intermediate column
-        result_df = result_df.drop('Previous_Value', axis=1)
-        
-        # Log results
-        growth_col_idx = result_df.columns.get_loc('YoY_Growth_Pct')
-        logger.info(f"✅ YoY Growth calculated:")
-        logger.info(f"   Years: {result_df[time_col].tolist()}")
-        logger.info(f"   Values: {result_df[metric_col].tolist()}")
-        logger.info(f"   Growth %: {[f'{x:.1f}%' if pd.notna(x) else 'N/A' for x in result_df['YoY_Growth_Pct'].tolist()]}")
+        if group_by_cols:
+            # Multi-series: Calculate YoY separately for each group
+            group_col = group_by_cols[0]
+            logger.info(f"📊 Multi-series YoY calculation for each group in {group_col}")
+            
+            # Sort by group and time
+            result_df = result_df.sort_values([group_col, time_col])
+            
+            # Calculate YoY growth within each group
+            result_df['Previous_Value'] = result_df.groupby(group_col)[metric_col].shift(1)
+            
+            result_df['YoY_Growth_Pct'] = result_df.apply(
+                lambda row: ((row[metric_col] - row['Previous_Value']) / row['Previous_Value'] * 100) 
+                if row['Previous_Value'] != 0 and pd.notna(row['Previous_Value'])
+                else np.nan,
+                axis=1
+            )
+            
+            result_df = result_df.drop('Previous_Value', axis=1)
+            
+            logger.info(f"✅ Multi-series YoY Growth calculated for {result_df[group_col].nunique()} groups")
+        else:
+            # Single-series: Original logic
+            # Sort by time dimension to ensure correct ordering
+            result_df = self._sort_by_time_dimension(result_df, time_col)
+            
+            # Calculate year-over-year change
+            result_df['Previous_Value'] = result_df[metric_col].shift(1)
+            
+            # Calculate growth percentage
+            # Handle division by zero: if previous value is 0, set growth to NaN
+            result_df['YoY_Growth_Pct'] = result_df.apply(
+                lambda row: ((row[metric_col] - row['Previous_Value']) / row['Previous_Value'] * 100) 
+                if row['Previous_Value'] != 0 and pd.notna(row['Previous_Value'])
+                else np.nan,
+                axis=1
+            )
+            
+            # Remove intermediate column
+            result_df = result_df.drop('Previous_Value', axis=1)
+            
+            # Log results
+            logger.info(f"✅ YoY Growth calculated:")
+            logger.info(f"   Years: {result_df[time_col].tolist()}")
+            logger.info(f"   Values: {result_df[metric_col].tolist()}")
+            logger.info(f"   Growth %: {[f'{x:.1f}%' if pd.notna(x) else 'N/A' for x in result_df['YoY_Growth_Pct'].tolist()]}")
         
         return result_df
     

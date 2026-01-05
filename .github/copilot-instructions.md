@@ -4,9 +4,9 @@
 
 Gen-Dash is an **AI-powered dashboard generation platform** that converts natural language queries into interactive data visualizations. The system uses a hybrid NLP approach (fuzzy matching + LLM fallback) to understand user intent and generate professional, role-based dashboards with AI-generated insights.
 
-**Core Stack**: FastAPI (async backend), MySQL + SQLAlchemy, Plotly (charts), SmartQueryParser (NLP), LangChain RAG, Claude 3 (explanations)
+**Core Stack**: FastAPI (async backend), MySQL + SQLAlchemy, Plotly (charts), SmartQueryParser (NLP), LangChain RAG, Claude 3 Haiku (explanations)
 
-**Current Version**: 1.2.0 (December 2025)
+**Current Version**: 1.2.0 (December 19, 2025)
 
 ## Architecture & Data Flow
 
@@ -41,56 +41,107 @@ def get_dashboard_system():
 
 ## Key Components & Patterns
 
-### 1. SmartQueryParser (Hybrid NLP)
+### 1. NLUChartPipeline (Query Processing)
+
+**Location**: [nlu/chart_pipeline.py](nlu/chart_pipeline.py)
+
+**Architecture**: Complete pipeline from natural language → entities → chart:
+
+```python
+Query → SmartQueryParser → ChartGenerator → Plotly Figure
+```
+
+**Usage Pattern**:
+
+```python
+pipeline = NLUChartPipeline(use_llm=True)
+entities = pipeline.process_query("sales by region")
+fig = pipeline.chart_generator.generate_chart(entities, query)
+```
+
+### 2. SmartQueryParser (Hybrid NLP)
 
 **Location**: [nlu/smart_query_parser.py](nlu/smart_query_parser.py)
 
 **Pattern**: Fuzzy matching first (70-80% queries, <50ms), LLM fallback (20-30%, ~500ms)
 
 ```python
-# Example: parse_query returns flat dict (NOT uppercase NER keys)
+# Example: parse_query returns flat dict with lowercase keys
 entities = {
-    'metric': 'sales',           # NOT 'METRIC': ['sales']
-    'dimension': 'region',
-    'chart_type': 'bar',
-    'aggregation': 'sum',
-    'filters': [],
-    # NEW in v1.2.0: Calculated metrics support
-    'calculation_type': 'yoy_growth',  # yoy_growth, mom_change, cumulative, moving_average, per_unit
-    'calculation_window': 3,           # For moving averages
-    'group_by': 'category',            # Multi-series grouping for line/area charts
-    'time_granularity': 'monthly'      # daily, monthly, quarterly, yearly
+    'metric': 'sales',                      # Numeric column to measure
+    'dimension': 'region',                  # Categorical column to group by
+    'chart_type': 'bar',                    # bar, line, pie, area, scatter, heatmap, radar
+    'aggregation': 'sum',                   # sum, avg, count, min, max
+    'filters': [],                          # Query filter conditions
+    'time_period': '2023',                  # Optional time filter
+    'limit': 10,                            # Optional result limit (e.g., top 10)
+    # v1.2.0: Calculated metrics & multi-series support
+    'calculation_type': 'yoy_growth',       # yoy_growth, mom_change, cumulative, moving_average, per_unit, percent_change
+    'calculation_window': 3,                # For moving averages (e.g., 3-month MA)
+    'group_by': 'category',                 # Secondary dimension for multi-series line/area charts
+    'time_granularity': 'monthly',          # daily, monthly, quarterly, yearly
+    'comparison_type': 'vs_previous'        # vs_previous, vs_baseline, year_over_year
 }
 ```
 
-**Migration Note**: Old NER format used uppercase keys + lists. Auto-migration at [smart_query_parser.py:L417](nlu/smart_query_parser.py#L417). See [docs/MIGRATION_SMART_PARSER.md](docs/MIGRATION_SMART_PARSER.md).
+**Hybrid Approach** ([smart_query_parser.py:L47-L86](nlu/smart_query_parser.py#L47-L86)):
 
-### 2. DataConnector Dynamic Loading
+1. Fuzzy matching tries to match query terms to dataset columns (fast)
+2. If confidence < 70 or ambiguous, falls back to LLM (Claude 3 Haiku via OpenRouter)
+3. Results cached to reduce API calls
+4. Requires `OPENROUTER_API_KEY` environment variable for LLM fallback
+
+### 3. DataConnector Dynamic Loading
 
 **Location**: [charts/data_connector.py](charts/data_connector.py)
 
-- Auto-loads Excel/CSV from `data/` folder on init or via file upload
-- Multi-dataset support: Organized in `data/{dataset_name}/` subdirectories
-- Cached in `self.cached_data` (dict of DataFrames)
-- Column extraction: `extract_all_columns_info()` returns `{table_name: {numeric: [], categorical: [], date: [], row_count: int}}`
-- **NO hardcoded datasets** - system adapts to any data structure
-- Dataset switching: `switch_dataset(name)` to change active dataset
+**Multi-Dataset Architecture**:
 
-### 3. MetricCalculator (Calculated Metrics)
+- Auto-loads Excel files from `data/` folder OR waits for uploads (`auto_load` parameter)
+- **Dataset Organization**: `data/{dataset_name}/` subdirectories
+- Stores multiple datasets: `self.datasets = {dataset_name: {table_name: DataFrame}}`
+- Active dataset tracked in `self.current_dataset`
+- Cached active data in `self.cached_data` (dict of DataFrames)
+
+**Key Methods** ([data_connector.py:L1-L150](charts/data_connector.py#L1-L150)):
+
+```python
+load_all_datasets()                    # Loads all datasets from data/ subdirectories
+switch_dataset(dataset_name)           # Changes active dataset + clears cached_data
+get_available_datasets()               # Returns list of dataset names
+get_current_dataset()                  # Returns active dataset name
+extract_all_columns_info()             # Returns {table: {numeric: [], text: [], date: [], row_count}}
+```
+
+**Column Detection Pattern**:
+
+- Numeric columns: dtype check (int64, float64)
+- Text/categorical: object dtype
+- Date columns: datetime64 dtype or recognized date patterns
+- **NO hardcoded datasets** - system adapts to any uploaded Excel structure
+
+### 4. MetricCalculator (Calculated Metrics)
 
 **Location**: [charts/metric_calculator.py](charts/metric_calculator.py)
 
-**Supported Calculations**:
+**Supported Calculations** ([metric_calculator.py:L1-L100](charts/metric_calculator.py#L1-L100)):
 
-- `yoy_growth`: Year-over-year growth percentage
-- `mom_change`: Month-over-month change percentage
-- `cumulative`: Running totals over time
+- `yoy_growth`: Year-over-year growth % → `((Current - Previous) / Previous) * 100`
+- `mom_change`: Month-over-month change % → Similar formula for monthly data
+- `percent_change`: Generic period-over-period % change
+- `cumulative`: Running totals over time (cumsum)
 - `moving_average`: N-period moving average (requires `calculation_window`)
-- `per_unit`: Per-order/per-customer calculations
+- `per_unit`: Per-order/per-customer calculations (requires unit column)
 
-**Usage Pattern**: ChartGenerator automatically invokes when `entities['calculation_type']` is present
+**Usage Pattern**:
 
-### 4. Role-Based Access Control (RBAC)
+- ChartGenerator automatically invokes when `entities['calculation_type']` is present
+- Handles both single-series and multi-series (grouped) data
+- Adds calculated columns: `YoY_Growth_Pct`, `MoM_Change_Pct`, `Cumulative_Total`, `MA_{window}`
+
+**Multi-Series Support**: Detects `group_by_*` columns and calculates metrics per group
+
+### 5. Role-Based Access Control (RBAC)
 
 **Location**: [auth/auth.py](auth/auth.py)
 
@@ -111,7 +162,7 @@ ROLE_PERMISSIONS = {
 }
 ```
 
-### 5. Dashboard Generation Workflow
+### 6. Dashboard Generation Workflow
 
 **Location**: [dashboard/dashboard_generator.py](dashboard/dashboard_generator.py)
 
@@ -132,26 +183,78 @@ self.themes = {
 2. `generate_dashboard()` → creates single HTML with all charts
 3. Charts stored in `temp_dashboards/` (working) and `saved_dashboards/` (persistent)
 
-### 6. Dashboard Explainer (AI Insights)
+### 7. Dashboard Explainer (AI Insights)
 
 **Location**: [dashboard/dashboard_explainer.py](dashboard/dashboard_explainer.py)
 
-**v1.2.0 Update**: Now uses Claude 3 Haiku for ALL explanations (removed hardcoded templates)
+**v1.2.0 Major Update**: Replaced ALL hardcoded templates with LLM-generated explanations
 
-**Two Modes**:
+**Two Operating Modes** ([dashboard_explainer.py:L1-L100](dashboard/dashboard_explainer.py#L1-L100)):
 
-1. **Chart-Only Mode**: AI analyzes chart data alone (default, no RAG documents)
-2. **RAG-Enhanced Mode**: AI combines chart analysis + uploaded documents (PDFs/DOCX/PPTX)
+1. **Chart-Only Mode** (default when no documents provided):
+   - AI analyzes chart data structure, metrics, dimensions
+   - Generates comprehensive insights: trends, comparisons, actionable recommendations
+   - Methods: `_explain_charts_only()`, `_generate_chart_only_explanation()`, `_extract_chart_insights()`
+2. **RAG-Enhanced Mode** (when documents uploaded):
+   - Combines chart analysis + company documents (PDFs/DOCX/PPTX)
+   - Uses FAISS vector store for semantic search
+   - Provides context-aware insights linked to business documents
 
 **Key Methods**:
 
-- `explain_dashboard(queries, force_chart_only=False)` - Generate insights for dashboard
-- `load_company_profile(file_path)` - Load documents for RAG context
-- Uses `OPENROUTER_API_KEY` for LLM access (Claude 3 Haiku)
+```python
+explain_dashboard(queries, force_chart_only=False)  # Main entry point
+load_company_profile(file_path)                    # Load docs for RAG
+explain_single_chart(query, entities)              # Single chart explanation
+get_comparative_insights(queries_list)             # Multi-chart comparison
+```
 
-**API Pattern**: `/api/explain-dashboard` POST with `{queries: [], force_chart_only: bool}`
+**LLM Configuration**:
+
+- Model: Claude 3 Haiku (via OpenRouter)
+- Temperature: 0.3 (focused but slightly creative)
+- Max tokens: 800
+- Requires: `OPENROUTER_API_KEY` environment variable
+
+**API Endpoints**:
+
+- `/api/explain-dashboard` POST: `{queries: [], force_chart_only: bool}`
+- `/api/load-company-profile` POST: Upload PDF/DOCX/PPTX for RAG context
 
 ## Development Workflows
+
+### Logging System (v1.1.0)
+
+**Structured Logging** ([main.py:L21-L30](main.py#L21-L30)):
+
+```python
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),                    # Console output
+        logging.FileHandler('logs/gendash.log', mode='a')  # File output
+    ]
+)
+```
+
+**Module-specific loggers**:
+
+- Use `logger = logging.getLogger(__name__)` in each module
+- Logs written to `logs/gendash.log` (rotating, 10MB max, 5 backups)
+- Available modules: app, database, auth, charts, dashboard, nlu, rag
+
+**Error Handling Pattern**: All API endpoints use structured error responses:
+
+```python
+try:
+    # Business logic
+except SpecificException as e:
+    logger.error(f"Operation failed: {e}")
+    return JSONResponse({"error": str(e)}, status_code=500)
+finally:
+    # Cleanup (e.g., db.close() handled by get_db() dependency)
+```
 
 ### Environment Setup
 
@@ -172,18 +275,31 @@ pip install -r requirements.txt
 ### Running the Application
 
 ```bash
-# Terminal from project root (with venv activated):
+# 1. Activate virtual environment (REQUIRED - do this FIRST in every terminal session):
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
+
+# 2. Start the FastAPI server from project root:
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Access**: http://localhost:8000
 
+**Critical**: The virtual environment MUST be activated before running any Python commands or starting the server. Check for `(venv)` prefix in terminal prompt.
+
 ### Database Setup
 
 **Connection String**: `mysql+pymysql://root:dhruv123@localhost:3306/analytics_dashboard`
 
+**Connection Pooling** ([main.py:L65-L71](main.py#L65-L71)):
+
+- Pool size: 5 connections
+- Max overflow: 10 connections
+- Connection recycling: Every 3600 seconds (1 hour)
+- Health checks enabled: `pool_pre_ping=True`
+
 ```python
-# Initialize tables (from project root):
+# Initialize tables (from project root with venv activated):
 python -c "from database.models import Base; from main import engine; Base.metadata.create_all(bind=engine)"
 ```
 
@@ -195,10 +311,15 @@ python -c "from database.models import Base; from main import engine; Base.metad
 ### Testing Query Pipeline
 
 ```bash
-# Standalone NLU test (no server):
+# Standalone NLU test (no server required - with venv activated):
 python3 nlu/chart_pipeline.py "sales by region"
 python3 nlu/chart_pipeline.py "average revenue by product"
+
+# Test NER model (if using custom NER instead of SmartQueryParser):
+python3 nlu/test_ner.py
 ```
+
+**Note**: Current system uses SmartQueryParser (fuzzy + LLM hybrid), not the trained NER model by default.
 
 ### Data Upload & Management
 

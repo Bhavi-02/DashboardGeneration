@@ -453,10 +453,16 @@ IMPORTANT: Look at the sample data values to understand what each column contain
   - GROUP_BY is usually None (unless stacked bars)
   - Example: "sales by region" → dimension='State', group_by=None, chart_type='bar'
 
+**TIME PHRASE DETECTION - CRITICAL PATTERN:**
+If query contains time phrases like "over time", "across years", "over the years", "through time", "year by year", "historically":
+  → DIMENSION MUST be a time column (Date, Month, Quarter, FY, Year)
+  → If query also asks "which X" or "compare X", then X becomes GROUP_BY (multi-series)
+  → Use LINE or GROUPED BAR chart for better comparison visualization
+
 **TIME_GRANULARITY DETECTION:**
 - "seasonal" / "seasonality" / "seasonal patterns" → time_granularity='quarterly'
 - "monthly trends" / "month by month" / "each month" → time_granularity='monthly'
-- "yearly" / "annual" / "by year" / "across years" → time_granularity='yearly'
+- "yearly" / "annual" / "by year" / "across years" / "over the years" / "year by year" → time_granularity='yearly'
 - "daily" / "day by day" → time_granularity='daily'
 
 **MULTI-SERIES EXAMPLES:**
@@ -465,6 +471,13 @@ IMPORTANT: Look at the sample data values to understand what each column contain
 
 - "Monthly sales trends by region"
   → metric='Net Amount', dimension='Month', group_by='State', chart_type='line', time_granularity='monthly'
+
+- "Which branch generated higher sales across the years?"
+  → metric='Taxable Amt', dimension='FY', group_by='Location', chart_type='line', time_granularity='yearly'
+  (Note: "which branch" = comparing branches, "across years" = time dimension)
+
+- "Compare product categories over time"
+  → metric='Net Amount', dimension='Date', group_by='Product Category', chart_type='line'
 
 - "Sales by product category" (NO time-series)
   → metric='Net Amount', dimension='Product Category', group_by=None, chart_type='bar'
