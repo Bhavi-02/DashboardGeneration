@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import os
+from typing import Optional, List, Dict, Any, Tuple
 
 class DataConnector:
     """Data connector to integrate with various data sources"""
@@ -205,7 +206,7 @@ class DataConnector:
         
         return best_match, best_score
     
-    def extract_all_columns_info(self):
+    def extract_all_columns_info(self) -> Dict[str, Dict[str, Any]]:
         """Extract all column information from all available tables"""
         all_columns_info = {}
         
@@ -253,7 +254,7 @@ class DataConnector:
         
         return df
 
-    def find_columns_mentioned_in_query(self, query_text, table_name):
+    def find_columns_mentioned_in_query(self, query_text: str, table_name: str) -> Tuple[List[str], Dict[str, str]]:
         """Find column names that are mentioned in the query"""
         if table_name not in self.cached_data:
             return [], []
@@ -363,73 +364,22 @@ class DataConnector:
                 print(f"🎯 Match types: {matches}")
         else:
             mentioned_cols, matches = [], {}
+    
+    def get_data_for_chart_column_based(
+        self, 
+        metric: Optional[str], 
+        dimension: Optional[str], 
+        filters: Optional[List[str]] = None, 
+        aggregation: Optional[str] = None, 
+        query_text: str = "", 
+        group_by: Optional[str] = None
+    ) -> pd.DataFrame:
+        """
+        Get actual data for chart generation prioritizing column names over NER entities
         
-    def get_data_for_chart(self, metric, dimension, filters=None, aggregation=None, query_text=""):
-        """Get actual data for chart generation with intelligent column matching"""
-        # Find relevant table
-        table_name, score = self.find_relevant_table(metric, dimension)
-        
-        if not table_name or score == 0:
-            raise Exception(f"❌ No relevant data table found for metric: {metric}, dimension: {dimension}")
-        
-        df = self.cached_data[table_name].copy()
-        print(f"📊 Using table: {table_name} (relevance score: {score})")
-        
-        # Extract all column information
-        columns_info = self.extract_all_columns_info()
-        print(f"📋 Available columns in {table_name}: {columns_info[table_name]['all_columns']}")
-        
-        # Find columns mentioned in query
-        if query_text:
-            mentioned_cols, matches = self.find_columns_mentioned_in_query(query_text, table_name)
-            if mentioned_cols:
-                print(f"🔍 Columns mentioned in query: {mentioned_cols}")
-                print(f"🎯 Match types: {matches}")
-                
-                # Smart logic: if we have mentioned columns, try to use them intelligently
-                # If metric/dimension entities don't match well, use mentioned columns
-                if len(mentioned_cols) >= 2:
-                    # Try to assign mentioned columns to metric and dimension based on data types
-                    numeric_mentioned = [col for col in mentioned_cols if col in df.select_dtypes(include=['number']).columns]
-                    
-                    if len(numeric_mentioned) >= 2:
-                        # Both can be metrics, use query structure to decide
-                        query_lower = query_text.lower()
-                        words = query_lower.split()
-                        
-                        # Find "by" keyword to determine metric vs dimension
-                        if 'by' in words:
-                            by_index = words.index('by')
-                            metric_part = ' '.join(words[:by_index])
-                            dimension_part = ' '.join(words[by_index+1:])
-                            
-                            # Find which mentioned column belongs to which part
-                            metric_col = None
-                            dimension_col = None
-                            
-                            for col in mentioned_cols:
-                                if col.lower() in metric_part:
-                                    metric_col = col
-                                elif col.lower() in dimension_part:
-                                    dimension_col = col
-                            
-                            if metric_col and dimension_col:
-                                print(f"   🎯 Smart assignment: {metric_col} (metric), {dimension_col} (dimension)")
-                                result_df = df[[dimension_col, metric_col]].copy()
-                                result_df.columns = [str(dimension).replace(' ', '_'), str(metric).replace(' ', '_')]
-                                
-                                # Apply filters and aggregation
-                                if filters:
-                                    result_df = self.apply_filters(result_df, df, filters)
-                                if aggregation:
-                                    result_df = self.apply_aggregation(result_df, aggregation)
-                                
-                                result_df = result_df.dropna()
-                                if result_df.empty:
-                                    raise Exception(f"❌ No data remaining after applying filters and aggregation")
-                                return result_df
-    def get_data_for_chart_column_based(self, metric, dimension, filters=None, aggregation=None, query_text=""):
-        """Get actual data for chart generation prioritizing column names over NER entities"""
+        Args:
+            group_by: Optional secondary dimension for multi-series charts (creates multiple lines/colors)
+        """
         # Find relevant table
         table_name, score = self.find_relevant_table(metric, dimension)
         
@@ -460,12 +410,115 @@ class DataConnector:
             if aggregation:
                 print(f"✅ Using detected aggregation: {aggregation}")
         
-        # Find columns mentioned in query - THIS IS NOW THE PRIMARY METHOD
+        # PRIORITY 1: Use SmartQueryParser extracted columns if they exist in the dataframe
+        metric_col = None
+        dimension_col = None
+        
+        if metric and metric != 'auto_detected' and metric != 'detected_metric' and metric in df.columns:
+            metric_col = metric
+            print(f"✅ Using SmartQueryParser metric: {metric_col}")
+        
+        if dimension and dimension != 'auto_detected' and dimension != 'detected_dimension' and dimension in df.columns:
+            dimension_col = dimension
+            print(f"✅ Using SmartQueryParser dimension: {dimension_col}")
+        
+        # PRIORITY 2: Find columns mentioned in query if SmartQueryParser didn't find them
+        mentioned_cols, matches = self.find_columns_mentioned_in_query(query_text, table_name)
+        # PRIORITY 2: Find columns mentioned in query if SmartQueryParser didn't find them
         mentioned_cols, matches = self.find_columns_mentioned_in_query(query_text, table_name)
         
         if mentioned_cols:
             print(f"🔍 Columns mentioned in query: {mentioned_cols}")
             print(f"🎯 Match types: {matches}")
+            
+            # Use mentioned columns if we don't already have values from SmartQueryParser
+            if not metric_col and mentioned_cols:
+                # Try to find metric from mentioned columns
+                for col in mentioned_cols:
+                    if col in df.select_dtypes(include=['number']).columns and not dimension_col == col:
+                        metric_col = col
+                        break
+            
+            if not dimension_col and mentioned_cols:
+                # Try to find dimension from mentioned columns
+                for col in mentioned_cols:
+                    if col != metric_col:
+                        dimension_col = col
+                        break
+        
+        # Now proceed with the column-based approach using the determined metric_col, dimension_col, and group_by
+        if metric_col and dimension_col:
+            # Check if group_by is provided and valid
+            group_by_col = None
+            if group_by and group_by in df.columns:
+                group_by_col = group_by
+                print(f"   🎯 Final column assignment: {metric_col} (metric), {dimension_col} (dimension), {group_by_col} (group_by)")
+                result_df = df[[dimension_col, group_by_col, metric_col]].copy()
+                
+                # Strip spaces from column names
+                dimension_col_clean = dimension_col.strip()
+                group_by_col_clean = group_by_col.strip()
+                metric_col_clean = metric_col.strip()
+                
+                result_df.columns = [f'dimension_{dimension_col_clean}', f'group_by_{group_by_col_clean}', f'metric_{metric_col_clean}']
+                
+                # Apply aggregation with GROUP BY (creates multi-series data)
+                if aggregation:
+                    print(f"📊 Applying aggregation with group_by: {aggregation}")
+                    result_df = result_df.groupby([f'dimension_{dimension_col_clean}', f'group_by_{group_by_col_clean}'])[f'metric_{metric_col_clean}'].agg(aggregation).reset_index()
+                else:
+                    # Default aggregation for charts (sum)
+                    print(f"📊 Applying default aggregation (sum) with group_by")
+                    result_df = result_df.groupby([f'dimension_{dimension_col_clean}', f'group_by_{group_by_col_clean}'])[f'metric_{metric_col_clean}'].sum().reset_index()
+            else:
+                # No group_by - single series chart
+                print(f"   🎯 Final column assignment: {metric_col} (metric), {dimension_col} (dimension)")
+                result_df = df[[dimension_col, metric_col]].copy()
+                
+                # Strip spaces from column names to avoid Plotly issues
+                dimension_col_clean = dimension_col.strip()
+                metric_col_clean = metric_col.strip()
+                
+                result_df.columns = [f'dimension_{dimension_col_clean}', f'metric_{metric_col_clean}']
+                
+                # Apply aggregation FIRST (group by dimension)
+                if aggregation:
+                    print(f"📊 Applying aggregation: {aggregation}")
+                    result_df = self.apply_aggregation(result_df, aggregation)
+                else:
+                    # Default aggregation for charts (sum)
+                    print(f"📊 Applying default aggregation: sum")
+                    result_df = result_df.groupby(f'dimension_{dimension_col_clean}')[f'metric_{metric_col_clean}'].sum().reset_index()
+            
+            # Sort by fiscal year if dimension is FY-like
+            result_df = self.sort_fiscal_year_column(result_df, f'dimension_{dimension_col_clean}')
+            
+            # Apply filters AFTER aggregation (especially important for "top N" filters)
+            if filters:
+                result_df = self.apply_filters(result_df, df, filters)
+            
+            result_df = result_df.dropna()
+            if result_df.empty:
+                raise Exception(f"❌ No data remaining after applying filters and aggregation")
+            
+            # CRITICAL: Reset index before returning to ensure clean data
+            result_df = result_df.reset_index(drop=True)
+            
+            # Debugging output
+            try:
+                print("🔎 get_data_for_chart_column_based - FINAL result_df:")
+                print(f"   Shape: {result_df.shape}")
+                print(f"   Columns: {result_df.columns.tolist()}")
+                print(f"   Index: {result_df.index.tolist()}")
+                print(f"   First 10 rows:")
+                print(result_df.head(10).to_string())
+                print(f"   dtypes: {result_df.dtypes.to_dict()}")
+            except Exception:
+                print("🔎 get_data_for_chart_column_based - could not print result_df")
+            return result_df
+        
+        # Legacy code path for backwards compatibility
+        if mentioned_cols:
             
             # COLUMN-BASED APPROACH: Use mentioned columns directly
             if len(mentioned_cols) >= 2:
@@ -866,7 +919,7 @@ class DataConnector:
         
         return False
 
-    def apply_filters(self, result_df, original_df, filters):
+    def apply_filters(self, result_df: pd.DataFrame, original_df: pd.DataFrame, filters: List[str]) -> pd.DataFrame:
         """Apply filters to the data"""
         for filter_item in filters:
             filter_lower = filter_item.lower()
@@ -904,7 +957,7 @@ class DataConnector:
         
         return result_df
     
-    def apply_aggregation(self, df, aggregation):
+    def apply_aggregation(self, df: pd.DataFrame, aggregation: str) -> pd.DataFrame:
         """Apply aggregation to the data"""
         dimension_col = df.columns[0]
         metric_col = df.columns[1]

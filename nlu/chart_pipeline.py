@@ -55,16 +55,27 @@ class NLUChartPipeline:
             'DIMENSION': [entities['dimension']] if entities['dimension'] else [],
             'CHART_TYPE': [entities['chart_type']] if entities['chart_type'] else ['bar'],
             'AGGREGATION': [entities['aggregation']] if entities['aggregation'] else ['sum'],
-            'FILTER': entities.get('filters', [])
+            'FILTER': entities.get('filters', []),
+            # NEW: Pass through calculation fields
+            'calculation_type': entities.get('calculation_type'),
+            'calculation_window': entities.get('calculation_window'),
+            'comparison_type': entities.get('comparison_type'),
+            'group_by': entities.get('group_by'),  # NEW
+            'time_granularity': entities.get('time_granularity')  # NEW
         }
         
         # Print extracted entities
         print("📋 Extracted Entities:")
         for entity_type, entity_list in entities_compatible.items():
-            if entity_list:
-                print(f"   {entity_type:12}: {', '.join(str(e) for e in entity_list)}")
+            # Handle new fields (non-list values)
+            if entity_type in ['calculation_type', 'calculation_window', 'comparison_type', 'group_by', 'time_granularity']:
+                if entity_list:
+                    print(f"   {entity_type:20}: {entity_list}")
             else:
-                print(f"   {entity_type:12}: None")
+                if entity_list:
+                    print(f"   {entity_type:12}: {', '.join(str(e) for e in entity_list)}")
+                else:
+                    print(f"   {entity_type:12}: None")
         
         print(f"   Confidence  : {entities.get('match_confidence', 0)}%")
         

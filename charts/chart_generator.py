@@ -7,10 +7,12 @@ import re
 from datetime import datetime, timedelta
 import os
 import sys
+from typing import Optional, List, Dict, Any, Tuple
 
 # Add parent directory to path to import data_connector
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from data_connector import DataConnector
+from metric_calculator import MetricCalculator
 
 class ChartGenerator:
     """Dynamic chart generator based on NER extracted entities - NO HARDCODING"""
@@ -49,6 +51,10 @@ class ChartGenerator:
         except Exception as e:
             raise Exception(f"❌ Could not initialize data connector: {e}. System requires real data sources.")
         
+        # Initialize metric calculator for calculated metrics (YoY growth, etc.)
+        self.metric_calculator = MetricCalculator()
+        print("🧮 Metric calculator initialized for calculated metrics")
+        
         # Display available data info for transparency (only if auto_load_data is True)
         if auto_load_data:
             self.display_available_data()
@@ -75,19 +81,68 @@ class ChartGenerator:
         """Add a data source (DataFrame) to the generator"""
         self.data_sources[name] = dataframe
     
-    def get_chart_data(self, metric, dimension, filters=None, aggregation=None, query_text=""):
+    def get_chart_data(
+        self, 
+        metric: Optional[str], 
+        dimension: Optional[str], 
+        filters: Optional[List[str]] = None, 
+        aggregation: Optional[str] = None, 
+        query_text: str = "", 
+        group_by: Optional[str] = None,
+        calculation_type: Optional[str] = None,
+        calculation_window: Optional[int] = None
+    ) -> pd.DataFrame:
         """
         Get data for chart generation - COLUMN-BASED APPROACH
         Priority: Actual column names in query > NER entities
+        
+        Args:
+            metric: Metric column name
+            dimension: Dimension column name
+            filters: List of filter conditions
+            aggregation: Aggregation function (sum, avg, count, etc.)
+            query_text: Original natural language query
+            group_by: Optional secondary dimension for multi-series charts (creates multiple lines/colors)
+            calculation_type: Type of calculation (yoy_growth, mom_change, cumulative, etc.)
+            calculation_window: Window size for moving average calculations
+            
+        Returns:
+            DataFrame with chart data, optionally with calculated metrics
         """
         if not self.data_connector:
             raise Exception("❌ No data connector available. Cannot generate charts without real data.")
             
         try:
-            # Use the new column-based approach
-            data = self.data_connector.get_data_for_chart_column_based(metric, dimension, filters, aggregation, query_text)
+            # Use the new column-based approach with group_by support
+            data = self.data_connector.get_data_for_chart_column_based(
+                metric, dimension, filters, aggregation, query_text, group_by
+            )
             if data is None or data.empty:
                 raise Exception(f"❌ No data found for query: {query_text}")
+            
+            # Apply calculated metrics if requested
+            if calculation_type:
+                print(f"🧮 Applying calculation: {calculation_type}")
+                
+                # Identify metric and dimension columns from the returned DataFrame
+                # Format: dimension_<name>, metric_<name>, or group_by_<name>
+                metric_col = None
+                dimension_col = None
+                
+                for col in data.columns:
+                    if col.startswith('metric_'):
+                        metric_col = col
+                    elif col.startswith('dimension_'):
+                        dimension_col = col
+                
+                if metric_col and dimension_col:
+                    data = self.metric_calculator.calculate_metric(
+                        data, calculation_type, metric_col, dimension_col, calculation_window
+                    )
+                    print(f"✅ Calculated metric applied: {calculation_type}")
+                else:
+                    print(f"⚠️ Could not identify metric/dimension columns for calculation")
+            
             return data
         except Exception as e:
             print(f"❌ Error getting real data: {e}")
@@ -133,13 +188,66 @@ class ChartGenerator:
             return 'table'  # Default fallback
     
     def create_bar_chart(self, data, metric, dimension, title=None):
-        """Create a beautiful bar chart from real data with enhanced colors"""
+        """Create a beautiful bar chart from real data with enhanced colors (supports grouped bars)"""
         if data is None or data.empty:
             raise Exception("❌ No data available for bar chart generation")
         
         # Reset index to ensure we're not plotting index values
         data = data.reset_index(drop=True)
+        
+        # Check if this is multi-series data (3 columns: dimension, group_by, metric)
+        is_multi_series = len(data.columns) == 3 and 'group_by_' in data.columns[1]
+        
+        if is_multi_series:
+            # Multi-series grouped bar chart
+            dimension_col = data.columns[0]  # First column is dimension (X-axis)
+            group_by_col = data.columns[1]   # Second column is group_by (color groups)
+            metric_col = data.columns[2]     # Third column is metric (Y-axis)
             
+            print(f"\n🔍 DEBUG create_bar_chart (MULTI-SERIES GROUPED):")
+            print(f"   Data shape: {data.shape}")
+            print(f"   Dimension (X-axis): {dimension_col}")
+            print(f"   Group By (color): {group_by_col}")
+            print(f"   Metric (Y-axis): {metric_col}")
+            
+            # Create grouped bar chart using plotly express
+            import plotly.express as px
+            
+            fig = px.bar(
+                data,
+                x=dimension_col,
+                y=metric_col,
+                color=group_by_col,
+                barmode='group',  # Grouped bars (use 'stack' for stacked)
+                title=title or f"{metric.title()} by {dimension.title()} (grouped by {group_by_col.replace('group_by_', '')})",
+                color_discrete_sequence=self.color_palettes['professional']
+            )
+            
+            fig.update_layout(
+                xaxis_title=dimension.title(),
+                yaxis_title=metric.title(),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font={'family': 'Arial', 'color': '#34495E'},
+                height=500,
+                margin=dict(b=120, t=80, l=60, r=60),
+                xaxis_tickangle=-45,
+                showlegend=True,
+                legend=dict(
+                    title=group_by_col.replace('group_by_', '').title(),
+                    orientation="v",
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="left",
+                    x=1.02
+                )
+            )
+            
+            print(f"   ✅ Created grouped bar chart with {data[group_by_col].nunique()} groups")
+            
+            return fig
+        
+        # Single-series bar chart (original logic)
         metric_col = data.columns[1]  # Second column is metric
         dimension_col = data.columns[0]  # First column is dimension
         
@@ -263,52 +371,89 @@ class ChartGenerator:
         return fig
     
     def create_line_chart(self, data, metric, dimension, title=None):
-        """Create a beautiful line chart from real data with enhanced colors"""
+        """Create a beautiful line chart from real data with enhanced colors (supports multi-series)"""
         if data is None or data.empty:
             raise Exception("❌ No data available for line chart generation")
         
         # Reset index to ensure we're not plotting index values
         data = data.reset_index(drop=True)
+        
+        # Check if this is multi-series data (3 columns: dimension, group_by, metric)
+        is_multi_series = len(data.columns) == 3 and 'group_by_' in data.columns[1]
+        
+        if is_multi_series:
+            # Multi-series chart: Column 0 = dimension (X), Column 1 = group_by (categories), Column 2 = metric (Y)
+            dimension_col = data.columns[0]
+            group_by_col = data.columns[1]
+            metric_col = data.columns[2]
             
-        metric_col = data.columns[1]  # Second column is metric
-        dimension_col = data.columns[0]  # First column is dimension
+            print(f"\n🔍 DEBUG create_line_chart (MULTI-SERIES):")
+            print(f"   Data shape: {data.shape}")
+            print(f"   Dimension (X-axis): {dimension_col}")
+            print(f"   Group By (lines): {group_by_col}")
+            print(f"   Metric (Y-axis): {metric_col}")
+            print(f"   Unique categories: {data[group_by_col].nunique()}")
+            
+            # Create figure
+            import plotly.graph_objects as go
+            fig = go.Figure()
+            
+            # Get unique categories for grouping
+            categories = data[group_by_col].unique()
+            colors = self.color_palettes['professional']
+            
+            # Create one line per category
+            for idx, category in enumerate(categories):
+                category_data = data[data[group_by_col] == category].sort_values(dimension_col)
+                
+                color = colors[idx % len(colors)]
+                
+                fig.add_trace(go.Scatter(
+                    x=category_data[dimension_col].tolist(),
+                    y=category_data[metric_col].tolist(),
+                    mode='lines+markers',
+                    name=str(category),
+                    line=dict(width=2.5, color=color),
+                    marker=dict(size=6, line=dict(width=1, color='white')),
+                    hovertemplate=f'<b>{category}</b><br>' +
+                                 '%{x}<br>' +
+                                 f'{metric.title()}: %{{y:,.0f}}<br>' +
+                                 '<extra></extra>'
+                ))
+            
+            print(f"   ✅ Created {len(categories)} lines for multi-series chart")
+            
+        else:
+            # Single-series chart: Column 0 = dimension (X), Column 1 = metric (Y)
+            metric_col = data.columns[1]
+            dimension_col = data.columns[0]
+            
+            print(f"\n🔍 DEBUG create_line_chart (SINGLE-SERIES):")
+            print(f"   Data shape: {data.shape}")
+            print(f"   Dimension column: {dimension_col}")
+            print(f"   Metric column: {metric_col}")
+            
+            # Extract values explicitly
+            x_values = data[dimension_col].tolist()
+            y_values = data[metric_col].tolist()
+            
+            # Create figure
+            import plotly.graph_objects as go
+            fig = go.Figure()
+            
+            fig.add_trace(go.Scatter(
+                x=x_values,
+                y=y_values,
+                mode='lines+markers',
+                name=metric.title(),
+                line=dict(width=3, color='#3498DB'),
+                marker=dict(size=8, color='#E74C3C', line=dict(width=2, color='white')),
+                hovertemplate='<b>%{x}</b><br>' +
+                             f'{metric.title()}: %{{y:,.0f}}<br>' +
+                             '<extra></extra>'
+            ))
         
-        # Debug: Print actual data being charted
-        print(f"\n🔍 DEBUG create_line_chart:")
-        print(f"   Data shape: {data.shape}")
-        print(f"   Columns: {data.columns.tolist()}")
-        print(f"   Dimension column: {dimension_col}")
-        print(f"   Metric column: {metric_col}")
-        print(f"   First 5 rows:")
-        print(data.head().to_string())
-        print(f"   Data types: {data.dtypes.to_dict()}")
-        print(f"   X values (first 5): {data[dimension_col].head().tolist()}")
-        print(f"   Y values (first 5): {data[metric_col].head().tolist()}")
-        
-        # Extract values explicitly to avoid any Plotly confusion
-        x_values = data[dimension_col].tolist()
-        y_values = data[metric_col].tolist()
-        
-        print(f"   📊 Plotting X values: {x_values}")
-        print(f"   📊 Plotting Y values: {y_values}")
-        
-        # Create figure using graph_objects for more control
-        import plotly.graph_objects as go
-        
-        fig = go.Figure()
-        
-        fig.add_trace(go.Scatter(
-            x=x_values,
-            y=y_values,
-            mode='lines+markers',
-            name=metric.title(),
-            line=dict(width=3, color='#3498DB'),
-            marker=dict(size=8, color='#E74C3C', line=dict(width=2, color='white')),
-            hovertemplate='<b>%{x}</b><br>' +
-                         f'{metric.title()}: %{{y:,.0f}}<br>' +
-                         '<extra></extra>'
-        ))
-        
+        # Common layout for both single and multi-series
         fig.update_layout(
             title={
                 'text': title or f"{metric.title()} Trend by {dimension.title()}",
@@ -323,7 +468,15 @@ class ChartGenerator:
             font={'family': 'Arial', 'color': '#34495E'},
             height=500,
             margin=dict(t=80, l=60, r=60, b=60),
-            template='plotly_white'
+            template='plotly_white',
+            showlegend=is_multi_series,  # Show legend for multi-series
+            legend=dict(
+                orientation="v",
+                yanchor="top",
+                y=0.99,
+                xanchor="left",
+                x=1.02
+            ) if is_multi_series else {}
         )
         
         # Enhance gridlines
@@ -715,13 +868,47 @@ class ChartGenerator:
         """
         Main method to generate chart based on extracted entities - NO HARDCODING
         entities: dict with keys like 'METRIC', 'DIMENSION', 'CHART_TYPE', 'FILTER', 'AGGREGATION'
+                 OR lowercase keys 'metric', 'dimension', 'chart_type', etc. (SmartQueryParser format)
         """
-        # Extract entity values
-        metrics = entities.get('METRIC', [])
-        dimensions = entities.get('DIMENSION', [])
-        chart_types = entities.get('CHART_TYPE', [])
-        filters = entities.get('FILTER', [])
-        aggregations = entities.get('AGGREGATION', [])
+        # Support both old NER format (uppercase keys with lists) and new SmartQueryParser format (lowercase keys with strings)
+        # SmartQueryParser format: {'metric': 'sales', 'dimension': 'region', ...}
+        # Old NER format: {'METRIC': ['sales'], 'DIMENSION': ['region'], ...}
+        
+        # Extract entity values - support both formats
+        metrics = entities.get('METRIC', entities.get('metric', []))
+        dimensions = entities.get('DIMENSION', entities.get('dimension', []))
+        chart_types = entities.get('CHART_TYPE', entities.get('chart_type', []))
+        filters = entities.get('FILTER', entities.get('filters', []))
+        aggregations = entities.get('AGGREGATION', entities.get('aggregation', []))
+        
+        # Convert single string values to lists for uniform handling
+        if isinstance(metrics, str):
+            metrics = [metrics] if metrics else []
+        if isinstance(dimensions, str):
+            dimensions = [dimensions] if dimensions else []
+        if isinstance(chart_types, str):
+            chart_types = [chart_types] if chart_types else []
+        if isinstance(aggregations, str):
+            aggregations = [aggregations] if aggregations else []
+        if isinstance(filters, str):
+            filters = [filters] if filters else []
+        
+        # NEW: Extract calculation fields (from SmartQueryParser)
+        calculation_type = entities.get('calculation_type')
+        calculation_window = entities.get('calculation_window')
+        comparison_type = entities.get('comparison_type')
+        group_by = entities.get('group_by')  # NEW: Multi-series support
+        time_granularity = entities.get('time_granularity')  # NEW: Time granularity
+        
+        if calculation_type:
+            print(f"🧮 Calculation detected: {calculation_type}")
+            if calculation_window:
+                print(f"   Window size: {calculation_window}")
+        
+        if group_by:
+            print(f"📊 Multi-series chart detected: group_by = {group_by}")
+        if time_granularity:
+            print(f"⏰ Time granularity: {time_granularity}")
         
         # Validate that we have essential entities OR column names in query
         # New approach: Try column-based even if NER finds nothing
@@ -733,6 +920,13 @@ class ChartGenerator:
         dimension = dimensions[0] if dimensions else 'detected_dimension'
         chart_type = chart_types[0] if chart_types else None
         aggregation = aggregations[0] if aggregations else None
+        
+        # Debug output
+        print(f"🔍 Extracted from entities:")
+        print(f"   Metric: {metric}")
+        print(f"   Dimension: {dimension}")
+        print(f"   Chart type: {chart_type}")
+        print(f"   Aggregation: {aggregation}")
         
         # Special handling for multi-metric queries
         if len(metrics) > 1 and not dimension:
@@ -751,9 +945,12 @@ class ChartGenerator:
             metric = 'value'
             print(f"🔄 Using default metric: {metric}")
         
-        # Get real data - COLUMN-BASED APPROACH
+        # Get real data - COLUMN-BASED APPROACH WITH GROUP_BY SUPPORT
         try:
-            data = self.get_chart_data(metric, dimension, filters, aggregation, query_text)
+            data = self.get_chart_data(
+                metric, dimension, filters, aggregation, query_text, group_by,
+                calculation_type, calculation_window
+            )
             print(f"✅ Retrieved {len(data)} rows of real data")
             
             # Extract actual column names from data for title
@@ -767,22 +964,69 @@ class ChartGenerator:
                 actual_metric = data.columns[1].replace('metric_', '')
                 print(f"📊 Using columns: {actual_metric} (metric) × {actual_dimension} (dimension)")
             
+            # NEW: Apply calculation if needed
+            if calculation_type and calculation_type not in [None, 'none', 'None']:
+                print(f"\n🧮 Applying calculation: {calculation_type}")
+                
+                # Get the actual column names (without prefixes)
+                metric_col = f'metric_{actual_metric}' if f'metric_{actual_metric}' in data.columns else actual_metric
+                dimension_col = f'dimension_{actual_dimension}' if f'dimension_{actual_dimension}' in data.columns else actual_dimension
+                
+                # Find actual column names in data
+                if len(data.columns) >= 2:
+                    dimension_col = data.columns[0]
+                    metric_col = data.columns[1]
+                
+                try:
+                    data = self.metric_calculator.calculate_metric(
+                        data=data,
+                        calculation_type=calculation_type,
+                        metric_col=metric_col,
+                        dimension_col=dimension_col,
+                        calculation_window=calculation_window
+                    )
+                    
+                    # Update actual_metric to use calculated column for visualization
+                    if calculation_type == 'yoy_growth' and 'YoY_Growth_Pct' in data.columns:
+                        print(f"   📈 Using YoY_Growth_Pct for visualization")
+                        # For YoY, we'll show growth percentage
+                        actual_metric = 'YoY_Growth_Pct'
+                    elif calculation_type == 'mom_change' and 'MoM_Change_Pct' in data.columns:
+                        actual_metric = 'MoM_Change_Pct'
+                    elif calculation_type == 'cumulative' and 'Cumulative_Total' in data.columns:
+                        actual_metric = 'Cumulative_Total'
+                    elif calculation_type == 'moving_average':
+                        ma_col = f'MA_{calculation_window or 3}'
+                        if ma_col in data.columns:
+                            actual_metric = ma_col
+                    
+                    print(f"   ✅ Calculation complete, new metric: {actual_metric}")
+                    
+                except Exception as calc_error:
+                    print(f"   ⚠️ Calculation failed: {calc_error}, using base data")
+            
         except Exception as e:
             raise Exception(f"❌ Failed to get chart data: {e}")
         
         # PRIORITY SYSTEM FOR CHART TYPE DETECTION
         detected_chart_type = None
         
+        print(f"\n🔍 CHART TYPE DETECTION DEBUG:")
+        print(f"   chart_type variable: '{chart_type}' (type: {type(chart_type)})")
+        print(f"   query_text: '{query_text}'")
+        
         # Priority 1: Check query text for explicit chart type keywords
         query_chart_type = self.detect_chart_type_from_query(query_text)
+        print(f"   Priority 1 result: '{query_chart_type}'")
+        
         if query_chart_type:
             detected_chart_type = query_chart_type
             print(f"🎯 Priority 1 - Chart type from query: {detected_chart_type}")
         
-        # Priority 2: Use NER extracted chart type if available and no query detection
-        elif chart_type:
+        # Priority 2: Use SmartQueryParser extracted chart type if available and no query detection
+        elif chart_type and chart_type not in ['detected_chart_type', 'auto', None]:
             detected_chart_type = chart_type
-            print(f"🤖 Priority 2 - Chart type from NER: {detected_chart_type}")
+            print(f"🤖 Priority 2 - Chart type from SmartQueryParser: {detected_chart_type}")
         
         # Priority 3: Auto-detect based on data characteristics
         else:

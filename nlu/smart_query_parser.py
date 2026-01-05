@@ -28,6 +28,30 @@ class QueryEntities(BaseModel):
     filters: List[str] = Field(default_factory=list, description="Filter conditions from the query")
     time_period: Optional[str] = Field(default=None, description="Time period if mentioned (e.g., 2023, last quarter)")
     limit: Optional[int] = Field(default=None, description="Result limit (e.g., top 10)")
+    
+    # NEW: Multi-series support for line/area charts
+    group_by: Optional[str] = Field(
+        default=None,
+        description="Secondary categorical dimension for grouping/coloring (e.g., 'product category' in 'sales over time by product category'). Creates multiple lines/series."
+    )
+    time_granularity: Optional[str] = Field(
+        default=None,
+        description="Time granularity for time-series: 'daily', 'monthly', 'quarterly', 'yearly'. Use 'quarterly' for seasonal patterns, 'monthly' for trends."
+    )
+    
+    # NEW: Calculated metrics support
+    calculation_type: Optional[str] = Field(
+        default=None, 
+        description="Type of calculation needed: 'yoy_growth' (year-over-year), 'mom_change' (month-over-month), 'percent_change', 'per_unit' (per order/customer), 'cumulative', 'moving_average', or None for simple aggregation"
+    )
+    calculation_window: Optional[int] = Field(
+        default=None,
+        description="Window size for moving average calculations (e.g., 3 for 3-month moving average)"
+    )
+    comparison_type: Optional[str] = Field(
+        default=None,
+        description="Comparison type: 'vs_previous', 'vs_baseline', 'year_over_year', or None"
+    )
 
 
 @dataclass
@@ -59,6 +83,15 @@ class SmartQueryParser:
         """
         self.use_llm = use_llm
         self.cache = {}  # Query -> Entities cache
+        
+        # Calculation trigger words (minimal hardcoding)
+        self.calculation_triggers = [
+            'growth', 'change', 'increase', 'decrease', 'decline',
+            'per', 'each', 'every', 'average',
+            'cumulative', 'total', 'running', 'accumulated',
+            'moving', 'rolling', 'trend',
+            'compare', 'vs', 'versus', 'against', 'comparison'
+        ]
         
         # Initialize LLM if enabled
         if self.use_llm:
@@ -212,16 +245,27 @@ class SmartQueryParser:
         
         query_lower = query.lower().strip()
         
-        # Step 1: Try fuzzy matching (fast path)
-        fuzzy_result = self._fuzzy_parse(query_lower, available_columns)
+        # Check if query needs calculation (use LLM for these)
+        needs_calculation = any(
+            trigger in query_lower 
+            for trigger in self.calculation_triggers
+        )
         
-        # If fuzzy matching has high confidence, use it
-        if fuzzy_result and self._is_high_confidence(fuzzy_result):
-            logger.info(f"✅ Fuzzy match succeeded for: {query}")
-            self.cache[cache_key] = fuzzy_result
-            return fuzzy_result
+        if needs_calculation:
+            logger.info(f"🧮 Calculation detected in query, routing to LLM: {query}")
         
-        # Step 2: LLM fallback for low-confidence or failed fuzzy matches
+        # Step 1: Try fuzzy matching (fast path) - ONLY for non-calculation queries
+        fuzzy_result = None
+        if not needs_calculation:
+            fuzzy_result = self._fuzzy_parse(query_lower, available_columns)
+            
+            # If fuzzy matching has high confidence, use it
+            if fuzzy_result and self._is_high_confidence(fuzzy_result):
+                logger.info(f"✅ Fuzzy match succeeded for: {query}")
+                self.cache[cache_key] = fuzzy_result
+                return fuzzy_result
+        
+        # Step 2: LLM for calculation queries OR low-confidence fuzzy matches
         if self.use_llm:
             logger.info(f"🤖 Using LLM fallback for: {query}")
             llm_result = self._llm_parse(query, available_columns, column_samples)
@@ -388,17 +432,50 @@ class SmartQueryParser:
 
 Your task:
 1. Identify the METRIC (numeric column to measure) - look at sample data to identify numeric columns
-2. Identify the DIMENSION (categorical column to group by) - look at sample data to identify categorical columns
-3. Suggest appropriate CHART_TYPE (bar, line, pie, area, scatter, heatmap, radar)
-4. Determine AGGREGATION function (sum, avg, count, min, max)
-5. Extract any FILTERS mentioned (time periods, limits, ranges)
+2. Identify the DIMENSION (primary axis for grouping) - **FOR LINE CHARTS: prioritize time columns (Date, Month, Quarter, FY)**
+3. Identify GROUP_BY (secondary dimension for multi-series charts) - categorical column that creates multiple lines/colors
+4. Suggest appropriate CHART_TYPE (bar, line, pie, area, scatter, heatmap, radar)
+5. Determine TIME_GRANULARITY for time-series (daily, monthly, quarterly, yearly)
+6. Determine AGGREGATION function (sum, avg, count, min, max)
+7. Extract any FILTERS mentioned (time periods, limits, ranges)
+8. Detect CALCULATION_TYPE if query needs calculations
 
 IMPORTANT: Look at the sample data values to understand what each column contains. Match the user's intent to the most appropriate column based on the actual data.
 
-For example:
-- "sales" or "revenue" should map to columns with monetary amounts (e.g., Net Amount, Taxable Amt)
-- "branch" or "location" should map to columns with place names (e.g., Location, State)
-- "product" should map to columns with product information (e.g., Product Category, Supply Name)
+**TABLEAU-STYLE DIMENSION PRIORITY:**
+- For **LINE** or **AREA** charts:
+  - DIMENSION should be time-based (Date, Month, Quarter, FY) if available
+  - GROUP_BY should be categorical (Product Category, State, etc.)
+  - Example: "sales trends by product category" → dimension='Month', group_by='Product Category', chart_type='line'
+
+- For **BAR** or **PIE** charts:
+  - DIMENSION should be categorical
+  - GROUP_BY is usually None (unless stacked bars)
+  - Example: "sales by region" → dimension='State', group_by=None, chart_type='bar'
+
+**TIME_GRANULARITY DETECTION:**
+- "seasonal" / "seasonality" / "seasonal patterns" → time_granularity='quarterly'
+- "monthly trends" / "month by month" / "each month" → time_granularity='monthly'
+- "yearly" / "annual" / "by year" / "across years" → time_granularity='yearly'
+- "daily" / "day by day" → time_granularity='daily'
+
+**MULTI-SERIES EXAMPLES:**
+- "Are there seasonal spikes in sales for certain product categories?"
+  → metric='Net Amount', dimension='Quarter', group_by='Product Category', chart_type='line', time_granularity='quarterly'
+
+- "Monthly sales trends by region"
+  → metric='Net Amount', dimension='Month', group_by='State', chart_type='line', time_granularity='monthly'
+
+- "Sales by product category" (NO time-series)
+  → metric='Net Amount', dimension='Product Category', group_by=None, chart_type='bar'
+
+**CALCULATION DETECTION:**
+- "year-on-year" / "yoy" → calculation_type='yoy_growth'
+- "month-on-month" / "mom" → calculation_type='mom_change'
+- "per order" / "per customer" → calculation_type='per_unit'
+- "cumulative" / "running total" → calculation_type='cumulative'
+- "moving average" / "rolling average" → calculation_type='moving_average', calculation_window=3
+- Regular aggregation ONLY → calculation_type=None
 
 CRITICAL: You MUST respond with ONLY the JSON object, no explanations, no additional text before or after.
 
@@ -428,6 +505,11 @@ CRITICAL: You MUST respond with ONLY the JSON object, no explanations, no additi
                     'filters': entities.filters or [],
                     'time_period': entities.time_period,
                     'limit': entities.limit,
+                    'group_by': self._validate_column(entities.group_by, columns) if entities.group_by else None,  # NEW
+                    'time_granularity': entities.time_granularity,  # NEW
+                    'calculation_type': entities.calculation_type,
+                    'calculation_window': entities.calculation_window,
+                    'comparison_type': entities.comparison_type,
                     'match_confidence': 95  # LLM typically has high confidence
                 }
                 
