@@ -225,17 +225,17 @@ class ChartGenerator:
             group_by_col = data.columns[1]   # Second column is group_by (color groups)
             metric_col = data.columns[2]     # Third column is metric (Y-axis)
             
-            print(f"📊 Multi-series grouped bar: {len(categories)} categories × {len(data[dimension_col].unique())} dimensions")
-            
             # Ensure numeric column is actually numeric
             data[metric_col] = pd.to_numeric(data[metric_col], errors='coerce')
+            
+            # Get unique categories first
+            categories = data[group_by_col].unique()
+            
+            print(f"📊 Multi-series grouped bar: {len(categories)} categories × {len(data[dimension_col].unique())} dimensions")
             
             # Create grouped bar chart using graph_objects for full control (avoid px.bar aggregation issues)
             import plotly.graph_objects as go
             fig = go.Figure()
-            
-            # Get unique categories and create one trace per category
-            categories = data[group_by_col].unique()
             colors = self.color_palettes['professional']
             
             for idx, category in enumerate(categories):
