@@ -618,19 +618,23 @@ Format as bullet points without numbering. Keep each insight to 1-2 lines maximu
                     x_str = ', '.join([str(x) for x in x_values[:10]])  # First 10 values
                     y_str = ', '.join([str(y) for y in y_values[:10]])
                     
-                    # Calculate statistics
+                    # Calculate statistics - filter out None values
                     if y_values:
-                        min_val = min(y_values)
-                        max_val = max(y_values)
-                        avg_val = sum(y_values) / len(y_values)
+                        # Filter out None values for numeric calculations
+                        numeric_y_values = [y for y in y_values if y is not None and isinstance(y, (int, float))]
                         
-                        # Calculate trend
-                        if len(y_values) >= 2:
-                            first_val = y_values[0]
-                            last_val = y_values[-1]
-                            change_pct = ((last_val - first_val) / first_val * 100) if first_val != 0 else 0
+                        if numeric_y_values:
+                            min_val = min(numeric_y_values)
+                            max_val = max(numeric_y_values)
+                            avg_val = sum(numeric_y_values) / len(numeric_y_values)
                             
-                            data_info = f"\n   Data: {x_str}\n   Values: {y_str}\n   Range: {min_val:,.0f} to {max_val:,.0f}, Avg: {avg_val:,.0f}\n   Overall Change: {change_pct:+.1f}%"
+                            # Calculate trend
+                            if len(numeric_y_values) >= 2:
+                                first_val = numeric_y_values[0]
+                                last_val = numeric_y_values[-1]
+                                change_pct = ((last_val - first_val) / first_val * 100) if first_val != 0 else 0
+                                
+                                data_info = f"\n   Data: {x_str}\n   Values: {y_str}\n   Range: {min_val:,.0f} to {max_val:,.0f}, Avg: {avg_val:,.0f}\n   Overall Change: {change_pct:+.1f}%"
             
             chart_summary = f"{i}. {query}{data_info}"
             charts_summary.append(chart_summary)
