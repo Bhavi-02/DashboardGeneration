@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DashAI - Conversational Analytics</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #667eea;
+        --primary-dark: #764ba2;
+        --secondary: #1ea1f2;
+        --success: #3ac47d;
+        --danger: #d92550;
+        --warning: #f7b924;
+        --dark: #1e2022;
+        --dark-light: #2c2f33;
+        --gray: #545454;
+        --gray-light: #e8e8e8;
+        --gray-lighter: #f5f6fa;
+        --white: #ffffff;
+        --shadow: 0 0.46875rem 2.1875rem rgba(59, 62, 102, 0.03);
+        --shadow-hover: 0 0.5rem 2.5rem rgba(59, 62, 102, 0.1);
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      body.dark-mode {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      }
+
+      body.dark-mode .sidebar,
+      body.dark-mode .chat-container,
+      body.dark-mode .chart-grid,
+      body.dark-mode .top-header {
+        background: var(--dark-light);
+        color: var(--white);
+      }
+
+      body.dark-mode .message-bubble.ai {
+        background: #3a3f47;
+      }
+
+      body.dark-mode .message-bubble.user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      body.dark-mode .input-container {
+        background: var(--dark-light);
+        border-color: #3a3f47;
+      }
+
+      /* Layout */
+      .app-container {
+        display: flex;
+        height: 100vh;
+        position: relative;
+      }
+
+      /* Top Header */
+      .top-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: white;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        z-index: 1000;
+      }
+
+      .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .header-brand h1 {
+        font-size: 1.5em;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .sidebar-toggle {
+        width: 40px;
+        height: 40px;
+        background: var(--gray-lighter);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3em;
+        transition: all 0.2s ease;
+        margin-right: 15px;
+      }
+
+      .sidebar-toggle:hover {
+        background: var(--gray-light);
+        transform: translateY(-2px);
+      }
+
+      .sidebar-toggle {
+        width: 40px;
+        height: 40px;
+        background: var(--gray-lighter);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3em;
+        transition: all 0.2s ease;
+        margin-right: 15px;
+      }
+
+      .sidebar-toggle:hover {
+        background: var(--gray-light);
+        transform: translateY(-2px);
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 15px;
+        background: var(--gray-lighter);
+        border-radius: 20px;
+        font-size: 0.9em;
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9em;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 280px;
+        background: white;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        margin-top: 70px;
+        height: calc(100vh - 70px);
+        transition: transform 0.3s ease, margin-left 0.3s ease;
+        position: relative;
+        z-index: 100;
+      }
+
+      .sidebar.collapsed {
+        transform: translateX(-100%);
+        margin-left: -280px;
+      }
+
+      .sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--gray-light);
+      }
+
+      .new-chat-btn {
+        width: 100%;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .new-chat-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+      }
+
+      .conversations-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+      }
+
+      .conversation-item {
+        padding: 12px 15px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+      }
+
+      .conversation-item:hover {
+        background: var(--gray-lighter);
+        border-left-color: var(--primary);
+      }
+
+      .conversation-item.active {
+        background: var(--gray-lighter);
+        border-left-color: var(--primary);
+      }
+
+      .conversation-title {
+        font-weight: 600;
+        font-size: 0.9em;
+        margin-bottom: 4px;
+        color: var(--dark);
+      }
+
+      .conversation-time {
+        font-size: 0.75em;
+        color: var(--gray);
+      }
+
+      .dataset-indicator {
+        padding: 15px 20px;
+        border-top: 1px solid var(--gray-light);
+        border-bottom: 1px solid var(--gray-light);
+        background: var(--gray-lighter);
+      }
+
+      .dataset-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        background: white;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 500;
+      }
+
+      .sidebar-footer {
+        padding: 20px;
+        border-top: 1px solid var(--gray-light);
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        display: flex;
+        margin-top: 70px;
+        height: calc(100vh - 70px);
+      }
+
+      /* Chat Container */
+      .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        position: relative;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px;
+        scroll-behavior: smooth;
+      }
+
+      .welcome-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+        padding: 40px;
+      }
+
+      .welcome-icon {
+        font-size: 4em;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .welcome-title {
+        font-size: 2em;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: var(--dark);
+      }
+
+      .welcome-subtitle {
+        font-size: 1.1em;
+        color: var(--gray);
+        margin-bottom: 40px;
+      }
+
+      .example-prompts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        width: 100%;
+        max-width: 800px;
+      }
+
+      .example-prompt {
+        padding: 20px;
+        background: var(--gray-lighter);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: left;
+        border: 2px solid transparent;
+      }
+
+      .example-prompt:hover {
+        background: white;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+
+      .example-prompt-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--dark);
+      }
+
+      .example-prompt-desc {
+        font-size: 0.85em;
+        color: var(--gray);
+      }
+
+      /* Message Bubbles */
+      .message {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .message.user {
+        flex-direction: row-reverse;
+      }
+
+      .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .message-avatar.ai {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+      }
+
+      .message-avatar.user {
+        background: var(--gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+      }
+
+      .message-content {
+        flex: 1;
+        max-width: 70%;
+      }
+
+      .message.user .message-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .message-bubble {
+        padding: 15px 20px;
+        border-radius: 12px;
+        line-height: 1.6;
+      }
+
+      .message-bubble.ai {
+        background: var(--gray-lighter);
+        border-bottom-left-radius: 4px;
+      }
+
+      .message-bubble.user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+      }
+
+      .message-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .message:hover .message-actions {
+        opacity: 1;
+      }
+
+      .message-action-btn {
+        padding: 4px 10px;
+        background: transparent;
+        border: 1px solid var(--gray-light);
+        border-radius: 6px;
+        font-size: 0.8em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--gray);
+      }
+
+      .message-action-btn:hover {
+        background: var(--gray-lighter);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      /* Code Blocks */
+      .code-block {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        position: relative;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        overflow-x: auto;
+      }
+
+      .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #444;
+      }
+
+      .code-lang {
+        color: #888;
+        font-size: 0.85em;
+      }
+
+      .copy-code-btn {
+        padding: 4px 12px;
+        background: #444;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8em;
+        transition: background 0.2s;
+      }
+
+      .copy-code-btn:hover {
+        background: #555;
+      }
+
+      /* Data Table */
+      .data-table-container {
+        margin: 15px 0;
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid var(--gray-light);
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+      }
+
+      .data-table th {
+        background: var(--gray-lighter);
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid var(--gray-light);
+      }
+
+      .data-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--gray-light);
+      }
+
+      .data-table tr:hover {
+        background: var(--gray-lighter);
+      }
+
+      /* Typing Indicator */
+      .typing-indicator {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .typing-bubble {
+        padding: 15px 20px;
+        background: var(--gray-lighter);
+        border-radius: 12px;
+        border-bottom-left-radius: 4px;
+        display: flex;
+        gap: 4px;
+      }
+
+      .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--gray);
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typing {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+        }
+        30% {
+          transform: translateY(-10px);
+        }
+      }
+
+      /* Input Container */
+      .input-container {
+        padding: 20px 30px;
+        background: white;
+        border-top: 1px solid var(--gray-light);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .suggested-prompts {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .suggested-prompt-btn {
+        padding: 8px 16px;
+        background: var(--gray-lighter);
+        border: 1px solid var(--gray-light);
+        border-radius: 20px;
+        font-size: 0.85em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--dark);
+      }
+
+      .suggested-prompt-btn:hover {
+        background: white;
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+      }
+
+      .input-wrapper {
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+      }
+
+      .input-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .input-action-btn {
+        width: 40px;
+        height: 40px;
+        background: var(--gray-lighter);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+      }
+
+      .input-action-btn:hover {
+        background: var(--gray-light);
+        transform: translateY(-2px);
+      }
+
+      .message-input {
+        flex: 1;
+        padding: 12px 20px;
+        border: 2px solid var(--gray-light);
+        border-radius: 12px;
+        font-size: 1em;
+        font-family: inherit;
+        resize: none;
+        max-height: 150px;
+        transition: border-color 0.2s ease;
+      }
+
+      .message-input:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      .send-btn {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3em;
+      }
+
+      .send-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+      }
+
+      .send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Chart Grid */
+      .chart-grid {
+        width: 50%;
+        background: white;
+        padding: 20px;
+        overflow-y: auto;
+        display: none;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        align-content: start;
+      }
+
+      .chart-grid.active {
+        display: grid;
+      }
+
+      .chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-light);
+      }
+
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--gray-light);
+      }
+
+      .chart-title {
+        font-weight: 600;
+        font-size: 0.9em;
+        color: var(--dark);
+      }
+
+      .chart-actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .chart-action-btn {
+        padding: 4px 8px;
+        background: transparent;
+        border: 1px solid var(--gray-light);
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8em;
+        transition: all 0.2s ease;
+      }
+
+      .chart-action-btn:hover {
+        background: var(--gray-lighter);
+        border-color: var(--primary);
+      }
+
+      .chart-placeholder {
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--gray-lighter);
+        border-radius: 8px;
+        color: var(--gray);
+      }
+
+      /* File Upload */
+      .file-upload-bubble {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 18px;
+        background: white;
+        border: 2px solid var(--gray-light);
+        border-radius: 12px;
+        margin: 10px 0;
+      }
+
+      .file-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--success);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2em;
+      }
+
+      .file-info {
+        flex: 1;
+      }
+
+      .file-name {
+        font-weight: 600;
+        font-size: 0.9em;
+        color: var(--dark);
+      }
+
+      .file-size {
+        font-size: 0.8em;
+        color: var(--gray);
+      }
+
+      /* Toast Notifications */
+      .toast-container {
+        position: fixed;
+        top: 90px;
+        right: 30px;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .toast {
+        padding: 15px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-hover);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        animation: slideInRight 0.3s ease;
+        border-left: 4px solid var(--primary);
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .toast.error {
+        border-left-color: var(--danger);
+      }
+
+      .toast.success {
+        border-left-color: var(--success);
+      }
+
+      .toast.warning {
+        border-left-color: var(--warning);
+      }
+
+      .toast-icon {
+        font-size: 1.5em;
+      }
+
+      .toast-content {
+        flex: 1;
+      }
+
+      .toast-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .toast-message {
+        font-size: 0.85em;
+        color: var(--gray);
+      }
+
+      .toast-close {
+        cursor: pointer;
+        color: var(--gray);
+        font-size: 1.2em;
+        transition: color 0.2s;
+      }
+
+      .toast-close:hover {
+        color: var(--dark);
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9em;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: var(--gray-light);
+        color: var(--dark);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Utility Classes */
+      .hidden {
+        display: none !important;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.3s ease;
+      }
+
+      /* Scrollbar Styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--gray-lighter);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--gray-light);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--gray);
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .chart-grid {
+          width: 100%;
+          position: fixed;
+          top: 70px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 999;
+        }
+
+        .chart-grid.active {
+          display: grid;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 70px;
+          z-index: 998;
+        }
+
+        .chart-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Header -->
+    <div class="top-header">
+      <button
+        class="sidebar-toggle"
+        onclick="toggleSidebar()"
+        title="Toggle Sidebar"
+      >
+        <span id="sidebarToggleIcon">☰</span>
+      </button>
+      <div class="header-brand">
+        <span style="font-size: 1.8em">🤖</span>
+        <h1>DashAI</h1>
+      </div>
+      <div class="header-actions">
+        <div class="user-badge" id="userBadge">
+          <div class="avatar" id="userAvatar">U</div>
+          <span id="userName">Loading...</span>
+          <span
+            style="font-size: 0.85em; color: var(--gray)"
+            id="userRole"
+          ></span>
+        </div>
+        <button
+          class="btn btn-secondary"
+          onclick="toggleDarkMode()"
+          title="Toggle Dark Mode"
+        >
+          🌙
+        </button>
+        <button class="btn btn-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+      <!-- Left Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <button class="new-chat-btn" onclick="startNewChat()">
+            <span>➕</span>
+            <span>New Chat</span>
+          </button>
+        </div>
+
+        <div
+          class="dataset-indicator"
+          id="datasetIndicator"
+          style="display: none"
+        >
+          <div class="dataset-badge">
+            📊 <span id="datasetName">No dataset</span>
+          </div>
+        </div>
+
+        <div class="conversations-list" id="conversationsList">
+          <!-- Conversations will be dynamically loaded -->
+        </div>
+
+        <div class="sidebar-footer">
+          <button
+            class="btn btn-outline"
+            style="width: 100%"
+            onclick="clearAllConversations()"
+          >
+            🗑️ Clear All Chats
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Chat Container -->
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcomeScreen">
+              <div class="welcome-icon">🤖✨</div>
+              <h2 class="welcome-title">What can I analyze for you today?</h2>
+              <p class="welcome-subtitle">
+                Upload your data and ask questions in natural language
+              </p>
+
+              <div class="example-prompts">
+                <div
+                  class="example-prompt"
+                  onclick="useExamplePrompt('Show me sales trends over time')"
+                >
+                  <div class="example-prompt-title">📈 Sales Trends</div>
+                  <div class="example-prompt-desc">
+                    Visualize revenue patterns and growth
+                  </div>
+                </div>
+                <div
+                  class="example-prompt"
+                  onclick="useExamplePrompt('What are my top performing products?')"
+                >
+                  <div class="example-prompt-title">🏆 Top Products</div>
+                  <div class="example-prompt-desc">
+                    Identify best-selling items
+                  </div>
+                </div>
+                <div
+                  class="example-prompt"
+                  onclick="useExamplePrompt('Show customer distribution by region')"
+                >
+                  <div class="example-prompt-title">🗺️ Regional Analysis</div>
+                  <div class="example-prompt-desc">
+                    Geographic performance breakdown
+                  </div>
+                </div>
+                <div
+                  class="example-prompt"
+                  onclick="useExamplePrompt('Compare this year vs last year')"
+                >
+                  <div class="example-prompt-title">📊 YoY Comparison</div>
+                  <div class="example-prompt-desc">
+                    Year-over-year growth analysis
+                  </div>
+                </div>
+                <div
+                  class="example-prompt"
+                  onclick="useExamplePrompt('Give me a dashboard with key metrics')"
+                >
+                  <div class="example-prompt-title">📋 Dashboard Overview</div>
+                  <div class="example-prompt-desc">
+                    Comprehensive metrics summary
+                  </div>
+                </div>
+                <div
+                  class="example-prompt"
+                  onclick="useExamplePrompt('What insights can you find in my data?')"
+                >
+                  <div class="example-prompt-title">💡 Data Insights</div>
+                  <div class="example-prompt-desc">
+                    AI-powered pattern discovery
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Messages will appear here -->
+          </div>
+
+          <!-- Input Container -->
+          <div class="input-container">
+            <div class="suggested-prompts hidden" id="suggestedPrompts">
+              <!-- Suggested prompts appear after dataset upload -->
+            </div>
+
+            <div class="input-wrapper">
+              <div class="input-actions">
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept=".xlsx,.xls,.csv"
+                  style="display: none"
+                  onchange="handleFileUpload(event)"
+                />
+                <button
+                  class="input-action-btn"
+                  onclick="document.getElementById('fileInput').click()"
+                  title="Upload Dataset"
+                >
+                  📎
+                </button>
+              </div>
+              <textarea
+                class="message-input"
+                id="messageInput"
+                placeholder="Ask me anything about your data..."
+                rows="1"
+                onkeydown="handleKeyPress(event)"
+              ></textarea>
+              <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                ➤
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="chart-grid" id="chartGrid">
+          <!-- Charts will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+      // Global State
+      let currentConversationId = null;
+      let conversations = [];
+      let currentDataset = null;
+      let ws = null;
+      let chartCounter = 0;
+      let activeCharts = [];
+      let isWaitingForResponse = false;
+
+      // Initialize on load
+      window.addEventListener("load", async () => {
+        try {
+          // Check authentication
+          const response = await fetch("/api/check-session");
+          const data = await response.json();
+
+          if (!data.authenticated) {
+            window.location.href = "/";
+            return;
+          }
+
+          // Load user info
+          await loadUserInfo();
+
+          // Load conversations from localStorage
+          loadConversations();
+
+          // Initialize WebSocket (placeholder)
+          // initializeWebSocket();
+        } catch (error) {
+          console.error("Session check failed:", error);
+          showToast("Session Error", "Please login again", "error");
+          setTimeout(() => (window.location.href = "/"), 2000);
+        }
+      });
+
+      // User Info
+      async function loadUserInfo() {
+        try {
+          const response = await fetch("/api/session-info");
+          const data = await response.json();
+
+          if (data.username) {
+            document.getElementById("userName").textContent = data.username;
+            document.getElementById("userRole").textContent = data.role || "";
+            document.getElementById("userAvatar").textContent = data.username
+              .charAt(0)
+              .toUpperCase();
+          }
+        } catch (error) {
+          console.error("Failed to load user info:", error);
+        }
+      }
+
+      // Conversation Management
+      function loadConversations() {
+        const saved = localStorage.getItem("dashai_conversations");
+        if (saved) {
+          conversations = JSON.parse(saved);
+          renderConversations();
+        }
+      }
+
+      function saveConversations() {
+        localStorage.setItem(
+          "dashai_conversations",
+          JSON.stringify(conversations)
+        );
+      }
+
+      function renderConversations() {
+        const list = document.getElementById("conversationsList");
+
+        if (conversations.length === 0) {
+          list.innerHTML =
+            '<div style="padding: 20px; text-align: center; color: var(--gray); font-size: 0.9em;">No conversations yet</div>';
+          return;
+        }
+
+        list.innerHTML = conversations
+          .map(
+            (conv) => `
+                <div class="conversation-item ${
+                  conv.id === currentConversationId ? "active" : ""
+                }" onclick="loadConversation('${conv.id}')">
+                    <div class="conversation-title">${conv.title}</div>
+                    <div class="conversation-time">${formatTime(
+                      conv.timestamp
+                    )}</div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function startNewChat() {
+        currentConversationId = "conv_" + Date.now();
+        const newConv = {
+          id: currentConversationId,
+          title: "New Conversation",
+          timestamp: Date.now(),
+          messages: [],
+          dataset: currentDataset,
+        };
+        conversations.unshift(newConv);
+        saveConversations();
+        renderConversations();
+        clearChatDisplay();
+        showWelcomeScreen();
+      }
+
+      function loadConversation(convId) {
+        currentConversationId = convId;
+        const conv = conversations.find((c) => c.id === convId);
+
+        if (conv) {
+          renderConversations();
+          clearChatDisplay();
+          hideWelcomeScreen();
+
+          // Render messages
+          conv.messages.forEach((msg) => {
+            if (msg.type === "user") {
+              addMessageToChat(msg.content, "user");
+            } else if (msg.type === "ai") {
+              addMessageToChat(msg.content, "ai");
+            } else if (msg.type === "chart") {
+              addChartToGrid(msg.chartData, msg.title);
+            }
+          });
+
+          // Restore dataset
+          if (conv.dataset) {
+            currentDataset = conv.dataset;
+            updateDatasetIndicator(conv.dataset);
+          }
+        }
+      }
+
+      function clearAllConversations() {
+        if (confirm("Are you sure you want to delete all conversations?")) {
+          conversations = [];
+          currentConversationId = null;
+          localStorage.removeItem("dashai_conversations");
+          renderConversations();
+          clearChatDisplay();
+          showWelcomeScreen();
+          showToast("Cleared", "All conversations deleted", "success");
+        }
+      }
+
+      function getCurrentConversation() {
+        if (!currentConversationId) {
+          startNewChat();
+        }
+        return conversations.find((c) => c.id === currentConversationId);
+      }
+
+      function updateConversationTitle(title) {
+        const conv = getCurrentConversation();
+        if (conv && conv.title === "New Conversation") {
+          conv.title =
+            title.substring(0, 50) + (title.length > 50 ? "..." : "");
+          saveConversations();
+          renderConversations();
+        }
+      }
+
+      function saveMessageToConversation(content, type, chartData = null) {
+        const conv = getCurrentConversation();
+        if (conv) {
+          const message = { content, type, timestamp: Date.now() };
+          if (chartData) {
+            message.chartData = chartData;
+            message.title = chartData.title || "Chart";
+          }
+          conv.messages.push(message);
+          saveConversations();
+        }
+      }
+
+      // Chat Display
+      function clearChatDisplay() {
+        const chatMessages = document.getElementById("chatMessages");
+        chatMessages.innerHTML = "";
+      }
+
+      function showWelcomeScreen() {
+        document.getElementById("welcomeScreen").style.display = "flex";
+      }
+
+      function hideWelcomeScreen() {
+        document.getElementById("welcomeScreen").style.display = "none";
+      }
+
+      function useExamplePrompt(prompt) {
+        document.getElementById("messageInput").value = prompt;
+        sendMessage();
+      }
+
+      // Message Handling
+      function handleKeyPress(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          sendMessage();
+        }
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const message = input.value.trim();
+
+        if (!message || isWaitingForResponse) return;
+
+        hideWelcomeScreen();
+
+        // Add user message
+        addMessageToChat(message, "user");
+        saveMessageToConversation(message, "user");
+        updateConversationTitle(message);
+
+        // Clear input
+        input.value = "";
+        input.style.height = "auto";
+
+        // Show typing indicator
+        showTypingIndicator();
+        isWaitingForResponse = true;
+
+        try {
+          // Placeholder: Call backend API
+          // TODO: Replace with actual API call
+          await simulateAIResponse(message);
+        } catch (error) {
+          console.error("Error sending message:", error);
+          removeTypingIndicator();
+          showToast(
+            "Error",
+            "Failed to get response. Please try again.",
+            "error"
+          );
+          isWaitingForResponse = false;
+        }
+      }
+
+      async function simulateAIResponse(userMessage) {
+        // Simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        removeTypingIndicator();
+        isWaitingForResponse = false;
+
+        // Check if user is asking for charts
+        const lowerMsg = userMessage.toLowerCase();
+        const isChartRequest =
+          lowerMsg.includes("show") ||
+          lowerMsg.includes("chart") ||
+          lowerMsg.includes("visualize") ||
+          lowerMsg.includes("dashboard") ||
+          lowerMsg.includes("insight") ||
+          lowerMsg.includes("trend");
+
+        if (isChartRequest && currentDataset) {
+          // Simulate chart generation
+          const response =
+            "I've analyzed your data and created visualizations for you. Here's what I found:";
+          addMessageToChat(response, "ai");
+          saveMessageToConversation(response, "ai");
+
+          // Generate multiple charts (placeholder)
+          const numCharts = Math.min(4, Math.floor(Math.random() * 3) + 2);
+          for (let i = 0; i < numCharts; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            addPlaceholderChart(`Chart ${chartCounter + 1}`, lowerMsg);
+          }
+        } else if (!currentDataset) {
+          const response =
+            "Please upload a dataset first so I can analyze your data and create visualizations for you. Click the 📎 button to upload an Excel or CSV file.";
+          addMessageToChat(response, "ai");
+          saveMessageToConversation(response, "ai");
+        } else {
+          const response =
+            "I understand your question. In a full implementation, I would:\n\n" +
+            "1. Parse your query using NLU\n" +
+            "2. Query the appropriate data\n" +
+            "3. Generate insights and visualizations\n" +
+            "4. Provide actionable recommendations\n\n" +
+            "Try asking me to 'show sales trends' or 'create a dashboard' to see chart generation!";
+          addMessageToChat(response, "ai");
+          saveMessageToConversation(response, "ai");
+        }
+      }
+
+      function addMessageToChat(content, sender) {
+        const chatMessages = document.getElementById("chatMessages");
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${sender}`;
+
+        const avatar = document.createElement("div");
+        avatar.className = `message-avatar ${sender}`;
+        avatar.textContent =
+          sender === "ai"
+            ? "🤖"
+            : document.getElementById("userAvatar").textContent;
+
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "message-content";
+
+        const bubble = document.createElement("div");
+        bubble.className = `message-bubble ${sender}`;
+
+        // Parse content for code blocks
+        bubble.innerHTML = parseMessageContent(content);
+
+        contentDiv.appendChild(bubble);
+
+        if (sender === "ai") {
+          const actions = document.createElement("div");
+          actions.className = "message-actions";
+          actions.innerHTML = `
+                    <button class="message-action-btn" onclick="copyMessage(this)">📋 Copy</button>
+                    <button class="message-action-btn" onclick="regenerateResponse(this)">🔄 Regenerate</button>
+                `;
+          contentDiv.appendChild(actions);
+        }
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(contentDiv);
+        chatMessages.appendChild(messageDiv);
+
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function parseMessageContent(content) {
+        // Simple parsing for code blocks and formatting
+        let html = content.replace(/\n/g, "<br>");
+
+        // Code blocks: ```language\ncode\n```
+        html = html.replace(
+          /```(\w+)<br>([\s\S]*?)```/g,
+          (match, lang, code) => {
+            return `
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">${lang}</span>
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre>${code.trim()}</pre>
+                    </div>
+                `;
+          }
+        );
+
+        // Inline code: `code`
+        html = html.replace(
+          /`([^`]+)`/g,
+          '<code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: monospace;">$1</code>'
+        );
+
+        return html;
+      }
+
+      function showTypingIndicator() {
+        const chatMessages = document.getElementById("chatMessages");
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "typing-indicator";
+        typingDiv.id = "typingIndicator";
+        typingDiv.innerHTML = `
+                <div class="message-avatar ai">🤖</div>
+                <div class="typing-bubble">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function removeTypingIndicator() {
+        const indicator = document.getElementById("typingIndicator");
+        if (indicator) {
+          indicator.remove();
+        }
+      }
+
+      // File Upload
+      async function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        hideWelcomeScreen();
+
+        // Add file bubble to chat
+        addFileBubble(file);
+
+        // Show analyzing message
+        addMessageToChat(`Analyzing ${file.name}...`, "ai");
+        showTypingIndicator();
+
+        try {
+          // TODO: Replace with actual upload API
+          const formData = new FormData();
+          formData.append("file", file);
+
+          // Placeholder: Simulate upload
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          removeTypingIndicator();
+
+          // Mock dataset info
+          currentDataset = {
+            name: file.name.replace(/\.[^/.]+$/, ""),
+            fileName: file.name,
+            uploadTime: Date.now(),
+          };
+
+          updateDatasetIndicator(currentDataset.name);
+
+          // Show dataset preview (mock)
+          const previewMessage =
+            `✅ Dataset uploaded successfully!\n\n` +
+            `**File:** ${file.name}\n` +
+            `**Rows:** 1,234\n` +
+            `**Columns:** 8\n\n` +
+            `Columns detected: Sales, Region, Product, Date, Revenue, Quantity, Customer, Category`;
+
+          addMessageToChat(previewMessage, "ai");
+
+          // Show suggested prompts
+          showSuggestedPrompts();
+
+          showToast("Success", "Dataset uploaded and analyzed", "success");
+        } catch (error) {
+          console.error("Upload failed:", error);
+          removeTypingIndicator();
+          showToast("Error", "Failed to upload dataset", "error");
+        }
+
+        // Reset file input
+        event.target.value = "";
+      }
+
+      function addFileBubble(file) {
+        const chatMessages = document.getElementById("chatMessages");
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "message user";
+        fileDiv.innerHTML = `
+                <div class="message-avatar user">${
+                  document.getElementById("userAvatar").textContent
+                }</div>
+                <div class="message-content">
+                    <div class="file-upload-bubble">
+                        <div class="file-icon">📊</div>
+                        <div class="file-info">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${(file.size / 1024).toFixed(
+                              1
+                            )} KB</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        chatMessages.appendChild(fileDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function updateDatasetIndicator(datasetName) {
+        document.getElementById("datasetIndicator").style.display = "block";
+        document.getElementById("datasetName").textContent = datasetName;
+      }
+
+      function showSuggestedPrompts() {
+        const container = document.getElementById("suggestedPrompts");
+        container.innerHTML = `
+                <button class="suggested-prompt-btn" onclick="useSuggestedPrompt('Show me sales by region')">📊 Sales by region</button>
+                <button class="suggested-prompt-btn" onclick="useSuggestedPrompt('What are the top performing products?')">🏆 Top products</button>
+                <button class="suggested-prompt-btn" onclick="useSuggestedPrompt('Show me monthly revenue trends')">📈 Revenue trends</button>
+                <button class="suggested-prompt-btn" onclick="useSuggestedPrompt('Give me a complete dashboard')">📋 Full dashboard</button>
+            `;
+        container.classList.remove("hidden");
+      }
+
+      function useSuggestedPrompt(prompt) {
+        document.getElementById("messageInput").value = prompt;
+        sendMessage();
+        document.getElementById("suggestedPrompts").classList.add("hidden");
+      }
+
+      // Chart Grid
+      function addPlaceholderChart(title, query) {
+        chartCounter++;
+        const chartId = `chart_${chartCounter}`;
+
+        // Show chart grid
+        const chartGrid = document.getElementById("chartGrid");
+        chartGrid.classList.add("active");
+
+        // Create chart card
+        const chartCard = document.createElement("div");
+        chartCard.className = "chart-card fade-in";
+        chartCard.id = chartId;
+        chartCard.innerHTML = `
+                <div class="chart-header">
+                    <div class="chart-title">${title}</div>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn" onclick="removeChart('${chartId}')" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="chart-placeholder">
+                    📊 Chart rendering placeholder<br>
+                    <small style="font-size: 0.8em;">In production: Plotly chart would render here</small>
+                </div>
+            `;
+
+        chartGrid.appendChild(chartCard);
+        activeCharts.push(chartId);
+
+        // Save to conversation
+        saveMessageToConversation(null, "chart", {
+          chartId,
+          title,
+          query,
+        });
+
+        // Placeholder for actual Plotly rendering
+        // In production, you would call:
+        // renderPlotlyChart(chartId, chartData);
+      }
+
+      function renderPlotlyChart(containerId, chartData) {
+        // Example Plotly rendering (uncomment in production)
+        /*
+            const config = {
+                responsive: true,
+                displayModeBar: true,
+                modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
+                displaylogo: false
+            };
+            
+            Plotly.newPlot(containerId, chartData.data, chartData.layout, config);
+            */
+      }
+
+      function removeChart(chartId) {
+        const chartCard = document.getElementById(chartId);
+        if (chartCard) {
+          chartCard.remove();
+          activeCharts = activeCharts.filter((id) => id !== chartId);
+
+          // Hide grid if no charts
+          if (activeCharts.length === 0) {
+            document.getElementById("chartGrid").classList.remove("active");
+          }
+        }
+      }
+
+      // Message Actions
+      function copyMessage(btn) {
+        const bubble = btn
+          .closest(".message-content")
+          .querySelector(".message-bubble");
+        const text = bubble.innerText;
+        navigator.clipboard.writeText(text);
+        showToast("Copied", "Message copied to clipboard", "success");
+      }
+
+      async function regenerateResponse(btn) {
+        const messageDiv = btn.closest(".message");
+        const prevMessage = messageDiv.previousElementSibling;
+
+        if (prevMessage && prevMessage.classList.contains("user")) {
+          const userMessage =
+            prevMessage.querySelector(".message-bubble").innerText;
+
+          // Remove current AI message
+          messageDiv.remove();
+
+          // Regenerate
+          showTypingIndicator();
+          isWaitingForResponse = true;
+          await simulateAIResponse(userMessage);
+        }
+      }
+
+      function copyCode(btn) {
+        const codeBlock = btn.closest(".code-block").querySelector("pre");
+        const code = codeBlock.innerText;
+        navigator.clipboard.writeText(code);
+        btn.textContent = "Copied!";
+        setTimeout(() => (btn.textContent = "Copy"), 2000);
+      }
+
+      // Dark Mode
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        const isDark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("dashai_dark_mode", isDark);
+
+        const btn = event.target;
+        btn.textContent = isDark ? "☀️" : "🌙";
+      }
+
+      // Sidebar Toggle
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const icon = document.getElementById("sidebarToggleIcon");
+        sidebar.classList.toggle("collapsed");
+
+        const isCollapsed = sidebar.classList.contains("collapsed");
+        icon.textContent = isCollapsed ? "☰" : "✕";
+        localStorage.setItem("dashai_sidebar_collapsed", isCollapsed);
+      }
+
+      // Load sidebar state on init
+      if (localStorage.getItem("dashai_sidebar_collapsed") === "true") {
+        const sidebar = document.getElementById("sidebar");
+        const icon = document.getElementById("sidebarToggleIcon");
+        sidebar.classList.add("collapsed");
+        icon.textContent = "☰";
+      }
+
+      // Load dark mode preference
+      if (localStorage.getItem("dashai_dark_mode") === "true") {
+        document.body.classList.add("dark-mode");
+      }
+
+      // Toast Notifications
+      function showToast(title, message, type = "info") {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+
+        const icons = {
+          info: "ℹ️",
+          success: "✅",
+          error: "❌",
+          warning: "⚠️",
+        };
+
+        toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <div class="toast-close" onclick="this.parentElement.remove()">✕</div>
+            `;
+
+        container.appendChild(toast);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => toast.remove(), 5000);
+      }
+
+      // Logout
+      async function logout() {
+        try {
+          await fetch("/api/logout", { method: "POST" });
+          window.location.href = "/";
+        } catch (error) {
+          console.error("Logout failed:", error);
+          window.location.href = "/";
+        }
+      }
+
+      // WebSocket (Placeholder)
+      function initializeWebSocket() {
+        // TODO: Implement WebSocket connection for real-time streaming
+        /*
+            ws = new WebSocket('ws://localhost:8000/ws/dashai');
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                // Attempt reconnection
+                setTimeout(initializeWebSocket, 3000);
+            };
+            */
+      }
+
+      function handleWebSocketMessage(data) {
+        // Handle streaming responses from backend
+        if (data.type === "token") {
+          // Append token to current message
+        } else if (data.type === "chart") {
+          // Render chart
+        }
+      }
+
+      // Utility Functions
+      function formatTime(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return "Just now";
+        if (minutes < 60) return `${minutes}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        if (days < 7) return `${days}d ago`;
+
+        return new Date(timestamp).toLocaleDateString();
+      }
+
+      // Auto-resize textarea
+      document
+        .getElementById("messageInput")
+        .addEventListener("input", function () {
+          this.style.height = "auto";
+          this.style.height = Math.min(this.scrollHeight, 150) + "px";
+        });
+    </script>
+  </body>
+</html>

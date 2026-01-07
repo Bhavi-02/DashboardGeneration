@@ -168,6 +168,14 @@ async def dashboard_explainer_ui(session: dict = Depends(require_auth)):
         return HTMLResponse(content=file_path.read_text(encoding='utf-8'))
     return HTMLResponse(content="<h1>Dashboard Explainer not found</h1>", status_code=404)
 
+@app.get("/dashai", response_class=HTMLResponse)
+async def dashai_ui(session: dict = Depends(require_auth)):
+    """Serve the DashAI conversational analytics UI"""
+    file_path = Path("Frontend/dashai.html")
+    if file_path.exists():
+        return HTMLResponse(content=file_path.read_text(encoding='utf-8'))
+    return HTMLResponse(content="<h1>DashAI not found</h1>", status_code=404)
+
 # New endpoint to get session info
 @app.get("/api/session-info")
 async def get_session_info(session: dict = Depends(require_auth)):

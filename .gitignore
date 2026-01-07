@@ -71,6 +71,7 @@ Thumbs.db
 .DS_Store
 
 # Models (if they're large - uncomment to exclude)
+node_modules
 ner_model/
 saved_dashboards/
 *.bin
