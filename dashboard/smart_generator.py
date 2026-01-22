@@ -324,7 +324,8 @@ class SmartChartRecommender:
         self,
         data_profile: DataProfile,
         user_context: UserContext,
-        num_recommendations: int = 5
+        num_recommendations: int = 5,
+        custom_prompt: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Generate chart recommendations
@@ -333,12 +334,13 @@ class SmartChartRecommender:
             data_profile: Dataset metadata
             user_context: User preferences
             num_recommendations: Number of charts to recommend
+            custom_prompt: Optional custom instructions (e.g., "focus on CEO metrics", "highlight product X")
         
         Returns:
             List of chart recommendations (as entity dicts)
         """
         if self.use_llm:
-            return self._recommend_with_llm(data_profile, user_context, num_recommendations)
+            return self._recommend_with_llm(data_profile, user_context, num_recommendations, custom_prompt)
         else:
             return self._recommend_fallback(data_profile, user_context, num_recommendations)
     
@@ -346,7 +348,8 @@ class SmartChartRecommender:
         self,
         data_profile: DataProfile,
         user_context: UserContext,
-        num_recommendations: int
+        num_recommendations: int,
+        custom_prompt: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """LLM-based recommendations using Claude Haiku"""
         try:
@@ -389,6 +392,7 @@ User Context:
 - Role: {role}
 - Priority Metrics: {priority_metrics}
 - Preferred Chart Types: {preferred_charts}
+{custom_instructions}
 
 Generate {num_recommendations} chart recommendations as JSON array with this structure:
 [
@@ -419,6 +423,12 @@ REQUIREMENTS:
             # Format schema for prompt
             schema_text = self._format_schema_for_prompt(data_profile)
             
+            # Format custom prompt if provided
+            custom_instructions = ""
+            if custom_prompt:
+                custom_instructions = f"\n\n⭐ SPECIAL INSTRUCTIONS: {custom_prompt}"
+                logger.info(f"💬 Custom prompt: {custom_prompt}")
+            
             # Build prompt
             prompt = prompt_template.format_messages(
                 schema=schema_text,
@@ -426,6 +436,7 @@ REQUIREMENTS:
                 role=user_context.role,
                 priority_metrics=', '.join(user_context.preferred_metrics) or "Any",
                 preferred_charts=', '.join(user_context.preferred_chart_types),
+                custom_instructions=custom_instructions,
                 num_recommendations=num_recommendations
             )
             
@@ -672,7 +683,8 @@ class SmartDashboardGenerator:
         user_department: Optional[str] = None,
         user_role: str = "Viewer",
         override_context: Optional[Dict[str, Any]] = None,
-        num_charts: int = 5
+        num_charts: int = 5,
+        custom_prompt: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Generate complete smart dashboard
@@ -682,6 +694,7 @@ class SmartDashboardGenerator:
             user_role: User's role (Admin, Analyst, etc.)
             override_context: Optional context override
             num_charts: Number of charts to generate
+            custom_prompt: Optional custom instructions (e.g., "focus on CEO metrics", "show product X performance")
         
         Returns:
             {
@@ -719,7 +732,7 @@ class SmartDashboardGenerator:
             # Step 3: Get recommendations
             logger.info(f"🤖 Step 3: Generating {num_charts} chart recommendations...")
             recommendations = self.recommender.recommend_charts(
-                data_profile, user_context, num_charts
+                data_profile, user_context, num_charts, custom_prompt
             )
             
             if not recommendations:

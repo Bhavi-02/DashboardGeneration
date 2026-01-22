@@ -766,6 +766,7 @@ async def generate_smart_dashboard_api(
     Request Body:
     {
         "num_charts": 5,  // Number of charts to generate (default 5)
+        "custom_prompt": "focus on CEO metrics",  // Optional: custom instructions for LLM
         "override_context": {  // Optional: override user context
             "department": "Marketing",
             "role": "Analyst"
@@ -784,6 +785,7 @@ async def generate_smart_dashboard_api(
         
         # Extract parameters
         num_charts = request_data.get('num_charts', 5)
+        custom_prompt = request_data.get('custom_prompt', None)
         override_context = request_data.get('override_context', None)
         
         # Get user context from session
@@ -815,7 +817,8 @@ async def generate_smart_dashboard_api(
             user_department=user_department,
             user_role=user_role,
             override_context=override_context,
-            num_charts=num_charts
+            num_charts=num_charts,
+            custom_prompt=custom_prompt
         )
         
         if not result['success']:

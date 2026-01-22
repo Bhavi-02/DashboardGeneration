@@ -417,6 +417,20 @@
           </div>
         </div>
 
+        <div class="control-group" style="margin-top: 20px">
+          <label for="customPrompt">💬 Custom Instructions (Optional)</label>
+          <input
+            type="text"
+            id="customPrompt"
+            placeholder="e.g., 'focus on CEO metrics', 'show product X performance', 'compare branches'"
+            style="padding: 12px"
+          />
+          <p style="margin-top: 8px; color: #666; font-size: 13px">
+            ✨ Give AI special instructions to tailor the dashboard to your
+            specific needs
+          </p>
+        </div>
+
         <p style="margin-top: 15px; color: #666; font-size: 14px">
           💡 <strong>Tip:</strong> Use the override options to explore different
           perspectives. For example, select "Marketing" to see marketing-focused
@@ -548,11 +562,19 @@
           const overrideDepartment =
             document.getElementById("overrideDepartment").value;
           const overrideRole = document.getElementById("overrideRole").value;
+          const customPrompt = document
+            .getElementById("customPrompt")
+            .value.trim();
 
           // Build request
           const requestBody = {
             num_charts: numCharts,
           };
+
+          // Add custom prompt if provided
+          if (customPrompt) {
+            requestBody.custom_prompt = customPrompt;
+          }
 
           // Add override context if specified
           if (overrideDepartment || overrideRole) {

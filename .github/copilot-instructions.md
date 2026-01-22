@@ -4,9 +4,10 @@
 
 Gen-Dash is an **AI-powered dashboard generation platform** that converts natural language queries into interactive data visualizations. The system uses a hybrid NLP approach (fuzzy matching + LLM fallback) to understand user intent and generate professional, role-based dashboards with AI-generated insights.
 
-**Core Stack**: FastAPI (async backend), MySQL + SQLAlchemy, Plotly (charts), SmartQueryParser (NLP), LangChain RAG, Claude 3 Haiku (explanations)
+**Core Stack**: FastAPI (async backend), MySQL + SQLAlchemy, Plotly (charts), SmartQueryParser (NLP), LangChain RAG, Claude 3 Haiku (explanations + smart generation)
 
-**Current Version**: 1.2.0 (December 19, 2025)
+**Current Version**: 1.2.0 (December 19, 2025)  
+**Last Instructions Update**: January 22, 2026
 
 ## Architecture & Data Flow
 
@@ -183,7 +184,64 @@ self.themes = {
 2. `generate_dashboard()` → creates single HTML with all charts
 3. Charts stored in `temp_dashboards/` (working) and `saved_dashboards/` (persistent)
 
-### 7. Dashboard Explainer (AI Insights)
+### 7. Smart Dashboard Generator (AI-Powered Auto-Generation)
+
+**Location**: [dashboard/smart_generator.py](dashboard/smart_generator.py)
+
+**v1.2.0+ Feature**: Zero-query dashboard generation using LLM-powered context analysis
+
+**Architecture** ([smart_generator.py:L1-L100](dashboard/smart_generator.py#L1-L100)):
+
+```python
+# 4-Component Pipeline
+DataProfiler → ContextAnalyzer → SmartChartRecommender → SmartDashboardGenerator
+```
+
+**How It Works**:
+
+1. **DataProfiler**: Analyzes dataset schema (numeric/text/date columns, cardinality)
+2. **ContextAnalyzer**: Builds user context (department-specific metrics, role preferences)
+3. **SmartChartRecommender**: LLM generates 5 chart recommendations via structured output
+4. **SmartDashboardGenerator**: Orchestrates workflow, generates charts, adds to dashboard
+
+**Usage Pattern**:
+
+```python
+smart_gen = SmartDashboardGenerator(data_connector, use_llm=True)
+result = smart_gen.generate_smart_dashboard(
+    user_department="Finance",
+    user_role="Analyst",
+    override_context=None,  # Optional custom context
+    num_charts=5,
+    custom_prompt="focus on CEO metrics"  # Optional: custom LLM instructions
+)
+# Returns: {success: bool, recommendations: List[dict], charts: List[Figure], profile: DataProfile}
+```
+
+**LLM Prompt Strategy** ([smart_generator.py:L300-L400](dashboard/smart_generator.py#L300-L400)):
+
+- Provides dataset schema (columns, types, row counts) as context
+- Adds department-specific context (e.g., Finance → revenue, cost; Marketing → campaigns, conversion)
+- **Custom Prompt Support**: Users can add special instructions like "give charts for CEO" or "focus on product X"
+- Uses Pydantic `structured_output` for type-safe JSON responses
+- Model: Claude 3 Haiku via OpenRouter (requires `OPENROUTER_API_KEY`)
+
+**API Endpoint**: `/api/generate-smart-dashboard` POST
+
+```python
+{
+    "num_charts": 5,
+    "custom_prompt": "focus on executive-level metrics",  # Optional: custom instructions
+    "override_context": {  # Optional
+        "department": "Sales",
+        "role": "Manager"
+    }
+}
+```
+
+**Critical**: Clears existing charts via `dashboard_system.dashboard.clear_charts()` before generation
+
+### 8. Dashboard Explainer (AI Insights)
 
 **Location**: [dashboard/dashboard_explainer.py](dashboard/dashboard_explainer.py)
 
@@ -356,15 +414,17 @@ data_connector.get_current_dataset()  # Returns 'healthcare'
 
 **Dashboard modules must add parent to path**:
 
-```python
+````python
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from charts.chart_generator import ChartGenerator
-```
-
-### 2. Logging Setup
-
+sys.path.append(os.path.join(os.path.di` - check `Cookie(None)` in FastAPI deps
+6. **Database connection pooling** - use `get_db()` dependency, never create sessions manually
+7. **Virtual environment must be activated** - run `source venv/bin/activate` before starting server
+8. **Dashboard Explainer requires API key** - set `OPENROUTER_API_KEY` in `.env` for AI insights
+9. **File uploads use UploadFile type** - FastAPI endpoint: `file: UploadFile = File(...)`
+10. **Calculated metrics need time columns** - YoY/MoM require date dimension in data
+11. **Smart Generator uses structured_output** - Pydantic models define LLM response schema
+12. **Smart Generator clears existing charts** - Always clears dashboard before auto-generation
 **Standard pattern** ([main.py:L21-L30](main.py#L21-L30)):
 
 ```python
@@ -376,7 +436,8 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
-```
+```dashboard/smart_generator.py](dashboard/smart_generator.py)         | AI chart recommendations | LLM auto-generation, context analysis     |
+| [
 
 ### 3. Error Handling in API Routes
 
@@ -388,17 +449,69 @@ try:
 except Exception as e:
     logger.error(f"Error: {e}")
     return JSONResponse({"error": str(e)}, status_code=500)
+````
+
+### 4. File Paths AND update `SmartChartRecommender` LLM prompt
+
+- **New themes**: Add to `self.themes` dict in [ArchitectUIDashboard](dashboard/dashboard_generator.py#L26-L68)
+- **New roles**: Update `ROLE_PERMISSIONS` in [auth.py](auth/auth.py#L18-L24) and database schema
+- **Data formats**: Extend [loaders.py](rag/loaders.py) for new file types
+- **API endpoints**: Follow session-checking pattern with `Depends(require_auth)`
+- **Department contexts**: Update `ContextAnalyzer.build_user_context()` in [smart_generator.py](dashboard/smart_generator.py) for new departments
+- **LLM prompts**: Both SmartGenerator and DashboardExplainer use ChatOpenAI with structured output - modify Pydantic models for schema changes
+
+## Advanced LLM Integration Patterns
+
+### Structured Output with Pydantic (v1.2.0+)
+
+**Pattern**: Use Pydantic models with `structured_output` for type-safe LLM responses
+
+```python
+from pydantic import BaseModel, Field
+from langchain_openai import ChatOpenAI
+
+class ChartRecommendation(BaseModel):
+    metric: str = Field(description="Column to measure")
+    dimension: str = Field(description="Column to group by")
+    chart_type: str = Field(description="bar, line, pie...")
+
+llm = ChatOpenAI(model="anthropic/claude-3-haiku", temperature=0.3)
+structured_llm = llm.with_structured_output(ChartRecommendation)
+response = structured_llm.invoke(prompt)  # Returns ChartRecommendation instance
 ```
 
-### 4. File Paths
+**Used In**:
 
-- **Exports**: `exports/dashboard_{id}_data_{timestamp}_chart{n}.csv`
-- **Saved Dashboards**: `saved_dashboards/dashboard_{id}_{title}_{timestamp}.html`
-- **Temp Dashboards**: `temp_dashboards/dashboard_snapshot_{id}_{timestamp}.html`
+- [smart_generator.py:L400-L500](dashboard/smart_generator.py#L400-L500): Chart recommendations
+- [dashboard_explainer.py](dashboard/dashboard_explainer.py): Explanation generation (text output)
 
-### 5. Frontend Serving Pattern
+**Benefits**: Guarantees valid JSON, eliminates parsing errors, provides autocomplete
 
-**Static HTML from `Frontend/` folder**:
+### Context-Aware Prompting
+
+**Pattern**: Inject dataset schema + user context into LLM prompts for personalized recommendations
+
+```python
+# Example from SmartChartRecommender
+prompt = f"""
+Dataset Schema:
+- Tables: {profile.tables}
+- Total Rows: {profile.total_rows}
+
+User Context:
+- Department: {context.department}
+- Role: {context.role}
+- Preferred Metrics: {context.preferred_metrics}
+
+Generate 5 chart recommendations...
+"""
+```
+
+**Key Principle**: More context = better recommendations, but watch token limits
+
+---
+
+**Last Updated**: January 22d/` folder\*\*:
 
 ```python
 @app.get("/admin_dashboard.html", response_class=HTMLResponse)
