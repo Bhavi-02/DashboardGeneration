@@ -58,6 +58,15 @@ except ImportError as e:
     print(f"Warning: Could not import dashboard explainer: {e}")
     get_dashboard_explainer = None
 
+# Import smart dashboard generator
+try:
+    from dashboard.smart_generator import SmartDashboardGenerator
+    from charts.data_connector import DataConnector
+    print("✅ Smart Dashboard Generator loaded successfully")
+except ImportError as e:
+    print(f"Warning: Could not import smart dashboard generator: {e}")
+    SmartDashboardGenerator = None
+
 DATABASE_URL = "mysql+pymysql://root:dhruv123@localhost:3306/analytics_dashboard"
 
 # Create engine with connection pooling and optimizations
@@ -275,6 +284,15 @@ async def chart_creator_ui(session: dict = Depends(require_auth)):
     if file_path.exists():
         return HTMLResponse(content=file_path.read_text(encoding='utf-8'))
     return HTMLResponse(content="<h1>Chart creator not found</h1>", status_code=404)
+
+# Smart Dashboard UI (AI-Powered)
+@app.get("/smart-dashboard", response_class=HTMLResponse)
+async def smart_dashboard_ui(session: dict = Depends(require_auth)):
+    """Serve the AI-powered smart dashboard generator UI"""
+    file_path = Path("Frontend/smart_dashboard.html")
+    if file_path.exists():
+        return HTMLResponse(content=file_path.read_text(encoding='utf-8'))
+    return HTMLResponse(content="<h1>Smart dashboard not found</h1>", status_code=404)
 
 # API: Get dataset information
 @app.get("/api/get-dataset-info")
@@ -735,6 +753,168 @@ async def view_saved_dashboard(dashboard_id: int, session: dict = Depends(requir
         )
     finally:
         db.close()
+
+# API: Generate Smart Dashboard (AI-powered)
+@app.post("/api/generate-smart-dashboard")
+async def generate_smart_dashboard_api(
+    request_data: Dict[str, Any] = Body(...),
+    session: dict = Depends(require_auth)
+):
+    """
+    Generate AI-powered dashboard with automatic chart recommendations
+    
+    Request Body:
+    {
+        "num_charts": 5,  // Number of charts to generate (default 5)
+        "override_context": {  // Optional: override user context
+            "department": "Marketing",
+            "role": "Analyst"
+        }
+    }
+    """
+    try:
+        logger.info(f"🤖 Smart dashboard generation requested by user {session['user_id']}")
+        
+        # Check if SmartDashboardGenerator is available
+        if SmartDashboardGenerator is None:
+            return JSONResponse({
+                "success": False,
+                "error": "Smart Dashboard Generator not available. Check server logs."
+            }, status_code=500)
+        
+        # Extract parameters
+        num_charts = request_data.get('num_charts', 5)
+        override_context = request_data.get('override_context', None)
+        
+        # Get user context from session
+        user_department = session.get('department')
+        user_role = session.get('role', 'Viewer')
+        
+        # Initialize data connector (use existing or create new)
+        data_connector = DataConnector(data_folder='data', auto_load=True)
+        
+        # Check if data is loaded
+        if not data_connector.get_current_dataset():
+            return JSONResponse({
+                "success": False,
+                "error": "No dataset loaded. Please upload data first.",
+                "recommendation": "Upload Excel files to the data/ folder or use the upload endpoint."
+            }, status_code=400)
+        
+        # Initialize smart generator
+        smart_gen = SmartDashboardGenerator(data_connector, use_llm=True)
+        
+        # Clear existing charts before generating (as per requirements)
+        ds = get_dashboard_system()
+        if ds:
+            ds.dashboard.clear_charts()
+            logger.info("🧹 Cleared existing charts before smart generation")
+        
+        # Generate smart dashboard
+        result = smart_gen.generate_smart_dashboard(
+            user_department=user_department,
+            user_role=user_role,
+            override_context=override_context,
+            num_charts=num_charts
+        )
+        
+        if not result['success']:
+            return JSONResponse({
+                "success": False,
+                "error": result.get('error', 'Unknown error'),
+                "profile": None,
+                "recommendations": []
+            }, status_code=500)
+        
+        # Add charts to dashboard system
+        recommendations = result['recommendations']
+        charts_added = 0
+        
+        for i, (rec, fig) in enumerate(zip(recommendations, result['charts']), 1):
+            if fig:
+                # Add chart to dashboard system
+                if ds:
+                    # Create synthetic query for tracking
+                    query = f"{rec['aggregation']} of {rec['metric']} by {rec['dimension']}"
+                    
+                    # Add chart using add_chart_from_query (correct method)
+                    try:
+                        ds.dashboard.add_chart_from_query(
+                            query=query,
+                            entities=rec,  # Use recommendation as entities dict
+                            chart_title=rec.get('_title', query)
+                        )
+                        charts_added += 1
+                        logger.info(f"  ✅ Added chart {i}: {rec.get('_title', query)}")
+                    except Exception as e:
+                        logger.error(f"  ❌ Failed to add chart {i}: {e}")
+        
+        # Generate dashboard HTML
+        if ds and charts_added > 0:
+            fig = ds.generate_and_save_dashboard(
+                filename="interactive_dashboard.html",
+                title=f"Smart Dashboard - {session['full_name']}"
+            )
+            
+            if fig:
+                # Create snapshot
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                snapshot_filename = f"dashboard_snapshot_{session['user_id']}_{timestamp}.html"
+                snapshot_path = Path("temp_dashboards") / snapshot_filename
+                snapshot_path.parent.mkdir(exist_ok=True)
+                
+                source_file = Path("interactive_dashboard.html")
+                if source_file.exists():
+                    import shutil
+                    shutil.copy(source_file, snapshot_path)
+                    logger.info(f"📸 Smart dashboard snapshot: {snapshot_path}")
+                
+                # Prepare response with metadata
+                import time
+                cache_timestamp = int(time.time() * 1000)
+                
+                return JSONResponse({
+                    "success": True,
+                    "message": f"Smart dashboard generated with {charts_added} charts",
+                    "chart_count": charts_added,
+                    "dashboard_url": f"/view-dashboard?v={cache_timestamp}",
+                    "snapshot_file": str(snapshot_path),
+                    "recommendations": [
+                        {
+                            "title": rec.get('_title', ''),
+                            "reasoning": rec.get('_reasoning', ''),
+                            "chart_type": rec['chart_type'],
+                            "metric": rec['metric'],
+                            "dimension": rec['dimension']
+                        }
+                        for rec in recommendations
+                    ],
+                    "profile": {
+                        "dataset": result['profile'].dataset_name,
+                        "total_rows": result['profile'].total_rows,
+                        "total_columns": result['profile'].total_columns
+                    },
+                    "context": {
+                        "department": result['context'].department,
+                        "role": result['context'].role
+                    }
+                })
+        
+        # If we got here, something went wrong
+        return JSONResponse({
+            "success": False,
+            "error": "Failed to generate dashboard HTML",
+            "charts_generated": charts_added
+        }, status_code=500)
+        
+    except Exception as e:
+        logger.error(f"❌ Smart dashboard generation error: {e}")
+        logger.error(traceback.format_exc())
+        return JSONResponse({
+            "success": False,
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }, status_code=500)
 
 # API: Save dashboard to database
 @app.post("/api/save-dashboard") 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -75,7 +75,9 @@
         border-radius: 15px;
         text-align: center;
         cursor: pointer;
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s;
         text-decoration: none;
       }
       .access-card:hover {
@@ -164,6 +166,16 @@
           <div class="icon">📊</div>
           <h3>Chart Creator</h3>
           <p>Create and download individual charts quickly</p>
+        </a>
+
+        <a
+          href="/smart-dashboard"
+          class="access-card"
+          style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%)"
+        >
+          <div class="icon">🤖</div>
+          <h3>Smart Dashboard (NEW)</h3>
+          <p>AI-powered automatic chart generation - zero effort!</p>
         </a>
 
         <a href="/dashboard/analyst" class="access-card analyst">

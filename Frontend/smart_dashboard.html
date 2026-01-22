@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Dashboard - AI-Powered Analytics</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .header {
+        background: white;
+        border-radius: 15px;
+        padding: 20px 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header h1 {
+        color: #667eea;
+        font-size: 28px;
+      }
+
+      .header .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .btn {
+        border: none;
+        padding: 10px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.3s;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+      }
+
+      .main-container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .intro-section {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        border-left: 5px solid #667eea;
+      }
+
+      .intro-section h2 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 24px;
+      }
+
+      .intro-section p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+
+      .feature-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .feature-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .feature-item h4 {
+        color: #667eea;
+        margin-bottom: 5px;
+      }
+
+      .feature-item p {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .controls {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+      }
+
+      .control-group {
+        margin-bottom: 20px;
+      }
+
+      .control-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .control-group input,
+      .control-group select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .control-group input:focus,
+      .control-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .generate-section {
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .generate-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 18px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .generate-btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+      }
+
+      .generate-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 30px;
+      }
+
+      .loading.active {
+        display: block;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .results {
+        display: none;
+      }
+
+      .results.active {
+        display: block;
+      }
+
+      .result-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #667eea;
+      }
+
+      .result-card h3 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .result-card .meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .result-card .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .recommendations-list {
+        display: grid;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .recommendation-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid #eee;
+        transition: border-color 0.3s;
+      }
+
+      .recommendation-card:hover {
+        border-color: #667eea;
+      }
+
+      .recommendation-card h4 {
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+
+      .recommendation-card .chart-type {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin-right: 10px;
+      }
+
+      .recommendation-card .reasoning {
+        color: #666;
+        font-size: 14px;
+        margin-top: 8px;
+        font-style: italic;
+      }
+
+      .error {
+        background: #ffebee;
+        color: #c62828;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 4px solid #c62828;
+        display: none;
+      }
+
+      .error.active {
+        display: block;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div>
+        <h1>🤖 Smart Dashboard - AI-Powered</h1>
+      </div>
+      <div class="user-info">
+        <span id="userName">Loading...</span>
+        <button
+          class="btn btn-secondary"
+          onclick="window.location.href = '/page.html'"
+        >
+          Back to Dashboard
+        </button>
+        <button class="btn btn-primary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="main-container">
+      <!-- Introduction Section -->
+      <div class="intro-section">
+        <h2>✨ Welcome to AI-Powered Dashboard Generation</h2>
+        <p>
+          <strong>No more blank canvas!</strong> Our AI analyzes your data and
+          automatically generates the most relevant charts for your role and
+          department.
+        </p>
+        <p>
+          Simply click "Generate Smart Dashboard" and watch as AI creates 5
+          insightful visualizations tailored to your needs.
+        </p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <h4>🎯 Context-Aware</h4>
+            <p>Charts tailored to your department and role</p>
+          </div>
+          <div class="feature-item">
+            <h4>⚡ Instant Insights</h4>
+            <p>From blank canvas to insights in seconds</p>
+          </div>
+          <div class="feature-item">
+            <h4>🔄 Smart Recommendations</h4>
+            <p>AI explains why each chart matters</p>
+          </div>
+          <div class="feature-item">
+            <h4>🎨 Professional Design</h4>
+            <p>Beautiful, interactive Plotly charts</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Section -->
+      <div class="controls">
+        <h3 style="margin-bottom: 20px; color: #333">⚙️ Generation Settings</h3>
+
+        <div class="controls-grid">
+          <div class="control-group">
+            <label for="numCharts">Number of Charts</label>
+            <select id="numCharts">
+              <option value="3">3 Charts (Quick)</option>
+              <option value="5" selected>5 Charts (Balanced)</option>
+              <option value="7">7 Charts (Comprehensive)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="overrideDepartment"
+              >Override Department (Optional)</label
+            >
+            <select id="overrideDepartment">
+              <option value="">Use My Department</option>
+              <option value="Finance">Finance</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Sales">Sales</option>
+              <option value="Operations">Operations</option>
+              <option value="HR">HR</option>
+              <option value="Customer Success">Customer Success</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="overrideRole">Override Role (Optional)</label>
+            <select id="overrideRole">
+              <option value="">Use My Role</option>
+              <option value="Admin">Admin</option>
+              <option value="Analyst">Analyst</option>
+              <option value="Departmental">Departmental</option>
+              <option value="Viewer">Viewer</option>
+            </select>
+          </div>
+        </div>
+
+        <p style="margin-top: 15px; color: #666; font-size: 14px">
+          💡 <strong>Tip:</strong> Use the override options to explore different
+          perspectives. For example, select "Marketing" to see marketing-focused
+          charts even if you're in Finance.
+        </p>
+      </div>
+
+      <!-- Generate Button -->
+      <div class="generate-section">
+        <button
+          class="generate-btn"
+          id="generateBtn"
+          onclick="generateSmartDashboard()"
+        >
+          🚀 Generate Smart Dashboard
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <h3 style="color: #667eea">🤖 AI is analyzing your data...</h3>
+        <p style="color: #666; margin-top: 10px">This may take 5-10 seconds</p>
+      </div>
+
+      <!-- Error Display -->
+      <div class="error" id="error"></div>
+
+      <!-- Results Section -->
+      <div class="results" id="results">
+        <div class="result-card">
+          <h3>✅ Smart Dashboard Generated Successfully!</h3>
+          <div class="meta">
+            <div class="meta-item">
+              📊 <strong>Charts:</strong> <span id="chartCount">0</span>
+            </div>
+            <div class="meta-item">
+              📁 <strong>Dataset:</strong> <span id="datasetName">-</span>
+            </div>
+            <div class="meta-item">
+              📈 <strong>Rows:</strong> <span id="totalRows">-</span>
+            </div>
+            <div class="meta-item">
+              👤 <strong>Context:</strong> <span id="contextInfo">-</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px">
+            <button
+              class="btn btn-primary"
+              onclick="viewDashboard()"
+              style="margin-right: 10px"
+            >
+              👁️ View Dashboard
+            </button>
+            <button class="btn btn-secondary" onclick="saveDashboard()">
+              💾 Save Dashboard
+            </button>
+          </div>
+        </div>
+
+        <h3 style="margin: 30px 0 15px; color: #333">
+          📋 AI Recommendations Explained
+        </h3>
+        <div class="recommendations-list" id="recommendationsList"></div>
+
+        <div
+          style="
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+          "
+        >
+          <h4 style="color: #333; margin-bottom: 10px">🔄 What's Next?</h4>
+          <p style="color: #666; margin-bottom: 15px">
+            Your smart dashboard is ready! You can view it, save it to your
+            collection, or generate a new one with different settings.
+          </p>
+          <button class="btn btn-primary" onclick="generateSmartDashboard()">
+            🔄 Generate New Dashboard
+          </button>
+        </div>
+      </div>
+
+      <a href="/page.html" class="back-link">← Back to Main Dashboard</a>
+    </div>
+
+    <script>
+      let dashboardUrl = null;
+      let snapshotFile = null;
+
+      // Load user info
+      async function loadUserInfo() {
+        try {
+          const response = await fetch("/api/session-info");
+          if (!response.ok) {
+            // Not authenticated, redirect to login
+            window.location.href = "/page.html";
+            return;
+          }
+          const data = await response.json();
+          document.getElementById("userName").textContent =
+            data.full_name || data.username;
+        } catch (error) {
+          console.error("Error loading user info:", error);
+          window.location.href = "/page.html";
+        }
+      }
+
+      // Generate smart dashboard
+      async function generateSmartDashboard() {
+        const generateBtn = document.getElementById("generateBtn");
+        const loading = document.getElementById("loading");
+        const results = document.getElementById("results");
+        const errorDiv = document.getElementById("error");
+
+        // Reset state
+        results.classList.remove("active");
+        errorDiv.classList.remove("active");
+        loading.classList.add("active");
+        generateBtn.disabled = true;
+
+        try {
+          // Get settings
+          const numCharts = parseInt(
+            document.getElementById("numCharts").value,
+          );
+          const overrideDepartment =
+            document.getElementById("overrideDepartment").value;
+          const overrideRole = document.getElementById("overrideRole").value;
+
+          // Build request
+          const requestBody = {
+            num_charts: numCharts,
+          };
+
+          // Add override context if specified
+          if (overrideDepartment || overrideRole) {
+            requestBody.override_context = {};
+            if (overrideDepartment)
+              requestBody.override_context.department = overrideDepartment;
+            if (overrideRole) requestBody.override_context.role = overrideRole;
+          }
+
+          // Call API
+          const response = await fetch("/api/generate-smart-dashboard", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Store dashboard info
+            dashboardUrl = data.dashboard_url;
+            snapshotFile = data.snapshot_file;
+
+            // Update results
+            document.getElementById("chartCount").textContent =
+              data.chart_count;
+            document.getElementById("datasetName").textContent =
+              data.profile.dataset;
+            document.getElementById("totalRows").textContent =
+              data.profile.total_rows.toLocaleString();
+            document.getElementById("contextInfo").textContent =
+              `${data.context.role} ${data.context.department ? "(" + data.context.department + ")" : ""}`;
+
+            // Display recommendations
+            const recommendationsList = document.getElementById(
+              "recommendationsList",
+            );
+            recommendationsList.innerHTML = "";
+
+            data.recommendations.forEach((rec, index) => {
+              const card = document.createElement("div");
+              card.className = "recommendation-card";
+              card.innerHTML = `
+                            <h4>${index + 1}. ${rec.title}</h4>
+                            <div>
+                                <span class="chart-type">${rec.chart_type.toUpperCase()}</span>
+                                <span style="color: #666; font-size: 14px;">
+                                    ${rec.metric} by ${rec.dimension}
+                                </span>
+                            </div>
+                            <div class="reasoning">"${rec.reasoning}"</div>
+                        `;
+              recommendationsList.appendChild(card);
+            });
+
+            // Show results
+            results.classList.add("active");
+          } else {
+            // Show error
+            errorDiv.textContent =
+              "❌ Error: " + (data.error || "Unknown error occurred");
+            errorDiv.classList.add("active");
+          }
+        } catch (error) {
+          console.error("Error generating smart dashboard:", error);
+          errorDiv.textContent = "❌ Network error: " + error.message;
+          errorDiv.classList.add("active");
+        } finally {
+          loading.classList.remove("active");
+          generateBtn.disabled = false;
+        }
+      }
+
+      // View dashboard
+      function viewDashboard() {
+        if (dashboardUrl) {
+          window.open(dashboardUrl, "_blank");
+        }
+      }
+
+      // Save dashboard
+      async function saveDashboard() {
+        if (!snapshotFile) {
+          alert("No dashboard to save");
+          return;
+        }
+
+        const title = prompt(
+          "Enter a title for this dashboard:",
+          "AI-Generated Dashboard",
+        );
+        if (!title) return;
+
+        try {
+          const response = await fetch("/api/save-dashboard", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: title,
+              description: "AI-generated smart dashboard",
+              snapshot_file: snapshotFile,
+              is_ai_generated: true,
+            }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            alert("✅ Dashboard saved successfully!");
+          } else {
+            alert("❌ Error saving dashboard: " + data.message);
+          }
+        } catch (error) {
+          alert("❌ Error saving dashboard: " + error.message);
+        }
+      }
+
+      // Logout
+      async function logout() {
+        try {
+          await fetch("/api/logout", { method: "POST" });
+          window.location.href = "/page.html";
+        } catch (error) {
+          console.error("Logout error:", error);
+        }
+      }
+
+      // Initialize
+      loadUserInfo();
+    </script>
+  </body>
+</html>
