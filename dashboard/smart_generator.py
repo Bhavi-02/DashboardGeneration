@@ -70,6 +70,9 @@ class DataProfile:
     total_rows: int
     total_columns: int
     sample_data: Optional[Dict[str, pd.DataFrame]] = None  # Optional sample data for context
+    industry: Optional[str] = None  # Detected industry (retail, saas, manufacturing, healthcare, finance)
+    semantic_columns: Optional[Dict[str, List[str]]] = None  # {location: [], time: [], segment: [], product: []}
+    relationships: Optional[List[str]] = None  # Detected data relationships (e.g., "Branch + Year → trends")
 
 
 @dataclass
@@ -95,7 +98,29 @@ class DataProfiler:
     - Calculate basic statistics (cardinality, null rates)
     - Identify potential relationships
     - Sample representative data
+    - Industry detection
+    - Semantic column categorization (location, time, segment, product)
     """
+    
+    # Semantic column patterns (handles different naming conventions)
+    SEMANTIC_PATTERNS = {
+        'location': ['branch', 'location', 'store', 'office', 'region', 'state', 'country', 'city', 'area', 'territory', 'zone', 'market', 'geography'],
+        'time': ['year', 'month', 'quarter', 'date', 'day', 'week', 'period', 'fiscal', 'time', 'timestamp'],
+        'segment': ['category', 'segment', 'type', 'class', 'group', 'division', 'department', 'unit'],
+        'product': ['product', 'item', 'sku', 'service', 'offering', 'goods', 'merchandise'],
+        'customer': ['customer', 'client', 'account', 'buyer', 'user', 'member'],
+        'financial': ['revenue', 'sales', 'cost', 'profit', 'margin', 'price', 'value', 'amount', 'total', 'rate', 'expense']
+    }
+    
+    # Industry detection keywords
+    INDUSTRY_KEYWORDS = {
+        'retail': ['store', 'branch', 'inventory', 'goods', 'merchandise', 'insulated', 'non-insulated', 'retail', 'product', 'sku'],
+        'saas': ['subscription', 'mrr', 'arr', 'churn', 'plan', 'tier', 'license', 'user'],
+        'manufacturing': ['production', 'units', 'defects', 'capacity', 'throughput', 'yield', 'assembly'],
+        'healthcare': ['patient', 'admission', 'diagnosis', 'treatment', 'claims', 'provider'],
+        'finance': ['transaction', 'portfolio', 'assets', 'liabilities', 'investment', 'loan'],
+        'ecommerce': ['order', 'cart', 'checkout', 'shipping', 'delivery', 'online']
+    }
     
     def __init__(self, data_connector: DataConnector):
         self.data_connector = data_connector
@@ -142,15 +167,29 @@ class DataProfiler:
                     df = self.data_connector.cached_data[table_name]
                     sample_data[table_name] = df.head(3)
             
+            # Detect industry
+            industry = self._detect_industry(tables)
+            
+            # Detect semantic column types
+            semantic_columns = self._detect_semantic_columns(tables)
+            
+            # Detect data relationships
+            relationships = self._detect_relationships(tables, semantic_columns)
+            
             profile = DataProfile(
                 dataset_name=dataset_name,
                 tables=tables,
                 total_rows=total_rows,
                 total_columns=total_columns,
-                sample_data=sample_data
+                sample_data=sample_data,
+                industry=industry,
+                semantic_columns=semantic_columns,
+                relationships=relationships
             )
             
             logger.info(f"📊 Data Profile: {dataset_name} - {total_rows} rows, {total_columns} columns")
+            logger.info(f"🏭 Detected Industry: {industry}")
+            logger.info(f"🔗 Detected Relationships: {len(relationships)} patterns")
             return profile
             
         except Exception as e:
@@ -201,6 +240,126 @@ class DataProfiler:
             recommended.extend(date_cols)
         
         return recommended[:10]
+    
+    def _detect_industry(self, tables: Dict[str, Dict[str, Any]]) -> str:
+        """
+        Detect industry based on column names and patterns
+        
+        Returns:
+            Industry name or 'general'
+        """
+        all_columns = []
+        for table_info in tables.values():
+            all_columns.extend(table_info.get('numeric', []))
+            all_columns.extend(table_info.get('text', []))
+            all_columns.extend(table_info.get('date', []))
+        
+        # Convert to lowercase for matching
+        columns_lower = ' '.join([col.lower() for col in all_columns])
+        
+        # Score each industry
+        industry_scores = {}
+        for industry, keywords in self.INDUSTRY_KEYWORDS.items():
+            score = sum(1 for keyword in keywords if keyword in columns_lower)
+            if score > 0:
+                industry_scores[industry] = score
+        
+        # Return highest scoring industry
+        if industry_scores:
+            detected = max(industry_scores, key=industry_scores.get)
+            logger.info(f"🏭 Industry detected: {detected} (score: {industry_scores[detected]})")
+            return detected
+        
+        return 'general'
+    
+    def _detect_semantic_columns(self, tables: Dict[str, Dict[str, Any]]) -> Dict[str, List[str]]:
+        """
+        Categorize columns into semantic types (location, time, segment, product, etc.)
+        Handles different naming conventions (Branch vs Location vs Store)
+        
+        Returns:
+            Dict of semantic categories with matching columns
+        """
+        semantic_map = {
+            'location': [],
+            'time': [],
+            'segment': [],
+            'product': [],
+            'customer': [],
+            'financial': []
+        }
+        
+        for table_info in tables.values():
+            all_cols = table_info.get('numeric', []) + table_info.get('text', []) + table_info.get('date', [])
+            
+            for col in all_cols:
+                col_lower = col.lower()
+                
+                # Match against semantic patterns
+                for semantic_type, patterns in self.SEMANTIC_PATTERNS.items():
+                    if any(pattern in col_lower for pattern in patterns):
+                        if col not in semantic_map[semantic_type]:  # Avoid duplicates
+                            semantic_map[semantic_type].append(col)
+        
+        # Log detected semantic columns
+        for sem_type, cols in semantic_map.items():
+            if cols:
+                logger.info(f"🏷️  {sem_type.capitalize()}: {cols}")
+        
+        return semantic_map
+    
+    def _detect_relationships(self, tables: Dict[str, Dict[str, Any]], semantic_columns: Dict[str, List[str]]) -> List[str]:
+        """
+        Detect meaningful data relationships for chart recommendations
+        
+        Patterns:
+        - Location + Time → Trend analysis by location
+        - Segment + Financial → Category performance
+        - Product + Time → Product lifecycle
+        - Location + Segment → Cross-dimensional analysis
+        
+        Returns:
+            List of relationship descriptions
+        """
+        relationships = []
+        
+        locations = semantic_columns.get('location', [])
+        times = semantic_columns.get('time', [])
+        segments = semantic_columns.get('segment', [])
+        products = semantic_columns.get('product', [])
+        financials = semantic_columns.get('financial', [])
+        
+        # Location + Time relationships
+        if locations and times:
+            for loc in locations:
+                for time in times:
+                    relationships.append(f"{loc} + {time} → Multi-series time trends (e.g., branch performance over years)")
+        
+        # Segment + Financial relationships
+        if segments and financials:
+            for seg in segments:
+                for fin in financials:
+                    relationships.append(f"{seg} + {fin} → Category performance analysis (e.g., revenue by product category)")
+        
+        # Product + Time relationships
+        if products and times:
+            for prod in products:
+                for time in times:
+                    relationships.append(f"{prod} + {time} → Product lifecycle trends (e.g., product sales over time)")
+        
+        # Location + Segment relationships
+        if locations and segments:
+            for loc in locations:
+                for seg in segments:
+                    relationships.append(f"{loc} + {seg} → Cross-dimensional analysis (e.g., category dominance by branch)")
+        
+        # Time + Financial relationships (always valuable)
+        if times and financials:
+            for time in times:
+                for fin in financials:
+                    relationships.append(f"{time} + {fin} → Growth analysis (e.g., year-on-year revenue growth)")
+        
+        return relationships[:15]  # Limit to top 15 most relevant
 
 
 # ============================================================================
@@ -355,37 +514,58 @@ class SmartChartRecommender:
         try:
             # Build prompt with data schema and user context
             prompt_template = ChatPromptTemplate.from_messages([
-                ("system", """You are a business intelligence analyst expert at creating insightful data visualizations.
+                ("system", """You are an expert business intelligence analyst specializing in executive-level data visualizations.
 
-Given a dataset schema and user context, recommend the most valuable charts to create.
+Your goal: Generate ACTIONABLE, INSIGHT-DRIVEN charts that answer critical business questions for executives (CEOs, department heads, analysts).
 
 CRITICAL INSTRUCTIONS:
 1. Only use columns that exist in the provided schema
-2. Match chart types to data relationships:
-   - bar: Categorical comparisons (branches, categories, products, states)
-   - line: Time trends and growth analysis (year-over-year, month-over-month)
-   - pie: Part-to-whole comparisons (revenue contribution, market share)
+2. Match chart types to analytical goals:
+   - bar: Categorical comparisons (branch vs branch, category vs category, state vs state)
+   - line: Time trends and growth analysis (year-over-year, month-over-month, multi-series for comparisons)
+   - pie: Part-to-whole comparisons (revenue contribution %, market share)
    - area: Cumulative trends and stacked comparisons over time
    - scatter: Correlations between metrics (price vs quantity, rate vs sales)
-3. Consider user department priorities
-4. Ensure variety in chart types
-5. Prioritize actionable insights and business questions
+   - heatmap: Cross-dimensional patterns (category performance across branches)
+3. **Prioritize COMPARISON and TREND analysis** over simple aggregations
+4. **Use time dimensions when available** for growth/trend charts
+5. **Multi-series line/area charts** for comparing segments over time (e.g., branch A vs branch B sales over years)
+6. Consider user department priorities and role
+7. Ensure variety in chart types
 
-EXAMPLE QUERIES TO EMULATE:
-- Year-on-year growth analysis: "What is the YoY growth in sales revenue from 2017 to 2025?"
-- Branch/location performance: "Which branch generated higher total sales across the years?"
-- Geographic trends: "How do sales trends differ by state?"
-- Product performance: "Which products consistently perform best in terms of revenue and quantity sold?"
-- Category comparisons: "Compare Insulated vs. Non-Insulated goods in terms of revenue, selling rate, and growth"
-- Category dominance: "Which product category dominates in each branch?"
-- Seasonal patterns: "Are there seasonal spikes in sales for certain product categories?"
-- Average metrics: "What is the average pre-tax value per order across years?"
-- Impact analysis: "How does rate variation affect sales quantity?"
-- Simple aggregations: "Sales by year", "Sales by category", "Sales by branch", "Sales by state"
+EXECUTIVE BUSINESS QUESTIONS (Use these as templates):
+- **Growth Analysis**: "What is the year-on-year growth in sales revenue?" → Line chart with YoY calculation
+- **Performance Comparison**: "Which branch/location generated higher total sales across years?" → Multi-series line chart
+- **Geographic Trends**: "How do sales trends differ by state/region?" → Multi-series line or bar chart
+- **Product Performance**: "Which products consistently perform best in terms of revenue and quantity?" → Bar chart with top performers
+- **Segment Comparison**: "Compare [Segment A] vs [Segment B] in terms of revenue, average rate, and growth trend" → Multiple charts or grouped bar
+- **Dominance Analysis**: "Which product category dominates in each branch/location?" → Grouped bar or heatmap
+- **Seasonal Patterns**: "Are there seasonal spikes in sales for certain categories?" → Line chart by month/quarter
+- **Average Metrics**: "What is the average [metric] per order/customer across years?" → Line chart for trends
+- **Impact Analysis**: "How does [factor X] affect [metric Y]?" → Scatter plot or grouped bar
+- **Simple Breakdowns**: "Sales by year/category/branch/state" → Bar or pie charts
+
+RELATIONSHIP-DRIVEN RECOMMENDATIONS:
+- If you see **Location + Time columns** → Create trend comparisons (multi-series line charts showing each location's performance over time)
+- If you see **Segment/Category + Financial metric** → Create performance analysis (which segment contributes most revenue?)
+- If you see **Product + Time** → Create lifecycle trends (how product sales evolve over time)
+- If you see **Location + Segment** → Create cross-dimensional analysis (which category performs best in each branch?)
 
 Return EXACTLY {num_recommendations} recommendations in JSON format."""),
                 ("user", """Dataset Schema:
 {schema}
+
+Industry Context: {industry}
+
+Detected Data Relationships:
+{relationships}
+
+Semantic Column Types:
+- Location/Branch columns: {location_cols}
+- Time/Date columns: {time_cols}
+- Segment/Category columns: {segment_cols}
+- Product columns: {product_cols}
+- Financial/Metric columns: {financial_cols}
 
 User Context:
 - Department: {department}
@@ -399,29 +579,46 @@ Generate {num_recommendations} chart recommendations as JSON array with this str
   {{
     "metric": "column_name",
     "dimension": "column_name",
-    "chart_type": "bar|line|pie|area|scatter",
+    "chart_type": "bar|line|pie|area|scatter|heatmap",
     "aggregation": "sum|avg|count|min|max",
-    "title": "Business-Friendly Descriptive Title",
-    "reasoning": "Why this chart answers a key business question",
-    "priority": 1
+    "title": "Executive-Friendly Descriptive Title",
+    "reasoning": "Why this chart answers a key business question for {role} in {department}",
+    "priority": 1,
+    "group_by": "optional_second_dimension_for_multi_series",
+    "calculation_type": "yoy_growth|mom_change|cumulative|percent_change"
   }}
 ]
 
-REQUIREMENTS: 
-- Only use columns from the schema above
-- If date/year column exists, prioritize time-based analysis (YoY growth, trends)
-- For categorical dimensions (branch, state, category, product), use bar/pie charts
-- For numeric comparisons, consider scatter plots (e.g., price vs quantity)
-- Ensure metric is numeric (sales, revenue, quantity), dimension is categorical or date
-- Make titles business-friendly: "Year-on-Year Sales Growth" not "Sales by Year"
-- Focus on comparative analysis: branch vs branch, category vs category, year vs year
-- Include performance metrics: totals, averages, growth rates
-- Identify top performers: "Top 10 Products by Revenue"
-""")
+REQUIREMENTS:
+✅ **Use the Detected Relationships above** to guide your recommendations
+✅ **Prioritize multi-dimensional analysis**: If location + time exist → create multi-series line charts comparing locations over time
+✅ **Include growth/trend calculations**: For time-based charts, consider YoY growth or cumulative analysis
+✅ **Create comparison charts**: Branch vs Branch, Category vs Category, State vs State
+✅ **Use semantic column types**: Match location columns with aggregated metrics, time columns with trends
+✅ **Ensure metric is numeric** (sales, revenue, quantity, rate, value, amount)
+✅ **Ensure dimension is categorical or date** (branch, state, category, product, year, month)
+✅ **Business-friendly titles**: "Year-on-Year Sales Growth by Branch" not "Sales by Year and Branch"
+✅ **Top performers**: Include "Top 10 Products by Revenue" or "Top 5 Branches by Sales" with limit=10 or limit=5
+✅ **Cross-dimensional insights**: "Which category dominates in each branch?" → use heatmap or grouped bar
+✅ **For {department} department**: Focus on {priority_metrics} metrics
+✅ **Industry-specific**: This is {industry} data - prioritize relevant metrics (e.g., retail → store/product analysis)
+
+🎯 GOAL: Each chart should answer a specific executive question about performance, trends, comparisons, or insights.""")
             ])
             
             # Format schema for prompt
             schema_text = self._format_schema_for_prompt(data_profile)
+            
+            # Extract semantic columns for prompt
+            semantic_cols = data_profile.semantic_columns or {}
+            location_cols = ', '.join(semantic_cols.get('location', [])) or 'None'
+            time_cols = ', '.join(semantic_cols.get('time', [])) or 'None'
+            segment_cols = ', '.join(semantic_cols.get('segment', [])) or 'None'
+            product_cols = ', '.join(semantic_cols.get('product', [])) or 'None'
+            financial_cols = ', '.join(semantic_cols.get('financial', [])) or 'None'
+            
+            # Format relationships
+            relationships_text = '\n'.join(f"  • {rel}" for rel in (data_profile.relationships or [])) or '  • No specific relationships detected'
             
             # Format custom prompt if provided
             custom_instructions = ""
@@ -432,6 +629,13 @@ REQUIREMENTS:
             # Build prompt
             prompt = prompt_template.format_messages(
                 schema=schema_text,
+                industry=data_profile.industry or 'general',
+                relationships=relationships_text,
+                location_cols=location_cols,
+                time_cols=time_cols,
+                segment_cols=segment_cols,
+                product_cols=product_cols,
+                financial_cols=financial_cols,
                 department=user_context.department or "General",
                 role=user_context.role,
                 priority_metrics=', '.join(user_context.preferred_metrics) or "Any",
