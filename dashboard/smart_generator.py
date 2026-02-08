@@ -162,10 +162,10 @@ class DataProfiler:
                                 len(info.get('text_columns', [])) + \
                                 len(info.get('date_columns', []))
                 
-                # Optional: Get sample data (first 3 rows)
+                # Optional: Get sample data (first 5 rows)
                 if include_sample and table_name in self.data_connector.cached_data:
                     df = self.data_connector.cached_data[table_name]
-                    sample_data[table_name] = df.head(3)
+                    sample_data[table_name] = df.head(5)
             
             # Detect industry
             industry = self._detect_industry(tables)
@@ -474,7 +474,7 @@ class SmartChartRecommender:
                     model="anthropic/claude-3-haiku",
                     api_key=self.api_key,
                     base_url="https://openrouter.ai/api/v1",
-                    temperature=0.3,  # Focused recommendations
+                    temperature=0.45,  # Slightly more diverse recommendations
                     max_tokens=1500
                 )
                 logger.info("✅ LLM initialized: Claude 3 Haiku")
@@ -661,8 +661,12 @@ REQUIREMENTS:
                     entity_dict = self._recommendation_to_entities(rec)
                     valid_recommendations.append(entity_dict)
             
-            logger.info(f"✅ Generated {len(valid_recommendations)} valid recommendations")
-            return valid_recommendations[:num_recommendations]
+            diverse_recommendations = self._dedupe_recommendations(valid_recommendations)
+            logger.info(
+                f"✅ Generated {len(valid_recommendations)} valid recommendations "
+                f"({len(diverse_recommendations)} after diversity filter)"
+            )
+            return diverse_recommendations[:num_recommendations]
             
         except Exception as e:
             logger.error(f"❌ LLM recommendation failed: {e}")
@@ -769,7 +773,17 @@ REQUIREMENTS:
             schema_lines.append(f"  Numeric columns: {', '.join(info['numeric'])}")
             schema_lines.append(f"  Categorical columns: {', '.join(info['text'])}")
             schema_lines.append(f"  Date columns: {', '.join(info['date'])}")
-            schema_lines.append(f"  Row count: {info['row_count']}\n")
+            schema_lines.append(f"  Row count: {info['row_count']}")
+
+            if data_profile.sample_data and table_name in data_profile.sample_data:
+                try:
+                    sample_df = data_profile.sample_data[table_name]
+                    schema_lines.append("  Sample rows (top 5):")
+                    schema_lines.append(sample_df.to_string(index=False))
+                except Exception:
+                    schema_lines.append("  Sample rows (top 5): [unavailable]")
+
+            schema_lines.append("")
         
         return '\n'.join(schema_lines)
     
@@ -824,6 +838,27 @@ REQUIREMENTS:
             logger.error(f"❌ Unexpected error parsing LLM response: {e}")
             logger.error(f"📄 Full response text:\n{response_text}")
             return []
+
+    def _dedupe_recommendations(self, recommendations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Remove near-duplicate recommendations based on key chart attributes."""
+        seen = set()
+        unique_recs = []
+
+        for rec in recommendations:
+            key = (
+                rec.get('metric'),
+                rec.get('dimension'),
+                rec.get('chart_type'),
+                rec.get('aggregation'),
+                rec.get('group_by'),
+                rec.get('calculation_type')
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            unique_recs.append(rec)
+
+        return unique_recs
     
     def _validate_recommendation(self, rec: Dict[str, Any], data_profile: DataProfile) -> bool:
         """Validate that recommendation uses valid columns"""
@@ -915,7 +950,7 @@ class SmartDashboardGenerator:
             
             # Step 1: Profile dataset
             logger.info("📊 Step 1: Profiling dataset...")
-            data_profile = self.profiler.profile_current_dataset(include_sample=False)
+            data_profile = self.profiler.profile_current_dataset(include_sample=True)
             
             if not data_profile.tables:
                 return {

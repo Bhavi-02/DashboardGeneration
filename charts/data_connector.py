@@ -465,7 +465,10 @@ class DataConnector:
                 # Apply aggregation with GROUP BY (creates multi-series data)
                 if aggregation:
                     print(f"📊 Applying aggregation with group_by: {aggregation}")
-                    result_df = result_df.groupby([f'dimension_{dimension_col_clean}', f'group_by_{group_by_col_clean}'])[f'metric_{metric_col_clean}'].agg(aggregation).reset_index()
+                    aggregation_fn = aggregation
+                    if aggregation in ['avg', 'average']:
+                        aggregation_fn = 'mean'
+                    result_df = result_df.groupby([f'dimension_{dimension_col_clean}', f'group_by_{group_by_col_clean}'])[f'metric_{metric_col_clean}'].agg(aggregation_fn).reset_index()
                 else:
                     # Default aggregation for charts (sum)
                     print(f"📊 Applying default aggregation (sum) with group_by")

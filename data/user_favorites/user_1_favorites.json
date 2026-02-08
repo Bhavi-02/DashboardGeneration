@@ -1,0 +1,34 @@
+{
+  "user_id": 1,
+  "username": "dhruvop",
+  "department": null,
+  "role": "Admin",
+  "timestamp": "2026-02-05T08:15:42.634Z",
+  "favorites": [
+    {
+      "chart_index": 4,
+      "metric": "Rate",
+      "dimension": "Group Party Name",
+      "chart_type": "scatter",
+      "title": "Relationship between Average Rate and Sales",
+      "reasoning": "This scatter plot will explore the relationship between average rate and sales, enabling the Admin to understand the impact of pricing on product performance and make informed decisions about pricing strategies."
+    },
+    {
+      "chart_index": 3,
+      "metric": "Net Amount",
+      "dimension": "State",
+      "chart_type": "heatmap",
+      "title": "State-wise Revenue Performance",
+      "reasoning": "This heatmap chart will provide a cross-dimensional view of revenue performance across different states, allowing the Admin to quickly identify high and low-performing regions and target areas for improvement."
+    },
+    {
+      "chart_index": 1,
+      "metric": "Net Amount",
+      "dimension": "Product Category",
+      "chart_type": "bar",
+      "title": "Top 10 Product Categories by Revenue",
+      "reasoning": "This bar chart will showcase the top-performing product categories in terms of total revenue, allowing the Admin to focus on the most lucrative segments of the business."
+    }
+  ],
+  "favorite_count": 3
+}

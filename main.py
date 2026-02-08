@@ -18,6 +18,7 @@ import json
 import io
 import traceback
 import logging
+from collections import Counter
 
 # Setup logging
 logging.basicConfig(
@@ -29,6 +30,52 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# In-memory session feedback store
+# Structure: {session_id: {"likes": [sig], "dislikes": [sig], "counts": {"chart_type": Counter, ...}}}
+session_feedback_store: Dict[str, Dict[str, Any]] = {}
+
+def _chart_signature(chart: Dict[str, Any]) -> str:
+    """Create a stable signature for a chart based on key attributes."""
+    return "|".join([
+        str(chart.get('metric', '')).strip(),
+        str(chart.get('dimension', '')).strip(),
+        str(chart.get('chart_type', '')).strip(),
+        str(chart.get('aggregation', '')).strip(),
+        str(chart.get('group_by', '')).strip(),
+        str(chart.get('calculation_type', '')).strip()
+    ])
+
+def _get_or_create_session_profile(session_id: str) -> Dict[str, Any]:
+    """Get or initialize the in-memory feedback profile for a session."""
+    if session_id not in session_feedback_store:
+        session_feedback_store[session_id] = {
+            "likes": [],
+            "dislikes": [],
+            "counts": {
+                "chart_type": Counter(),
+                "metric": Counter(),
+                "dimension": Counter()
+            }
+        }
+    return session_feedback_store[session_id]
+
+def _build_session_prompt(profile: Dict[str, Any]) -> str:
+    """Build a short prompt snippet from session feedback profile."""
+    counts = profile.get("counts", {})
+    top_chart_types = [c for c, _ in counts.get("chart_type", Counter()).most_common(3)]
+    top_metrics = [m for m, _ in counts.get("metric", Counter()).most_common(3)]
+    top_dimensions = [d for d, _ in counts.get("dimension", Counter()).most_common(3)]
+    disliked_sigs = profile.get("dislikes", [])[-5:]
+
+    return (
+        "\n\nSESSION FEEDBACK CONTEXT:\n"
+        f"- Preferred chart types (session): {', '.join(top_chart_types) or 'N/A'}\n"
+        f"- Preferred metrics (session): {', '.join(top_metrics) or 'N/A'}\n"
+        f"- Preferred dimensions (session): {', '.join(top_dimensions) or 'N/A'}\n"
+        f"- Avoid charts similar to these signatures: {', '.join(disliked_sigs) or 'N/A'}\n"
+        "Use this to bias recommendations and avoid disliked chart patterns."
+    )
 
 # Add dashboard path to sys.path
 dashboard_path = Path(__file__).parent / "dashboard"
@@ -758,7 +805,8 @@ async def view_saved_dashboard(dashboard_id: int, session: dict = Depends(requir
 @app.post("/api/generate-smart-dashboard")
 async def generate_smart_dashboard_api(
     request_data: Dict[str, Any] = Body(...),
-    session: dict = Depends(require_auth)
+    session: dict = Depends(require_auth),
+    session_id: Optional[str] = Cookie(None)
 ):
     """
     Generate AI-powered dashboard with automatic chart recommendations
@@ -803,6 +851,45 @@ async def generate_smart_dashboard_api(
                 "recommendation": "Upload Excel files to the data/ folder or use the upload endpoint."
             }, status_code=400)
         
+        # Enrich prompt with user's favorite charts (if any)
+        favorites_prompt = ""
+        try:
+            favorites_file = Path("data/user_favorites") / f"user_{session['user_id']}_favorites.json"
+            if favorites_file.exists():
+                with open(favorites_file, 'r') as f:
+                    favorites_data = json.load(f)
+
+                favorites_list = favorites_data.get('favorites', []) or []
+                if favorites_list:
+                    chart_types = [f.get('chart_type') for f in favorites_list if f.get('chart_type')]
+                    metrics = [f.get('metric') for f in favorites_list if f.get('metric')]
+                    dimensions = [f.get('dimension') for f in favorites_list if f.get('dimension')]
+                    titles = [f.get('title') for f in favorites_list if f.get('title')]
+
+                    top_chart_types = [c for c, _ in Counter(chart_types).most_common(3)]
+                    top_metrics = [m for m, _ in Counter(metrics).most_common(3)]
+                    top_dimensions = [d for d, _ in Counter(dimensions).most_common(3)]
+                    top_titles = titles[:3]
+
+                    favorites_prompt = (
+                        "\n\nUSER FAVORITES CONTEXT:\n"
+                        f"- Preferred chart types: {', '.join(top_chart_types) or 'N/A'}\n"
+                        f"- Preferred metrics: {', '.join(top_metrics) or 'N/A'}\n"
+                        f"- Preferred dimensions: {', '.join(top_dimensions) or 'N/A'}\n"
+                        f"- Example favorite charts: {', '.join(top_titles) or 'N/A'}\n"
+                        "Use these preferences to personalize recommendations, but avoid duplicating exact charts from previous runs."
+                    )
+        except Exception as e:
+            logger.warning(f"⚠️  Failed to load favorites for prompt: {e}")
+
+        if favorites_prompt:
+            custom_prompt = (custom_prompt or "") + favorites_prompt
+
+        # Enrich prompt with session feedback (likes/dislikes)
+        if session_id and session_id in session_feedback_store:
+            session_prompt = _build_session_prompt(session_feedback_store[session_id])
+            custom_prompt = (custom_prompt or "") + session_prompt
+
         # Initialize smart generator
         smart_gen = SmartDashboardGenerator(data_connector, use_llm=True)
         
@@ -829,85 +916,62 @@ async def generate_smart_dashboard_api(
                 "recommendations": []
             }, status_code=500)
         
-        # Add charts to dashboard system
+        # Convert Plotly figures to JSON for direct rendering
         recommendations = result['recommendations']
-        charts_added = 0
+        chart_data = []
         
         for i, (rec, fig) in enumerate(zip(recommendations, result['charts']), 1):
             if fig:
-                # Add chart to dashboard system
-                if ds:
-                    # Create synthetic query for tracking
-                    query = f"{rec['aggregation']} of {rec['metric']} by {rec['dimension']}"
+                try:
+                    # Convert Plotly figure to JSON
+                    chart_json = fig.to_json()
                     
-                    # Add chart using add_chart_from_query (correct method)
-                    try:
-                        ds.dashboard.add_chart_from_query(
-                            query=query,
-                            entities=rec,  # Use recommendation as entities dict
-                            chart_title=rec.get('_title', query)
-                        )
-                        charts_added += 1
-                        logger.info(f"  ✅ Added chart {i}: {rec.get('_title', query)}")
-                    except Exception as e:
-                        logger.error(f"  ❌ Failed to add chart {i}: {e}")
+                    chart_data.append({
+                        "chart_json": chart_json,
+                        "title": rec.get('_title', f"Chart {i}"),
+                        "reasoning": rec.get('_reasoning', ''),
+                        "chart_type": rec['chart_type'],
+                        "metric": rec['metric'],
+                        "dimension": rec['dimension'],
+                        "chart_index": i
+                    })
+                    logger.info(f"  ✅ Prepared chart {i}: {rec.get('_title', '')}")
+                except Exception as e:
+                    logger.error(f"  ❌ Failed to convert chart {i} to JSON: {e}")
         
-        # Generate dashboard HTML
-        if ds and charts_added > 0:
-            fig = ds.generate_and_save_dashboard(
-                filename="interactive_dashboard.html",
-                title=f"Smart Dashboard - {session['full_name']}"
-            )
-            
-            if fig:
-                # Create snapshot
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                snapshot_filename = f"dashboard_snapshot_{session['user_id']}_{timestamp}.html"
-                snapshot_path = Path("temp_dashboards") / snapshot_filename
-                snapshot_path.parent.mkdir(exist_ok=True)
-                
-                source_file = Path("interactive_dashboard.html")
-                if source_file.exists():
-                    import shutil
-                    shutil.copy(source_file, snapshot_path)
-                    logger.info(f"📸 Smart dashboard snapshot: {snapshot_path}")
-                
-                # Prepare response with metadata
-                import time
-                cache_timestamp = int(time.time() * 1000)
-                
-                return JSONResponse({
-                    "success": True,
-                    "message": f"Smart dashboard generated with {charts_added} charts",
-                    "chart_count": charts_added,
-                    "dashboard_url": f"/view-dashboard?v={cache_timestamp}",
-                    "snapshot_file": str(snapshot_path),
-                    "recommendations": [
-                        {
-                            "title": rec.get('_title', ''),
-                            "reasoning": rec.get('_reasoning', ''),
-                            "chart_type": rec['chart_type'],
-                            "metric": rec['metric'],
-                            "dimension": rec['dimension']
-                        }
-                        for rec in recommendations
-                    ],
-                    "profile": {
-                        "dataset": result['profile'].dataset_name,
-                        "total_rows": result['profile'].total_rows,
-                        "total_columns": result['profile'].total_columns
-                    },
-                    "context": {
-                        "department": result['context'].department,
-                        "role": result['context'].role
+        # Return charts as JSON for direct frontend rendering
+        if chart_data:
+            return JSONResponse({
+                "success": True,
+                "message": f"Smart dashboard generated with {len(chart_data)} charts",
+                "chart_count": len(chart_data),
+                "charts": chart_data,
+                "recommendations": [
+                    {
+                        "title": rec.get('_title', ''),
+                        "reasoning": rec.get('_reasoning', ''),
+                        "chart_type": rec['chart_type'],
+                        "metric": rec['metric'],
+                        "dimension": rec['dimension']
                     }
-                })
+                    for rec in recommendations
+                ],
+                "profile": {
+                    "dataset": result['profile'].dataset_name,
+                    "total_rows": result['profile'].total_rows,
+                    "total_columns": result['profile'].total_columns
+                },
+                "context": {
+                    "department": result['context'].department,
+                    "role": result['context'].role
+                }
+            })
         
         # If we got here, something went wrong
         return JSONResponse({
             "success": False,
-            "error": "Failed to generate dashboard HTML",
-            "charts_generated": charts_added
+            "error": "No charts were generated successfully",
+            "chart_count": 0
         }, status_code=500)
         
     except Exception as e:
@@ -1028,6 +1092,170 @@ async def save_dashboard(
         }, status_code=500)
     finally:
         db.close()
+
+
+@app.post("/api/save-chart-favorites")
+async def save_chart_favorites(
+    request_data: Dict[str, Any] = Body(...),
+    session: dict = Depends(require_auth)
+):
+    """
+    Save user's favorited charts for personalized recommendations
+    
+    This endpoint tracks which charts users find most valuable, allowing
+    the AI to generate more similar charts in future smart dashboards.
+    
+    Request Body:
+    {
+        "favorites": [
+            {
+                "chart_index": 0,
+                "metric": "sales",
+                "dimension": "region",
+                "chart_type": "bar",
+                "title": "Sales by Region",
+                "reasoning": "Why this chart is useful"
+            }
+        ],
+        "timestamp": "2026-01-23T12:00:00Z"
+    }
+    """
+    try:
+        favorites = request_data.get('favorites', [])
+        timestamp = request_data.get('timestamp', datetime.now().isoformat())
+        
+        if favorites is None:
+            return JSONResponse({
+                "success": False,
+                "message": "Favorites payload is missing"
+            }, status_code=400)
+        
+        user_id = session['user_id']
+        username = session['username']
+        department = session.get('department', 'Unknown')
+        role = session.get('role', 'Unknown')
+        
+        # Create favorites directory if it doesn't exist
+        favorites_dir = Path("data/user_favorites")
+        favorites_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Save to JSON file (for analytics and future ML training)
+        favorite_data = {
+            "user_id": user_id,
+            "username": username,
+            "department": department,
+            "role": role,
+            "timestamp": timestamp,
+            "favorites": favorites,
+            "favorite_count": len(favorites)
+        }
+        
+        # Persist latest favorites snapshot
+        latest_favorites_file = favorites_dir / f"user_{user_id}_favorites.json"
+        with open(latest_favorites_file, 'w') as f:
+            json.dump(favorite_data, f, indent=2)
+
+        # Append to user's favorites history log
+        favorites_history_file = favorites_dir / f"user_{user_id}_favorites.jsonl"
+        with open(favorites_history_file, 'a') as f:
+            f.write(json.dumps(favorite_data) + '\n')
+        
+        logger.info(f"❤️ Saved {len(favorites)} chart favorites for user {username} ({department})")
+        if favorites:
+            logger.info(f"   Favorited charts: {[f.get('title') for f in favorites]}")
+        else:
+            logger.info("   Favorites cleared")
+        
+        # TODO: Future enhancement - analyze favorites to:
+        # 1. Identify user preferences (chart types, metrics, dimensions)
+        # 2. Generate personalized dashboard recommendations
+        # 3. Train ML model to predict which charts user will like
+        # 4. Cluster users by similar preferences
+        
+        return JSONResponse({
+            "success": True,
+            "message": f"Saved {len(favorites)} favorites",
+            "favorites_count": len(favorites),
+            "saved_to": str(latest_favorites_file),
+            "history_log": str(favorites_history_file)
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error saving chart favorites: {e}")
+        logger.error(traceback.format_exc())
+        return JSONResponse({
+            "success": False,
+            "error": str(e)
+        }, status_code=500)
+
+
+@app.post("/api/record-chart-feedback")
+async def record_chart_feedback(
+    request_data: Dict[str, Any] = Body(...),
+    session: dict = Depends(require_auth),
+    session_id: Optional[str] = Cookie(None)
+):
+    """Record per-session feedback for a chart (like/dislike)."""
+    try:
+        if not session_id:
+            return JSONResponse({
+                "success": False,
+                "error": "session_id cookie is required"
+            }, status_code=400)
+
+        chart = request_data.get('chart')
+        liked = request_data.get('liked')
+
+        if not isinstance(chart, dict) or liked is None:
+            return JSONResponse({
+                "success": False,
+                "error": "chart (object) and liked (bool) are required"
+            }, status_code=400)
+
+        signature = _chart_signature(chart)
+        profile = _get_or_create_session_profile(session_id)
+
+        if liked:
+            if signature not in profile["likes"]:
+                profile["likes"].append(signature)
+            profile["counts"]["chart_type"].update([chart.get('chart_type')])
+            profile["counts"]["metric"].update([chart.get('metric')])
+            profile["counts"]["dimension"].update([chart.get('dimension')])
+        else:
+            if signature not in profile["dislikes"]:
+                profile["dislikes"].append(signature)
+
+        # Persist feedback to JSONL for later analysis
+        feedback_dir = Path("data/user_feedback")
+        feedback_dir.mkdir(parents=True, exist_ok=True)
+        feedback_file = feedback_dir / f"user_{session['user_id']}_session_{session_id}.jsonl"
+
+        payload = {
+            "timestamp": datetime.now().isoformat(),
+            "user_id": session['user_id'],
+            "session_id": session_id,
+            "liked": bool(liked),
+            "chart": chart,
+            "signature": signature
+        }
+
+        with open(feedback_file, 'a') as f:
+            f.write(json.dumps(payload) + "\n")
+
+        return JSONResponse({
+            "success": True,
+            "message": "Feedback recorded",
+            "signature": signature
+        })
+
+    except Exception as e:
+        logger.error(f"❌ Error recording chart feedback: {e}")
+        logger.error(traceback.format_exc())
+        return JSONResponse({
+            "success": False,
+            "error": str(e)
+        }, status_code=500)
+
 
 # API: Get current session chart count (for debugging/monitoring)
 @app.get("/api/current-chart-count")
