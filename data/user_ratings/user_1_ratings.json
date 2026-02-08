@@ -1,0 +1,36 @@
+{
+  "user_id": 1,
+  "username": "dhruvop",
+  "department": null,
+  "role": "Admin",
+  "version": 2,
+  "ratings": [
+    {
+      "rating_id": "a8d9c794-52ce-42db-9512-6f9079df651a",
+      "signature": "Discount %|State|line|||",
+      "rating": "dislike",
+      "chart_metadata": {
+        "metric": "Discount %",
+        "dimension": "State",
+        "chart_type": "line",
+        "title": "Average Discount Trends by Branch",
+        "reasoning": "This line chart will show the average discount percentage over time for each branch location. This information can help executives understand pricing strategies and identify any outliers or opportunities for optimization."
+      },
+      "timestamp": "2026-02-08T18:04:33.523664+00:00",
+      "rating_history": [
+        {
+          "rating": "dislike",
+          "timestamp": "2026-02-08T18:04:33.523664+00:00"
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "total_ratings": 1,
+    "likes": 0,
+    "dislikes": 1,
+    "neutral": 0,
+    "last_activity": "2026-02-08T18:04:33.523664+00:00"
+  },
+  "last_updated": "2026-02-08T18:04:33.523664+00:00"
+}

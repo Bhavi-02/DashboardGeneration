@@ -1,0 +1,55 @@
+{
+  "_comment": "Business term → Actual column name mappings",
+  "_last_updated": "2026-02-08",
+  "_dataset": "Ecommerce Data 2017-2025",
+
+  "sales": "Net Amount",
+  "revenue": "Net Amount",
+  "total_sales": "Net Amount",
+  "sales_amount": "Net Amount",
+  "amount": "Net Amount",
+
+  "region": "State",
+  "location": "State",
+  "area": "State",
+  "territory": "State",
+
+  "year": "FY ",
+  "fiscal_year": "FY ",
+  "fy": "FY ",
+  "period": "FY ",
+
+  "product": "Product Category",
+  "category": "Product Category",
+  "item": "Product Category",
+
+  "customer": "Party Name",
+  "client": "Party Name",
+  "party": "Party Name",
+  "account": "Party Name",
+
+  "quantity": "Quantity",
+  "qty": "Quantity",
+  "units": "Quantity",
+  "volume": "Quantity",
+
+  "price": "Rate",
+  "unit_price": "Rate",
+  "rate": "Rate",
+
+  "tax": "IGST Amount",
+  "igst": "IGST Amount",
+
+  "month": "Month",
+  "time": "Date",
+  "date": "Date",
+
+  "quarter": "Quarter",
+  "q": "Quarter",
+
+  "zone": "Zone",
+  "channel": "Zone",
+
+  "subzone": "Sub Zone",
+  "sub_zone": "Sub Zone"
+}

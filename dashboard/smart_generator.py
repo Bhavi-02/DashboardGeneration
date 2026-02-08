@@ -484,33 +484,37 @@ class SmartChartRecommender:
         data_profile: DataProfile,
         user_context: UserContext,
         num_recommendations: int = 5,
-        custom_prompt: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+        custom_prompt: Optional[str] = None,
+        semantic_mapper: Optional[Any] = None
+    ) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
         Generate chart recommendations
-        
+
         Args:
             data_profile: Dataset metadata
             user_context: User preferences
             num_recommendations: Number of charts to recommend
             custom_prompt: Optional custom instructions (e.g., "focus on CEO metrics", "highlight product X")
-        
+            semantic_mapper: Optional SemanticMapper for column name translation
+
         Returns:
-            List of chart recommendations (as entity dicts)
+            (recommendations, failed_recommendations)
         """
         if self.use_llm:
-            return self._recommend_with_llm(data_profile, user_context, num_recommendations, custom_prompt)
+            return self._recommend_with_llm(data_profile, user_context, num_recommendations, custom_prompt, semantic_mapper)
         else:
-            return self._recommend_fallback(data_profile, user_context, num_recommendations)
-    
+            recommendations = self._recommend_fallback(data_profile, user_context, num_recommendations)
+            return recommendations, []
+
     def _recommend_with_llm(
         self,
         data_profile: DataProfile,
         user_context: UserContext,
         num_recommendations: int,
-        custom_prompt: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
-        """LLM-based recommendations using Claude Haiku"""
+        custom_prompt: Optional[str] = None,
+        semantic_mapper: Optional[Any] = None
+    ) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """LLM-based recommendations using Claude Haiku with validation"""
         try:
             # Build prompt with data schema and user context
             prompt_template = ChatPromptTemplate.from_messages([
@@ -518,8 +522,17 @@ class SmartChartRecommender:
 
 Your goal: Generate ACTIONABLE, INSIGHT-DRIVEN charts that answer critical business questions for executives (CEOs, department heads, analysts).
 
-CRITICAL INSTRUCTIONS:
-1. Only use columns that exist in the provided schema
+⚠️ CRITICAL COLUMN NAME RULE:
+**YOU MUST USE EXACT COLUMN NAMES from the JSON schema below. Copy-paste column names EXACTLY as they appear - including spaces, capitalization, and special characters. DO NOT rename, paraphrase, or modify column names.**
+
+Examples:
+✅ Correct: If schema has "Net Amount" → use "Net Amount" (NOT "Sales", NOT "Revenue")
+✅ Correct: If schema has "FY " (with trailing space) → use "FY " exactly
+✅ Correct: If schema has "Product Category" → use "Product Category" (NOT "Category", NOT "product_category")
+❌ Wrong: Using business terms like "Sales", "Region", "Year" when the actual columns are named differently
+
+CHART DESIGN INSTRUCTIONS:
+1. Only use columns that exist in the provided JSON schema
 2. Match chart types to analytical goals:
    - bar: Categorical comparisons (branch vs branch, category vs category, state vs state)
    - line: Time trends and growth analysis (year-over-year, month-over-month, multi-series for comparisons)
@@ -653,25 +666,31 @@ REQUIREMENTS:
             
             # Parse JSON response
             recommendations = self._parse_llm_response(response.content)
-            
-            # Validate and convert to entity dicts
-            valid_recommendations = []
-            for rec in recommendations:
-                if self._validate_recommendation(rec, data_profile):
-                    entity_dict = self._recommendation_to_entities(rec)
-                    valid_recommendations.append(entity_dict)
-            
-            diverse_recommendations = self._dedupe_recommendations(valid_recommendations)
-            logger.info(
-                f"✅ Generated {len(valid_recommendations)} valid recommendations "
-                f"({len(diverse_recommendations)} after diversity filter)"
+
+            # NEW: Validate and map columns using semantic mapper + fuzzy matching
+            validated_recommendations, failed_recommendations = self.validate_and_map_columns(
+                recommendations,
+                data_profile,
+                semantic_mapper
             )
-            return diverse_recommendations[:num_recommendations]
+
+            # Convert to entity dicts and deduplicate
+            entity_dicts = [self._recommendation_to_entities(rec) for rec in validated_recommendations]
+            diverse_recommendations = self._dedupe_recommendations(entity_dicts)
+
+            logger.info(
+                f"✅ Generated {len(validated_recommendations)} valid recommendations "
+                f"({len(diverse_recommendations)} after diversity filter), "
+                f"{len(failed_recommendations)} failed"
+            )
+
+            return diverse_recommendations[:num_recommendations], failed_recommendations
             
         except Exception as e:
             logger.error(f"❌ LLM recommendation failed: {e}")
             logger.info("⚠️  Falling back to rule-based recommendations")
-            return self._recommend_fallback(data_profile, user_context, num_recommendations)
+            fallback_recs = self._recommend_fallback(data_profile, user_context, num_recommendations)
+            return fallback_recs, []
     
     def _recommend_fallback(
         self,
@@ -764,28 +783,50 @@ REQUIREMENTS:
         return recommendations[:num_recommendations]
     
     def _format_schema_for_prompt(self, data_profile: DataProfile) -> str:
-        """Format data profile as readable schema for LLM"""
-        schema_lines = [f"Dataset: {data_profile.dataset_name}"]
-        schema_lines.append(f"Total: {data_profile.total_rows} rows, {data_profile.total_columns} columns\n")
-        
-        for table_name, info in data_profile.tables.items():
-            schema_lines.append(f"Table: {table_name}")
-            schema_lines.append(f"  Numeric columns: {', '.join(info['numeric'])}")
-            schema_lines.append(f"  Categorical columns: {', '.join(info['text'])}")
-            schema_lines.append(f"  Date columns: {', '.join(info['date'])}")
-            schema_lines.append(f"  Row count: {info['row_count']}")
+        """Format data profile as structured JSON schema for LLM"""
+        schema_dict = {
+            "dataset_name": data_profile.dataset_name,
+            "total_rows": data_profile.total_rows,
+            "total_columns": data_profile.total_columns,
+            "tables": []
+        }
 
+        for table_name, info in data_profile.tables.items():
+            table_schema = {
+                "table_name": table_name,
+                "row_count": info['row_count'],
+                "columns": {
+                    "numeric": [{"name": col, "type": "numeric"} for col in info['numeric']],
+                    "categorical": [{"name": col, "type": "categorical"} for col in info['text']],
+                    "date": [{"name": col, "type": "date"} for col in info['date']]
+                }
+            }
+
+            # Add sample values for first few columns (helps LLM understand data)
             if data_profile.sample_data and table_name in data_profile.sample_data:
                 try:
                     sample_df = data_profile.sample_data[table_name]
-                    schema_lines.append("  Sample rows (top 5):")
-                    schema_lines.append(sample_df.to_string(index=False))
-                except Exception:
-                    schema_lines.append("  Sample rows (top 5): [unavailable]")
+                    table_schema["sample_values"] = {}
 
-            schema_lines.append("")
-        
-        return '\n'.join(schema_lines)
+                    # Sample up to 3 columns of each type
+                    for col in info['numeric'][:3]:
+                        if col in sample_df.columns:
+                            table_schema["sample_values"][col] = sample_df[col].head(3).tolist()
+
+                    for col in info['text'][:3]:
+                        if col in sample_df.columns:
+                            table_schema["sample_values"][col] = sample_df[col].head(3).tolist()
+
+                    for col in info['date'][:3]:
+                        if col in sample_df.columns:
+                            # Convert datetime to string for JSON serialization
+                            table_schema["sample_values"][col] = [str(val) for val in sample_df[col].head(3).tolist()]
+                except Exception as e:
+                    logger.warning(f"⚠️  Could not add sample values: {e}")
+
+            schema_dict["tables"].append(table_schema)
+
+        return json.dumps(schema_dict, indent=2)
     
     def _parse_llm_response(self, response_text: str) -> List[Dict[str, Any]]:
         """Parse LLM JSON response"""
@@ -893,6 +934,175 @@ REQUIREMENTS:
             '_priority': rec.get('priority', 99)
         }
 
+    def validate_and_map_columns(
+        self,
+        recommendations: List[Dict[str, Any]],
+        data_profile: DataProfile,
+        semantic_mapper: Optional[Any] = None
+    ) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """
+        Validate recommendations and map column names using multiple strategies
+
+        Strategy layers:
+        1. Semantic mapping (if mapper provided): "sales" → "Net Amount"
+        2. Fuzzy matching: Handle typos and case differences
+        3. Normalization: Strip spaces, handle trailing/leading whitespace
+
+        Args:
+            recommendations: List of recommendation dicts from LLM
+            data_profile: DataProfile with schema information
+            semantic_mapper: Optional SemanticMapper instance
+
+        Returns:
+            (validated_recommendations, failed_recommendations)
+        """
+        from difflib import get_close_matches
+
+        # Build flattened column list from all tables
+        all_columns = []
+        for info in data_profile.tables.values():
+            all_columns.extend(info['numeric'] + info['text'] + info['date'])
+
+        # Also build a normalized lookup for case-insensitive matching
+        normalized_lookup = {col.lower().strip(): col for col in all_columns}
+
+        validated = []
+        failed = []
+
+        for rec in recommendations:
+            metric = rec.get('metric', '')
+            dimension = rec.get('dimension', '')
+            group_by = rec.get('group_by')
+
+            # Track if we had to map anything (for transparency)
+            mappings_applied = []
+
+            # === VALIDATE AND MAP METRIC ===
+            metric_mapped = metric
+
+            # Layer 1: Semantic mapping
+            if semantic_mapper:
+                mapped = semantic_mapper.map_term(metric)
+                if mapped and mapped != metric:
+                    logger.info(f"📍 Semantic mapping: '{metric}' → '{mapped}'")
+                    metric_mapped = mapped
+                    mappings_applied.append(f"metric: {metric} → {mapped} (semantic)")
+
+            # Layer 2: Exact match (case-insensitive)
+            if metric_mapped not in all_columns:
+                normalized_metric = metric_mapped.lower().strip()
+                if normalized_metric in normalized_lookup:
+                    actual_col = normalized_lookup[normalized_metric]
+                    if actual_col != metric_mapped:
+                        logger.info(f"📍 Normalized mapping: '{metric_mapped}' → '{actual_col}'")
+                        metric_mapped = actual_col
+                        mappings_applied.append(f"metric: {metric} → {actual_col} (normalized)")
+
+            # Layer 3: Fuzzy matching
+            if metric_mapped not in all_columns:
+                matches = get_close_matches(metric_mapped, all_columns, n=1, cutoff=0.6)
+                if matches:
+                    logger.warning(f"⚠️  Fuzzy match: '{metric_mapped}' → '{matches[0]}'")
+                    metric_mapped = matches[0]
+                    mappings_applied.append(f"metric: {metric} → {matches[0]} (fuzzy)")
+                else:
+                    logger.error(f"❌ Cannot map metric '{metric}' to any column")
+                    failed.append({
+                        'metric': metric,
+                        'dimension': dimension,
+                        'title': rec.get('title', ''),
+                        'reason': f"Column '{metric}' not found in dataset"
+                    })
+                    continue
+
+            # === VALIDATE AND MAP DIMENSION ===
+            dimension_mapped = dimension
+
+            # Layer 1: Semantic mapping
+            if semantic_mapper:
+                mapped = semantic_mapper.map_term(dimension)
+                if mapped and mapped != dimension:
+                    logger.info(f"📍 Semantic mapping: '{dimension}' → '{mapped}'")
+                    dimension_mapped = mapped
+                    mappings_applied.append(f"dimension: {dimension} → {mapped} (semantic)")
+
+            # Layer 2: Exact match (case-insensitive)
+            if dimension_mapped not in all_columns:
+                normalized_dimension = dimension_mapped.lower().strip()
+                if normalized_dimension in normalized_lookup:
+                    actual_col = normalized_lookup[normalized_dimension]
+                    if actual_col != dimension_mapped:
+                        logger.info(f"📍 Normalized mapping: '{dimension_mapped}' → '{actual_col}'")
+                        dimension_mapped = actual_col
+                        mappings_applied.append(f"dimension: {dimension} → {actual_col} (normalized)")
+
+            # Layer 3: Fuzzy matching
+            if dimension_mapped not in all_columns:
+                matches = get_close_matches(dimension_mapped, all_columns, n=1, cutoff=0.6)
+                if matches:
+                    logger.warning(f"⚠️  Fuzzy match: '{dimension_mapped}' → '{matches[0]}'")
+                    dimension_mapped = matches[0]
+                    mappings_applied.append(f"dimension: {dimension} → {matches[0]} (fuzzy)")
+                else:
+                    logger.error(f"❌ Cannot map dimension '{dimension}' to any column")
+                    failed.append({
+                        'metric': metric,
+                        'dimension': dimension,
+                        'title': rec.get('title', ''),
+                        'reason': f"Column '{dimension}' not found in dataset"
+                    })
+                    continue
+
+            # === VALIDATE AND MAP GROUP_BY (if present) ===
+            group_by_mapped = group_by
+            if group_by:
+                # Layer 1: Semantic mapping
+                if semantic_mapper:
+                    mapped = semantic_mapper.map_term(group_by)
+                    if mapped and mapped != group_by:
+                        logger.info(f"📍 Semantic mapping: '{group_by}' → '{mapped}'")
+                        group_by_mapped = mapped
+                        mappings_applied.append(f"group_by: {group_by} → {mapped} (semantic)")
+
+                # Layer 2: Exact match (case-insensitive)
+                if group_by_mapped not in all_columns:
+                    normalized_group_by = group_by_mapped.lower().strip()
+                    if normalized_group_by in normalized_lookup:
+                        actual_col = normalized_lookup[normalized_group_by]
+                        if actual_col != group_by_mapped:
+                            logger.info(f"📍 Normalized mapping: '{group_by_mapped}' → '{actual_col}'")
+                            group_by_mapped = actual_col
+                            mappings_applied.append(f"group_by: {group_by} → {actual_col} (normalized)")
+
+                # Layer 3: Fuzzy matching
+                if group_by_mapped not in all_columns:
+                    matches = get_close_matches(group_by_mapped, all_columns, n=1, cutoff=0.6)
+                    if matches:
+                        logger.warning(f"⚠️  Fuzzy match: '{group_by_mapped}' → '{matches[0]}'")
+                        group_by_mapped = matches[0]
+                        mappings_applied.append(f"group_by: {group_by} → {matches[0]} (fuzzy)")
+                    else:
+                        logger.warning(f"⚠️  Removing invalid group_by '{group_by}'")
+                        group_by_mapped = None  # Remove invalid group_by instead of failing
+
+            # Update recommendation with mapped columns
+            rec['metric'] = metric_mapped
+            rec['dimension'] = dimension_mapped
+            if group_by:
+                rec['group_by'] = group_by_mapped
+
+            # Add mapping info for debugging
+            if mappings_applied:
+                rec['_mappings'] = mappings_applied
+                logger.info(f"✅ Validated with mappings: {rec.get('title', 'Untitled')}")
+            else:
+                logger.info(f"✅ Validated (no mappings needed): {rec.get('title', 'Untitled')}")
+
+            validated.append(rec)
+
+        logger.info(f"📊 Validation complete: {len(validated)} valid, {len(failed)} failed out of {len(recommendations)} total")
+        return validated, failed
+
 
 # ============================================================================
 # Component 4: SmartDashboardGenerator (Orchestrator)
@@ -967,11 +1177,21 @@ class SmartDashboardGenerator:
             user_context = self.context_analyzer.analyze_context(
                 user_department, user_role, override_context
             )
-            
-            # Step 3: Get recommendations
+
+            # Step 2.5: Initialize semantic mapper for column name translation
+            logger.info("🔗 Step 2.5: Loading semantic mappings...")
+            from utils.semantic_mapper import SemanticMapper
+            import os
+            config_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                'config', 'semantic_mappings.json'
+            )
+            semantic_mapper = SemanticMapper(data_profile, config_path)
+
+            # Step 3: Get recommendations (with validation and mapping)
             logger.info(f"🤖 Step 3: Generating {num_charts} chart recommendations...")
-            recommendations = self.recommender.recommend_charts(
-                data_profile, user_context, num_charts, custom_prompt
+            recommendations, failed_recommendations = self.recommender.recommend_charts(
+                data_profile, user_context, num_charts, custom_prompt, semantic_mapper
             )
             
             if not recommendations:
@@ -1010,13 +1230,14 @@ class SmartDashboardGenerator:
             
             # Step 5: Return results
             logger.info(f"✅ Smart dashboard complete: {len(charts)}/{num_charts} charts generated")
-            
+
             return {
                 'success': True,
                 'recommendations': successful_recommendations,
                 'charts': charts,
                 'profile': data_profile,
                 'context': user_context,
+                'failed_recommendations': failed_recommendations,  # NEW: Include validation failures
                 'error': None
             }
             

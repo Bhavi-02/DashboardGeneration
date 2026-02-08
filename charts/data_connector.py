@@ -454,14 +454,14 @@ class DataConnector:
                 group_by_col = group_by
                 print(f"   🎯 Final column assignment: {metric_col} (metric), {dimension_col} (dimension), {group_by_col} (group_by)")
                 result_df = df[[dimension_col, group_by_col, metric_col]].copy()
-                
+
                 # Strip spaces from column names
                 dimension_col_clean = dimension_col.strip()
                 group_by_col_clean = group_by_col.strip()
                 metric_col_clean = metric_col.strip()
-                
+
                 result_df.columns = [f'dimension_{dimension_col_clean}', f'group_by_{group_by_col_clean}', f'metric_{metric_col_clean}']
-                
+
                 # Apply aggregation with GROUP BY (creates multi-series data)
                 if aggregation:
                     print(f"📊 Applying aggregation with group_by: {aggregation}")
@@ -474,7 +474,14 @@ class DataConnector:
                     print(f"📊 Applying default aggregation (sum) with group_by")
                     result_df = result_df.groupby([f'dimension_{dimension_col_clean}', f'group_by_{group_by_col_clean}'])[f'metric_{metric_col_clean}'].sum().reset_index()
             else:
-                # No group_by - single series chart
+                # No group_by provided OR group_by column doesn't exist - single series chart
+                if group_by and group_by not in df.columns:
+                    # Warn when group_by column doesn't exist
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"⚠️  Group_by column '{group_by}' not found in dataset, using single-series chart instead")
+                    print(f"⚠️  Group_by column '{group_by}' not found, falling back to single-series")
+                
                 print(f"   🎯 Final column assignment: {metric_col} (metric), {dimension_col} (dimension)")
                 result_df = df[[dimension_col, metric_col]].copy()
                 

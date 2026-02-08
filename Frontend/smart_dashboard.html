@@ -647,6 +647,25 @@
         >
           🚀 Generate Smart Dashboard
         </button>
+        <button
+          class="btn btn-secondary"
+          id="clearPrefsBtn"
+          onclick="clearPreferences()"
+          style="
+            margin-left: 15px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+          "
+          title="Clear your chart preferences to reset personalization"
+        >
+          🗑️ Clear Preferences
+        </button>
       </div>
 
       <!-- Loading State -->
@@ -732,14 +751,281 @@
       </div>
 
       <a href="/page.html" class="back-link">← Back to Main Dashboard</a>
+
+      <!-- Toast Notification Container -->
+      <div
+        id="toast-container"
+        style="
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        "
+      ></div>
     </div>
 
     <script>
       let dashboardUrl = null;
       let snapshotFile = null;
-      let currentCharts = []; // Store current charts for favorites
-      let favorites = new Set(); // Track favorited chart indices
-      let dislikes = new Set(); // Track disliked chart indices
+      let currentCharts = []; // Store current charts
+      const chartRatings = new Map(); // UPDATED: signature -> 'like' | 'neutral' | 'dislike'
+
+      // Add CSS animations for toast notifications
+      (function () {
+        const style = document.createElement("style");
+        style.textContent = `
+          @keyframes slideIn {
+            from {
+              transform: translateX(400px);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+
+          @keyframes slideOut {
+            from {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateX(400px);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+
+      // Toast notification function
+      function showNotification(type, message) {
+        const container = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+
+        const icons = {
+          success: "✅",
+          error: "❌",
+          warning: "⚠️",
+          info: "ℹ️",
+        };
+
+        const colors = {
+          success: "#4caf50",
+          error: "#f44336",
+          warning: "#ff9800",
+          info: "#2196f3",
+        };
+
+        toast.innerHTML = `
+          <div style="
+            background: white;
+            border-left: 4px solid ${colors[type]};
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+          ">
+            <span style="font-size: 20px;">${icons[type]}</span>
+            <span style="flex: 1; color: #333;">${message}</span>
+            <button onclick="this.closest('div').parentElement.remove()" style="
+              background: none;
+              border: none;
+              font-size: 20px;
+              cursor: pointer;
+              color: #999;
+              padding: 0;
+              width: 20px;
+              height: 20px;
+            ">×</button>
+          </div>
+        `;
+
+        container.appendChild(toast);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+          toast.style.animation = "slideOut 0.3s ease-in";
+          setTimeout(() => toast.remove(), 300);
+        }, 5000);
+      }
+
+      // ============================================================================
+      // Unified Rating System Functions (v2)
+      // ============================================================================
+
+      // Load user ratings from server on page init
+      async function loadUserRatings() {
+        try {
+          const response = await fetch("/api/get-chart-ratings");
+          const data = await response.json();
+
+          if (data.success) {
+            // Populate chartRatings map
+            chartRatings.clear();
+            data.ratings.forEach((rating) => {
+              chartRatings.set(rating.signature, rating.rating);
+            });
+
+            // Update UI for all visible charts
+            updateAllRatingButtons();
+
+            console.log(
+              `✅ Loaded ${data.ratings.length} user preferences from server`,
+            );
+
+            if (data.ratings.length > 0) {
+              showNotification(
+                "success",
+                `Loaded ${data.ratings.length} chart preferences`,
+              );
+            }
+          } else {
+            console.warn("⚠️ Could not load ratings:", data.message);
+            showNotification("warning", "Could not load preferences");
+            loadRatingsFromLocalStorage(); // Fallback
+          }
+        } catch (error) {
+          console.error("❌ Error loading ratings:", error);
+          showNotification(
+            "error",
+            "Failed to load preferences. Check connection.",
+          );
+          loadRatingsFromLocalStorage(); // Fallback
+        }
+      }
+
+      // Fallback: Load from localStorage (for offline resilience)
+      function loadRatingsFromLocalStorage() {
+        try {
+          const stored = localStorage.getItem("chartRatings");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            chartRatings.clear();
+            Object.entries(parsed).forEach(([sig, rating]) => {
+              chartRatings.set(sig, rating);
+            });
+            console.log("📦 Loaded ratings from localStorage as fallback");
+          }
+        } catch (error) {
+          console.error("Failed to load from localStorage:", error);
+        }
+      }
+
+      // Update all visible rating buttons
+      function updateAllRatingButtons() {
+        currentCharts.forEach((chart, index) => {
+          if (chart.signature) {
+            updateRatingButtons(chart.signature, index);
+          }
+        });
+      }
+
+      // Update specific chart's rating buttons
+      function updateRatingButtons(signature, chartIndex) {
+        const rating = chartRatings.get(signature) || "neutral";
+
+        const likeBtn = document.getElementById(`like-btn-${chartIndex}`);
+        const dislikeBtn = document.getElementById(`dislike-btn-${chartIndex}`);
+        const wrapper = document.getElementById(`chart-wrapper-${chartIndex}`);
+
+        if (!likeBtn || !dislikeBtn || !wrapper) return;
+
+        // Reset states
+        likeBtn.classList.remove("active");
+        dislikeBtn.classList.remove("active");
+        wrapper.classList.remove("liked", "disliked");
+
+        // Apply current state
+        if (rating === "like") {
+          likeBtn.classList.add("active");
+          wrapper.classList.add("liked");
+        } else if (rating === "dislike") {
+          dislikeBtn.classList.add("active");
+          wrapper.classList.add("disliked");
+        }
+      }
+
+      // Unified rating handler with optimistic UI
+      async function handleRating(chartIndex, newRating) {
+        const chart = currentCharts[chartIndex];
+        if (!chart) return;
+
+        const signature = chart.signature;
+        const currentRating = chartRatings.get(signature) || "neutral";
+
+        // Toggle: clicking same button resets to neutral
+        const finalRating = currentRating === newRating ? "neutral" : newRating;
+
+        // Optimistic UI update
+        const previousRating = currentRating;
+        chartRatings.set(signature, finalRating);
+        updateRatingButtons(signature, chartIndex);
+
+        // Save to backend
+        try {
+          const response = await fetch("/api/rate-chart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chart: {
+                signature: signature,
+                metric: chart.metric,
+                dimension: chart.dimension,
+                chart_type: chart.chart_type,
+                title: chart.title,
+                reasoning: chart.reasoning,
+              },
+              rating: finalRating,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Success feedback
+            const emoji =
+              finalRating === "like"
+                ? "❤️"
+                : finalRating === "dislike"
+                  ? "👎"
+                  : "➖";
+            const action =
+              finalRating === "neutral"
+                ? "Reset rating"
+                : `Chart ${finalRating}d`;
+            showNotification("success", `${emoji} ${action}!`);
+
+            // Save to localStorage as backup
+            const ratingsObj = {};
+            chartRatings.forEach((rating, sig) => {
+              if (rating !== "neutral") ratingsObj[sig] = rating;
+            });
+            localStorage.setItem("chartRatings", JSON.stringify(ratingsObj));
+
+            console.log(`✅ Saved rating: ${signature} -> ${finalRating}`);
+          } else {
+            // Revert on server error
+            chartRatings.set(signature, previousRating);
+            updateRatingButtons(signature, chartIndex);
+            showNotification("error", data.message || "Failed to save rating");
+          }
+        } catch (error) {
+          // Revert on network error
+          chartRatings.set(signature, previousRating);
+          updateRatingButtons(signature, chartIndex);
+          showNotification("error", "Network error. Please try again.");
+          console.error("❌ Rating error:", error);
+        }
+      }
 
       // Load user info
       async function loadUserInfo() {
@@ -756,6 +1042,52 @@
         } catch (error) {
           console.error("Error loading user info:", error);
           window.location.href = "/page.html";
+        }
+      }
+
+      // Clear user preferences
+      async function clearPreferences() {
+        if (
+          !confirm(
+            "Are you sure you want to clear all your chart preferences? This will reset personalization and allow the AI to generate fresh recommendations.\n\nYour preferences will be backed up, so you can contact support if you need to restore them.",
+          )
+        ) {
+          return;
+        }
+
+        const clearBtn = document.getElementById("clearPrefsBtn");
+        const originalText = clearBtn.innerHTML;
+        clearBtn.disabled = true;
+        clearBtn.innerHTML = "⏳ Clearing...";
+
+        try {
+          const response = await fetch("/api/clear-chart-preferences", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            alert(
+              "✅ Preferences cleared successfully!\n\n" +
+                result.message +
+                "\n\nThe next dashboard generation will use default AI recommendations.",
+            );
+          } else {
+            alert(
+              "❌ Error: " + (result.error || "Failed to clear preferences"),
+            );
+          }
+        } catch (error) {
+          console.error("Clear preferences error:", error);
+          alert("❌ Network error: " + error.message);
+        } finally {
+          clearBtn.disabled = false;
+          clearBtn.innerHTML = originalText;
         }
       }
 
@@ -879,8 +1211,13 @@
           return;
         }
 
-        // Store charts globally for favorites
-        currentCharts = charts;
+        // Store charts globally for ratings (with signatures)
+        currentCharts = charts.map((chart) => ({
+          ...chart,
+          signature:
+            chart.signature ||
+            `${chart.metric}|${chart.dimension}|${chart.chart_type}|||`,
+        }));
 
         charts.forEach((chartData, index) => {
           // Create chart wrapper
@@ -888,33 +1225,76 @@
           wrapper.className = "chart-wrapper";
           wrapper.id = `chart-wrapper-${index}`;
 
-          // Create favorite button
-          const favoriteBtn = document.createElement("button");
-          favoriteBtn.className = "favorite-btn";
-          favoriteBtn.id = `favorite-btn-${index}`;
-          favoriteBtn.setAttribute("data-chart-index", index);
-          const isFavorited = favorites.has(index);
-          favoriteBtn.innerHTML = `<span class="heart-icon">${isFavorited ? "❤" : "♡"}</span>`;
-          if (isFavorited) {
-            favoriteBtn.classList.add("favorited");
-            wrapper.classList.add("favorited");
-          }
-          favoriteBtn.onclick = () => toggleFavorite(index);
-          wrapper.appendChild(favoriteBtn);
+          const signature = currentCharts[index].signature;
+          const currentRating = chartRatings.get(signature) || "neutral";
 
-          // Create dislike button
-          const dislikeBtn = document.createElement("button");
-          dislikeBtn.className = "dislike-btn";
-          dislikeBtn.id = `dislike-btn-${index}`;
-          dislikeBtn.setAttribute("data-chart-index", index);
-          const isDisliked = dislikes.has(index);
-          dislikeBtn.innerHTML = `<span class="thumb-icon">${isDisliked ? "👎" : "👎"}</span>`;
-          if (isDisliked) {
-            dislikeBtn.classList.add("disliked");
+          // Add rating state to wrapper
+          if (currentRating === "like") {
+            wrapper.classList.add("liked");
+          } else if (currentRating === "dislike") {
             wrapper.classList.add("disliked");
           }
-          dislikeBtn.onclick = () => toggleDislike(index);
-          wrapper.appendChild(dislikeBtn);
+
+          // Create button container for top-right placement
+          const buttonContainer = document.createElement("div");
+          buttonContainer.style.cssText = `
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+          `;
+
+          // Create Like button
+          const likeBtn = document.createElement("button");
+          likeBtn.className = "rating-btn";
+          likeBtn.id = `like-btn-${index}`;
+          if (currentRating === "like") likeBtn.classList.add("active");
+          likeBtn.innerHTML = `<span style="font-size: 16px;">👍</span> Like`;
+          likeBtn.style.cssText = `
+            background: ${currentRating === "like" ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "#f0f0f0"};
+            color: ${currentRating === "like" ? "white" : "#666"};
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: ${currentRating === "like" ? "0 2px 8px rgba(102, 126, 234, 0.3)" : "none"};
+          `;
+          likeBtn.onclick = () => handleRating(index, "like");
+          buttonContainer.appendChild(likeBtn);
+
+          // Create Dislike button
+          const dislikeBtn = document.createElement("button");
+          dislikeBtn.className = "rating-btn";
+          dislikeBtn.id = `dislike-btn-${index}`;
+          if (currentRating === "dislike") dislikeBtn.classList.add("active");
+          dislikeBtn.innerHTML = `<span style="font-size: 16px;">👎</span> Dislike`;
+          dislikeBtn.style.cssText = `
+            background: ${currentRating === "dislike" ? "linear-gradient(135deg, #f44336 0%, #e91e63 100%)" : "#f0f0f0"};
+            color: ${currentRating === "dislike" ? "white" : "#666"};
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: ${currentRating === "dislike" ? "0 2px 8px rgba(244, 67, 54, 0.3)" : "none"};
+          `;
+          dislikeBtn.onclick = () => handleRating(index, "dislike");
+          buttonContainer.appendChild(dislikeBtn);
+
+          // Add button container to wrapper (must be before header for absolute positioning)
+          wrapper.appendChild(buttonContainer);
+          wrapper.style.position = "relative"; // Enable absolute positioning
 
           // Create chart header
           const header = document.createElement("div");
@@ -977,215 +1357,13 @@
         });
 
         console.log(`✅ Rendered ${charts.length} charts on page`);
-        updateFavoriteCount();
+        // updateFavoriteCount(); // REMOVED: No longer needed with unified rating system
       }
 
-      // Toggle favorite status
-      function toggleFavorite(chartIndex) {
-        const btn = document.getElementById(`favorite-btn-${chartIndex}`);
-        const wrapper = document.getElementById(`chart-wrapper-${chartIndex}`);
-        const heartIcon = btn.querySelector(".heart-icon");
-        const dislikeBtn = document.getElementById(`dislike-btn-${chartIndex}`);
-
-        if (favorites.has(chartIndex)) {
-          // Remove from favorites
-          favorites.delete(chartIndex);
-          btn.classList.remove("favorited");
-          wrapper.classList.remove("favorited");
-          heartIcon.textContent = "♡";
-          console.log(`💔 Removed chart ${chartIndex} from favorites`);
-        } else {
-          // Add to favorites
-          favorites.add(chartIndex);
-          btn.classList.add("favorited");
-          wrapper.classList.add("favorited");
-          heartIcon.textContent = "❤";
-          if (dislikes.has(chartIndex)) {
-            dislikes.delete(chartIndex);
-            wrapper.classList.remove("disliked");
-            dislikeBtn.classList.remove("disliked");
-          }
-          console.log(`❤️ Added chart ${chartIndex} to favorites`);
-        }
-
-        // Update favorite count display
-        updateFavoriteCount();
-
-        // Save to backend
-        saveFavoritesToBackend();
-
-        // Record feedback for session model (only on positive like)
-        if (favorites.has(chartIndex)) {
-          sendChartFeedback(chartIndex, true);
-        }
-      }
-
-      // Toggle dislike status
-      function toggleDislike(chartIndex) {
-        const btn = document.getElementById(`dislike-btn-${chartIndex}`);
-        const wrapper = document.getElementById(`chart-wrapper-${chartIndex}`);
-        const favoriteBtn = document.getElementById(
-          `favorite-btn-${chartIndex}`,
-        );
-        const heartIcon = favoriteBtn.querySelector(".heart-icon");
-
-        if (dislikes.has(chartIndex)) {
-          // Remove from dislikes
-          dislikes.delete(chartIndex);
-          btn.classList.remove("disliked");
-          wrapper.classList.remove("disliked");
-          console.log(`👍 Removed chart ${chartIndex} from dislikes`);
-        } else {
-          // Add to dislikes
-          dislikes.add(chartIndex);
-          btn.classList.add("disliked");
-          wrapper.classList.add("disliked");
-          if (favorites.has(chartIndex)) {
-            favorites.delete(chartIndex);
-            favoriteBtn.classList.remove("favorited");
-            wrapper.classList.remove("favorited");
-            heartIcon.textContent = "♡";
-          }
-          console.log(`👎 Disliked chart ${chartIndex}`);
-          sendChartFeedback(chartIndex, false);
-        }
-
-        updateFavoriteCount();
-        saveFavoritesToBackend();
-        saveDislikesToStorage();
-      }
-
-      // Send feedback to backend for session-based learning
-      async function sendChartFeedback(chartIndex, liked) {
-        try {
-          const chartData = currentCharts[chartIndex];
-          if (!chartData) return;
-
-          const payload = {
-            chart: {
-              metric: chartData.metric,
-              dimension: chartData.dimension,
-              chart_type: chartData.chart_type,
-              title: chartData.title,
-              reasoning: chartData.reasoning,
-            },
-            liked: liked,
-          };
-
-          await fetch("/api/record-chart-feedback", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
-        } catch (error) {
-          console.error("❌ Error sending chart feedback:", error);
-        }
-      }
-
-      // Update favorite count display
-      function updateFavoriteCount() {
-        const favoriteCountEl = document.getElementById("favoriteCount");
-        const favoriteCountNumber = document.getElementById(
-          "favoriteCountNumber",
-        );
-
-        if (favorites.size > 0) {
-          favoriteCountNumber.textContent = favorites.size;
-          favoriteCountEl.style.display = "inline-block";
-        } else {
-          favoriteCountEl.style.display = "none";
-        }
-      }
-
-      // Save favorites to backend
-      async function saveFavoritesToBackend() {
-        try {
-          // Collect favorited chart data (empty list clears favorites)
-          const favoritedCharts = Array.from(favorites).map((index) => {
-            const chartData = currentCharts[index];
-            return {
-              chart_index: index,
-              metric: chartData.metric,
-              dimension: chartData.dimension,
-              chart_type: chartData.chart_type,
-              title: chartData.title,
-              reasoning: chartData.reasoning,
-            };
-          });
-
-          // Send to backend
-          const response = await fetch("/api/save-chart-favorites", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              favorites: favoritedCharts,
-              timestamp: new Date().toISOString(),
-            }),
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            console.log(`✅ Saved ${favorites.size} favorites to backend`);
-          } else {
-            console.warn(
-              "⚠️ Failed to save favorites:",
-              data.error || data.message,
-            );
-          }
-        } catch (error) {
-          console.error("❌ Error saving favorites:", error);
-        } finally {
-          // Store in localStorage as backup
-          localStorage.setItem(
-            "chartFavorites",
-            JSON.stringify(Array.from(favorites)),
-          );
-          console.log("💾 Synced favorites to localStorage");
-        }
-      }
-
-      // Load favorites from localStorage on page load
-      function loadFavoritesFromStorage() {
-        try {
-          const stored = localStorage.getItem("chartFavorites");
-          if (stored) {
-            favorites = new Set(JSON.parse(stored));
-            console.log(
-              `📂 Loaded ${favorites.size} favorites from localStorage`,
-            );
-          }
-        } catch (error) {
-          console.error("❌ Error loading favorites:", error);
-        }
-      }
-
-      // Save dislikes to localStorage
-      function saveDislikesToStorage() {
-        localStorage.setItem(
-          "chartDislikes",
-          JSON.stringify(Array.from(dislikes)),
-        );
-      }
-
-      // Load dislikes from localStorage
-      function loadDislikesFromStorage() {
-        try {
-          const stored = localStorage.getItem("chartDislikes");
-          if (stored) {
-            dislikes = new Set(JSON.parse(stored));
-            console.log(
-              `📂 Loaded ${dislikes.size} dislikes from localStorage`,
-            );
-          }
-        } catch (error) {
-          console.error("❌ Error loading dislikes:", error);
-        }
-      }
+      // ============================================================================
+      // Legacy rating functions removed - replaced by unified rating system (v2)
+      // See lines 842-993 for new implementation
+      // ============================================================================
 
       // Scroll to charts section
       function scrollToCharts() {
@@ -1230,9 +1408,8 @@
         }
       }
 
-      // Initialize
-      loadFavoritesFromStorage();
-      loadDislikesFromStorage();
+      // Initialize - UPDATED (v2)
+      loadUserRatings(); // Load ratings from server first (with localStorage fallback)
       loadUserInfo();
     </script>
   </body>

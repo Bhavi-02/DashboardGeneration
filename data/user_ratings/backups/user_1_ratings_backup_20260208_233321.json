@@ -1,0 +1,154 @@
+{
+  "user_id": 1,
+  "username": "dhruvop",
+  "department": null,
+  "role": "Admin",
+  "version": 2,
+  "ratings": [
+    {
+      "rating_id": "2617e6c1-432c-4802-af92-8e7a7bccd566",
+      "signature": "Net Amount|Location|line|||",
+      "rating": "like",
+      "chart_metadata": {
+        "metric": "Net Amount",
+        "dimension": "Location",
+        "chart_type": "line",
+        "title": "Year-over-Year Sales Growth by Branch",
+        "reasoning": "This multi-series line chart will allow the admin to analyze sales growth trends across different branches over time, identifying top performing locations and spotting any underperforming areas that need attention."
+      },
+      "timestamp": "2026-02-08T17:23:21.263210+00:00",
+      "rating_history": [
+        {
+          "rating": "dislike",
+          "timestamp": "2026-02-08T17:22:21.529838+00:00"
+        },
+        {
+          "rating": "like",
+          "timestamp": "2026-02-08T17:23:21.263210+00:00"
+        }
+      ]
+    },
+    {
+      "rating_id": "17318eb0-7805-4373-9727-1b16feb68079",
+      "signature": "Net Amount|Product Category|bar|||",
+      "rating": "like",
+      "chart_metadata": {
+        "metric": "Net Amount",
+        "dimension": "Product Category",
+        "chart_type": "bar",
+        "title": "Top 10 Product Categories by Revenue",
+        "reasoning": "This bar chart will highlight the top performing product categories in terms of revenue, allowing the admin to focus on the most profitable segments and identify any emerging or underperforming categories that may require further investigation."
+      },
+      "timestamp": "2026-02-08T17:22:25.933726+00:00",
+      "rating_history": [
+        {
+          "rating": "like",
+          "timestamp": "2026-02-08T17:22:25.933726+00:00"
+        }
+      ]
+    },
+    {
+      "rating_id": "b9368755-c9bd-4589-928a-23cee257fc13",
+      "signature": "Quantity|State|line|||",
+      "rating": "like",
+      "chart_metadata": {
+        "metric": "Quantity",
+        "dimension": "State",
+        "chart_type": "line",
+        "title": "Quarterly Sales Volume Trends by State",
+        "reasoning": "This multi-series line chart will enable the admin to analyze sales volume trends across different states over time, identifying any regional variations or seasonal patterns that could inform targeted marketing or inventory strategies."
+      },
+      "timestamp": "2026-02-08T17:22:29.270757+00:00",
+      "rating_history": [
+        {
+          "rating": "like",
+          "timestamp": "2026-02-08T17:22:29.270757+00:00"
+        }
+      ]
+    },
+    {
+      "rating_id": "621c4249-1c6d-45d0-8e48-c75cfe218d5e",
+      "signature": "Net Amount|Group Party Name|heatmap|||",
+      "rating": "like",
+      "chart_metadata": {
+        "metric": "Net Amount",
+        "dimension": "Group Party Name",
+        "chart_type": "heatmap",
+        "title": "Revenue Performance by Product Category and Branch",
+        "reasoning": "This heatmap will provide a cross-dimensional view of revenue performance, highlighting which product categories are strongest in each branch location. This can help the admin identify opportunities for cross-selling, inventory optimization, or targeted promotions."
+      },
+      "timestamp": "2026-02-08T17:22:31.579959+00:00",
+      "rating_history": [
+        {
+          "rating": "like",
+          "timestamp": "2026-02-08T17:22:31.579959+00:00"
+        }
+      ]
+    },
+    {
+      "rating_id": "5a23016f-c461-4dd7-ba99-3a9284f16531",
+      "signature": "Net Amount|Group Party Name|bar|||",
+      "rating": "dislike",
+      "chart_metadata": {
+        "metric": "Net Amount",
+        "dimension": "Group Party Name",
+        "chart_type": "bar",
+        "title": "Month-over-Month Revenue Changes by Product Category",
+        "reasoning": "This grouped bar chart will showcase the month-over-month changes in sales revenue for the top product categories, enabling the Admin to spot seasonal trends and identify the most volatile or stable segments of the business."
+      },
+      "timestamp": "2026-02-08T17:23:14.010369+00:00",
+      "rating_history": [
+        {
+          "rating": "dislike",
+          "timestamp": "2026-02-08T17:23:14.010369+00:00"
+        }
+      ]
+    },
+    {
+      "rating_id": "34d17a72-f639-47b7-9c29-3d6226f62767",
+      "signature": "Quantity|Product Category|heatmap|||",
+      "rating": "dislike",
+      "chart_metadata": {
+        "metric": "Quantity",
+        "dimension": "Product Category",
+        "chart_type": "heatmap",
+        "title": "Product Category Performance Across States",
+        "reasoning": "This heatmap will provide a cross-dimensional view of how different product categories perform in each state, enabling the Admin to identify geographic strengths and opportunities for specific product segments."
+      },
+      "timestamp": "2026-02-08T17:23:18.141486+00:00",
+      "rating_history": [
+        {
+          "rating": "dislike",
+          "timestamp": "2026-02-08T17:23:18.141486+00:00"
+        }
+      ]
+    },
+    {
+      "rating_id": "f6482fa2-17ef-4dd0-8600-6ddfc0e4dfe5",
+      "signature": "Net Amount|State|line|||",
+      "rating": "dislike",
+      "chart_metadata": {
+        "metric": "Net Amount",
+        "dimension": "State",
+        "chart_type": "line",
+        "title": "Year-over-Year Sales Revenue Trends by State",
+        "reasoning": "This multi-series line chart will allow the Admin to analyze how sales revenue has trended over time across different states, identifying high-growth and underperforming regions."
+      },
+      "timestamp": "2026-02-08T17:23:26.769412+00:00",
+      "rating_history": [
+        {
+          "rating": "dislike",
+          "timestamp": "2026-02-08T17:23:26.769412+00:00"
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "total_ratings": 7,
+    "likes": 4,
+    "dislikes": 3,
+    "neutral": 0,
+    "last_activity": "2026-02-08T17:23:26.769412+00:00"
+  },
+  "last_updated": "2026-02-08T17:23:26.769412+00:00"
+}

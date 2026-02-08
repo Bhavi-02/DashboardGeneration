@@ -1338,10 +1338,14 @@ class ChartGenerator:
         
         # Use the detected chart type
         chart_type = detected_chart_type
-        
-        # Create title using actual column names
-        filter_text = f" ({', '.join(filters)})" if filters else ""
-        title = f"{query_text}" if query_text else f"{actual_metric} by {actual_dimension}{filter_text}"
+
+        # Create title - prioritize LLM-provided title if available
+        if '_title' in entities and entities['_title']:
+            title = entities['_title']
+        else:
+            # Fallback to generated title
+            filter_text = f" ({', '.join(filters)})" if filters else ""
+            title = f"{query_text}" if query_text else f"{actual_metric} by {actual_dimension}{filter_text}"
         
         # Generate appropriate chart based on type
         try:

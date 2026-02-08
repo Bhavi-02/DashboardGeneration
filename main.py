@@ -12,13 +12,15 @@ import sys
 import os
 import pandas as pd
 import zipfile
-from datetime import datetime
+from datetime import datetime, timezone
 import plotly.io as pio
 import json
 import io
 import traceback
 import logging
 from collections import Counter
+import math
+import uuid
 
 # Setup logging
 logging.basicConfig(
@@ -76,6 +78,148 @@ def _build_session_prompt(profile: Dict[str, Any]) -> str:
         f"- Avoid charts similar to these signatures: {', '.join(disliked_sigs) or 'N/A'}\n"
         "Use this to bias recommendations and avoid disliked chart patterns."
     )
+
+
+# ============================================================================
+# Unified Rating System Helper Functions
+# ============================================================================
+
+def _calculate_decay_weight(rating_timestamp: str, decay_rate: float = 0.02) -> float:
+    """
+    Calculate time-decay weight for a rating.
+
+    Formula: weight = e^(-λ * days_old)
+    λ = 0.02 (35-day half-life - balanced approach)
+
+    Weight Examples:
+    - 1 day old: 98% weight
+    - 1 week old: 87% weight
+    - 1 month old: 55% weight
+    - 3 months old: 17% weight
+    - 6 months old: 3% weight
+
+    Returns:
+        float: Weight in range [0.01, 1.0]
+    """
+    try:
+        rating_time = datetime.fromisoformat(rating_timestamp.replace('Z', '+00:00'))
+        current_time = datetime.now(timezone.utc)
+        days_old = (current_time - rating_time).total_seconds() / 86400.0
+        weight = math.exp(-decay_rate * days_old)
+        return max(0.01, min(1.0, weight))
+    except Exception as e:
+        logger.warning(f"Error calculating decay weight: {e}")
+        return 1.0  # Default to full weight on error
+
+
+def _aggregate_weighted_ratings(ratings: list) -> dict:
+    """
+    Aggregate ratings with time-decay weights.
+
+    Args:
+        ratings: List of rating entries with 'rating', 'timestamp', 'chart_metadata'
+
+    Returns:
+        dict: {
+            'liked_chart_types': [(type, weight), ...],
+            'liked_metrics': [(metric, weight), ...],
+            'liked_dimensions': [(dimension, weight), ...],
+            'disliked_signatures': [signature, ...]
+        }
+    """
+    from collections import defaultdict
+
+    liked_chart_types = defaultdict(float)
+    liked_metrics = defaultdict(float)
+    liked_dimensions = defaultdict(float)
+    disliked_signatures = []
+
+    for rating_entry in ratings:
+        weight = _calculate_decay_weight(rating_entry['timestamp'])
+        chart = rating_entry['chart_metadata']
+        rating = rating_entry['rating']
+
+        if rating == 'like':
+            liked_chart_types[chart.get('chart_type', '')] += weight
+            liked_metrics[chart.get('metric', '')] += weight
+            liked_dimensions[chart.get('dimension', '')] += weight
+        elif rating == 'dislike':
+            disliked_signatures.append(rating_entry['signature'])
+
+    return {
+        'liked_chart_types': sorted(liked_chart_types.items(), key=lambda x: x[1], reverse=True),
+        'liked_metrics': sorted(liked_metrics.items(), key=lambda x: x[1], reverse=True),
+        'liked_dimensions': sorted(liked_dimensions.items(), key=lambda x: x[1], reverse=True),
+        'disliked_signatures': disliked_signatures[-10:]  # Last 10 dislikes
+    }
+
+
+def _build_personalization_prompt(user_id: int) -> str:
+    """
+    Build LLM prompt enrichment from time-decayed user ratings.
+    Replaces old _build_favorites_prompt functionality.
+
+    This function loads the user's unified ratings file (v2 schema) and
+    aggregates their preferences with time-decay weighting. Recent ratings
+    are weighted more heavily than older ratings.
+
+    Args:
+        user_id: Database user ID
+
+    Returns:
+        str: Formatted prompt snippet to append to custom_prompt, or empty string if no ratings
+    """
+    try:
+        ratings_file = Path("data/user_ratings") / f"user_{user_id}_ratings.json"
+        if not ratings_file.exists():
+            return ""
+
+        with open(ratings_file, 'r') as f:
+            data = json.load(f)
+
+        ratings = data.get('ratings', [])
+        if not ratings:
+            return ""
+
+        # Aggregate with time decay
+        prefs = _aggregate_weighted_ratings(ratings)
+
+        # Build prompt
+        prompt_parts = ["\n\n📊 USER PERSONALIZATION CONTEXT:"]
+
+        if prefs['liked_chart_types']:
+            top_types = prefs['liked_chart_types'][:3]
+            type_list = ', '.join([f"{t} (weight: {w:.1f})" for t, w in top_types])
+            prompt_parts.append(f"✅ Preferred chart types: {type_list}")
+
+        if prefs['liked_metrics']:
+            top_metrics = prefs['liked_metrics'][:5]
+            metric_list = ', '.join([f"{m} (weight: {w:.1f})" for m, w in top_metrics])
+            prompt_parts.append(f"✅ Preferred metrics: {metric_list}")
+
+        if prefs['liked_dimensions']:
+            top_dims = prefs['liked_dimensions'][:5]
+            dim_list = ', '.join([f"{d} (weight: {w:.1f})" for d, w in top_dims])
+            prompt_parts.append(f"✅ Preferred dimensions: {dim_list}")
+
+        if prefs['disliked_signatures']:
+            sig_list = ', '.join(prefs['disliked_signatures'])
+            prompt_parts.append(f"❌ AVOID patterns: {sig_list}")
+
+        prompt_parts.extend([
+            "",
+            "💡 INSTRUCTIONS:",
+            "- Strongly favor chart types and metrics with high weights",
+            "- Avoid generating charts matching disliked signatures",
+            "- Balance personalization with data-driven insights"
+        ])
+
+        return '\n'.join(prompt_parts)
+
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to build personalization prompt: {e}")
+        return ""
+
 
 # Add dashboard path to sys.path
 dashboard_path = Path(__file__).parent / "dashboard"
@@ -850,45 +994,18 @@ async def generate_smart_dashboard_api(
                 "error": "No dataset loaded. Please upload data first.",
                 "recommendation": "Upload Excel files to the data/ folder or use the upload endpoint."
             }, status_code=400)
-        
-        # Enrich prompt with user's favorite charts (if any)
-        favorites_prompt = ""
-        try:
-            favorites_file = Path("data/user_favorites") / f"user_{session['user_id']}_favorites.json"
-            if favorites_file.exists():
-                with open(favorites_file, 'r') as f:
-                    favorites_data = json.load(f)
 
-                favorites_list = favorites_data.get('favorites', []) or []
-                if favorites_list:
-                    chart_types = [f.get('chart_type') for f in favorites_list if f.get('chart_type')]
-                    metrics = [f.get('metric') for f in favorites_list if f.get('metric')]
-                    dimensions = [f.get('dimension') for f in favorites_list if f.get('dimension')]
-                    titles = [f.get('title') for f in favorites_list if f.get('title')]
+        # UPDATED: Use unified rating system for personalization (v2)
+        personalization_prompt = _build_personalization_prompt(session['user_id'])
 
-                    top_chart_types = [c for c, _ in Counter(chart_types).most_common(3)]
-                    top_metrics = [m for m, _ in Counter(metrics).most_common(3)]
-                    top_dimensions = [d for d, _ in Counter(dimensions).most_common(3)]
-                    top_titles = titles[:3]
-
-                    favorites_prompt = (
-                        "\n\nUSER FAVORITES CONTEXT:\n"
-                        f"- Preferred chart types: {', '.join(top_chart_types) or 'N/A'}\n"
-                        f"- Preferred metrics: {', '.join(top_metrics) or 'N/A'}\n"
-                        f"- Preferred dimensions: {', '.join(top_dimensions) or 'N/A'}\n"
-                        f"- Example favorite charts: {', '.join(top_titles) or 'N/A'}\n"
-                        "Use these preferences to personalize recommendations, but avoid duplicating exact charts from previous runs."
-                    )
-        except Exception as e:
-            logger.warning(f"⚠️  Failed to load favorites for prompt: {e}")
-
-        if favorites_prompt:
-            custom_prompt = (custom_prompt or "") + favorites_prompt
-
-        # Enrich prompt with session feedback (likes/dislikes)
+        # Still support session feedback (per-session quick adjustments)
         if session_id and session_id in session_feedback_store:
             session_prompt = _build_session_prompt(session_feedback_store[session_id])
-            custom_prompt = (custom_prompt or "") + session_prompt
+            personalization_prompt += session_prompt
+
+        # Add personalization to custom prompt
+        if personalization_prompt:
+            custom_prompt = (custom_prompt or "") + personalization_prompt
 
         # Initialize smart generator
         smart_gen = SmartDashboardGenerator(data_connector, use_llm=True)
@@ -941,6 +1058,14 @@ async def generate_smart_dashboard_api(
         
         # Return charts as JSON for direct frontend rendering
         if chart_data:
+            # Prepare validation report
+            validation_report = {
+                "total_generated": len(recommendations) + len(result.get('failed_recommendations', [])),
+                "total_valid": len(recommendations),
+                "failed_count": len(result.get('failed_recommendations', [])),
+                "failed": result.get('failed_recommendations', [])
+            }
+
             return JSONResponse({
                 "success": True,
                 "message": f"Smart dashboard generated with {len(chart_data)} charts",
@@ -956,6 +1081,7 @@ async def generate_smart_dashboard_api(
                     }
                     for rec in recommendations
                 ],
+                "validation_report": validation_report,  # NEW: Include validation report
                 "profile": {
                     "dataset": result['profile'].dataset_name,
                     "total_rows": result['profile'].total_rows,
@@ -1094,95 +1220,324 @@ async def save_dashboard(
         db.close()
 
 
-@app.post("/api/save-chart-favorites")
-async def save_chart_favorites(
+
+
+# ============================================================================
+# Unified Chart Rating API Endpoints (v2)
+# ============================================================================
+
+@app.post("/api/rate-chart")
+async def rate_chart(
     request_data: Dict[str, Any] = Body(...),
     session: dict = Depends(require_auth)
 ):
     """
-    Save user's favorited charts for personalized recommendations
-    
-    This endpoint tracks which charts users find most valuable, allowing
-    the AI to generate more similar charts in future smart dashboards.
-    
+    Unified chart rating endpoint (replaces save-chart-favorites and record-chart-feedback).
+
+    Supports three-state ratings: 'like', 'neutral', 'dislike'
+    - Recent ratings weighted more heavily (time-decayed preferences)
+    - Click same button to toggle back to neutral
+    - Persists to user profile for cross-session personalization
+
     Request Body:
     {
-        "favorites": [
-            {
-                "chart_index": 0,
-                "metric": "sales",
-                "dimension": "region",
-                "chart_type": "bar",
-                "title": "Sales by Region",
-                "reasoning": "Why this chart is useful"
-            }
-        ],
-        "timestamp": "2026-01-23T12:00:00Z"
+        "chart": {
+            "signature": "Net Amount|Location|line|||",
+            "metric": "Net Amount",
+            "dimension": "Location",
+            "chart_type": "line",
+            "title": "Sales by Branch",
+            "reasoning": "..."
+        },
+        "rating": "like" | "neutral" | "dislike"
     }
     """
     try:
-        favorites = request_data.get('favorites', [])
-        timestamp = request_data.get('timestamp', datetime.now().isoformat())
-        
-        if favorites is None:
+        chart = request_data.get('chart')
+        rating = request_data.get('rating')
+
+        # Validation
+        if not chart or not isinstance(chart, dict):
             return JSONResponse({
                 "success": False,
-                "message": "Favorites payload is missing"
+                "message": "chart object is required"
             }, status_code=400)
-        
+
+        if rating not in ['like', 'neutral', 'dislike']:
+            return JSONResponse({
+                "success": False,
+                "message": "rating must be 'like', 'neutral', or 'dislike'"
+            }, status_code=400)
+
         user_id = session['user_id']
         username = session['username']
-        department = session.get('department', 'Unknown')
-        role = session.get('role', 'Unknown')
-        
-        # Create favorites directory if it doesn't exist
-        favorites_dir = Path("data/user_favorites")
-        favorites_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Save to JSON file (for analytics and future ML training)
-        favorite_data = {
-            "user_id": user_id,
-            "username": username,
-            "department": department,
-            "role": role,
-            "timestamp": timestamp,
-            "favorites": favorites,
-            "favorite_count": len(favorites)
-        }
-        
-        # Persist latest favorites snapshot
-        latest_favorites_file = favorites_dir / f"user_{user_id}_favorites.json"
-        with open(latest_favorites_file, 'w') as f:
-            json.dump(favorite_data, f, indent=2)
+        signature = chart.get('signature', _chart_signature(chart))
 
-        # Append to user's favorites history log
-        favorites_history_file = favorites_dir / f"user_{user_id}_favorites.jsonl"
-        with open(favorites_history_file, 'a') as f:
-            f.write(json.dumps(favorite_data) + '\n')
-        
-        logger.info(f"❤️ Saved {len(favorites)} chart favorites for user {username} ({department})")
-        if favorites:
-            logger.info(f"   Favorited charts: {[f.get('title') for f in favorites]}")
+        # Load or create user ratings file
+        ratings_dir = Path("data/user_ratings")
+        ratings_dir.mkdir(parents=True, exist_ok=True)
+        ratings_file = ratings_dir / f"user_{user_id}_ratings.json"
+
+        if ratings_file.exists():
+            with open(ratings_file, 'r') as f:
+                user_data = json.load(f)
         else:
-            logger.info("   Favorites cleared")
-        
-        # TODO: Future enhancement - analyze favorites to:
-        # 1. Identify user preferences (chart types, metrics, dimensions)
-        # 2. Generate personalized dashboard recommendations
-        # 3. Train ML model to predict which charts user will like
-        # 4. Cluster users by similar preferences
-        
+            user_data = {
+                "user_id": user_id,
+                "username": username,
+                "department": session.get('department'),
+                "role": session.get('role'),
+                "version": 2,
+                "ratings": [],
+                "statistics": {"total_ratings": 0, "likes": 0, "dislikes": 0, "neutral": 0}
+            }
+
+        # Find existing rating or create new
+        existing_idx = None
+        for idx, r in enumerate(user_data['ratings']):
+            if r['signature'] == signature:
+                existing_idx = idx
+                break
+
+        timestamp = datetime.now(timezone.utc).isoformat()
+
+        if existing_idx is not None:
+            # Update existing rating
+            old_rating = user_data['ratings'][existing_idx]['rating']
+            user_data['ratings'][existing_idx]['rating'] = rating
+            user_data['ratings'][existing_idx]['timestamp'] = timestamp
+            user_data['ratings'][existing_idx]['rating_history'].append({
+                "rating": rating,
+                "timestamp": timestamp
+            })
+
+            # Update statistics
+            if old_rating != rating:
+                user_data['statistics'][old_rating + 's'] -= 1
+                user_data['statistics'][rating + 's'] += 1
+
+            rating_id = user_data['ratings'][existing_idx]['rating_id']
+        else:
+            # Create new rating
+            rating_id = str(uuid.uuid4())
+
+            user_data['ratings'].append({
+                "rating_id": rating_id,
+                "signature": signature,
+                "rating": rating,
+                "chart_metadata": {
+                    "metric": chart.get('metric'),
+                    "dimension": chart.get('dimension'),
+                    "chart_type": chart.get('chart_type'),
+                    "title": chart.get('title'),
+                    "reasoning": chart.get('reasoning')
+                },
+                "timestamp": timestamp,
+                "rating_history": [{"rating": rating, "timestamp": timestamp}]
+            })
+
+            user_data['statistics']['total_ratings'] += 1
+            user_data['statistics'][rating + 's'] += 1
+
+        # Remove neutral ratings (clean up - neutral is absence of opinion)
+        user_data['ratings'] = [r for r in user_data['ratings'] if r['rating'] != 'neutral']
+
+        # Update metadata
+        user_data['last_updated'] = timestamp
+        user_data['statistics']['last_activity'] = timestamp
+
+        # Save to file
+        with open(ratings_file, 'w') as f:
+            json.dump(user_data, f, indent=2)
+
+        logger.info(f"{'❤️' if rating == 'like' else '👎' if rating == 'dislike' else '➖'} User {username} rated chart as '{rating}': {chart.get('title')}")
+
         return JSONResponse({
             "success": True,
-            "message": f"Saved {len(favorites)} favorites",
-            "favorites_count": len(favorites),
-            "saved_to": str(latest_favorites_file),
-            "history_log": str(favorites_history_file)
+            "message": f"Chart rated as '{rating}'",
+            "rating": {
+                "rating_id": rating_id,
+                "signature": signature,
+                "rating": rating,
+                "timestamp": timestamp
+            },
+            "user_stats": {
+                "total_ratings": user_data['statistics']['total_ratings'],
+                "likes": user_data['statistics']['likes'],
+                "dislikes": user_data['statistics']['dislikes']
+            }
         })
-        
+
     except Exception as e:
-        logger.error(f"❌ Error saving chart favorites: {e}")
+        logger.error(f"❌ Error saving chart rating: {e}")
         logger.error(traceback.format_exc())
+        return JSONResponse({
+            "success": False,
+            "error": str(e)
+        }, status_code=500)
+
+
+@app.get("/api/get-chart-ratings")
+async def get_chart_ratings(session: dict = Depends(require_auth)):
+    """
+    Get user's chart ratings with time-decay weights.
+
+    Returns all user's ratings (likes and dislikes) with decay weights calculated
+    based on age of rating. Recent ratings have weight ~1.0, older ratings decay
+    exponentially (35-day half-life).
+
+    Response:
+    {
+        "success": true,
+        "user_id": 1,
+        "last_updated": "2026-02-08T10:30:00Z",
+        "ratings": [
+            {
+                "signature": "Net Amount|Location|line|||",
+                "rating": "like",
+                "chart_metadata": {...},
+                "timestamp": "2026-02-08T10:15:30Z",
+                "decay_weight": 0.98
+            }
+        ],
+        "statistics": {"total_ratings": 25, "likes": 12, "dislikes": 3}
+    }
+    """
+    try:
+        user_id = session['user_id']
+        ratings_file = Path("data/user_ratings") / f"user_{user_id}_ratings.json"
+
+        if not ratings_file.exists():
+            return JSONResponse({
+                "success": True,
+                "user_id": user_id,
+                "ratings": [],
+                "statistics": {"total_ratings": 0, "likes": 0, "dislikes": 0}
+            })
+
+        with open(ratings_file, 'r') as f:
+            user_data = json.load(f)
+
+        # Add decay weights to each rating
+        for rating in user_data['ratings']:
+            rating['decay_weight'] = _calculate_decay_weight(rating['timestamp'])
+
+        return JSONResponse({
+            "success": True,
+            "user_id": user_id,
+            "last_updated": user_data.get('last_updated'),
+            "ratings": user_data['ratings'],
+            "statistics": user_data['statistics']
+        })
+
+    except Exception as e:
+        logger.error(f"❌ Error loading chart ratings: {e}")
+        return JSONResponse({
+            "success": False,
+            "error": str(e)
+        }, status_code=500)
+
+
+@app.post("/api/clear-chart-preferences")
+async def clear_chart_preferences_api(
+    session: dict = Depends(require_auth)
+):
+    """
+    Clear all user chart preferences/ratings to reset personalization.
+    This allows users to start fresh with chart recommendations.
+    
+    Returns:
+    {
+        "success": true,
+        "message": "Preferences cleared successfully",
+        "user_id": 1
+    }
+    """
+    try:
+        user_id = session['user_id']
+        ratings_file = Path("data/user_ratings") / f"user_{user_id}_ratings.json"
+
+        if ratings_file.exists():
+            # Backup the file before deletion (optional safety measure)
+            backup_dir = Path("data/user_ratings/backups")
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            backup_file = backup_dir / f"user_{user_id}_ratings_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            
+            import shutil
+            shutil.copy(ratings_file, backup_file)
+            logger.info(f"📋 Backed up ratings to {backup_file}")
+            
+            # Delete the ratings file
+            ratings_file.unlink()
+            logger.info(f"🗑️  Cleared preferences for user {user_id}")
+            message = "All preferences cleared successfully. Backup saved."
+        else:
+            logger.info(f"ℹ️  No preferences file found for user {user_id}")
+            message = "No preferences to clear."
+
+        return JSONResponse({
+            "success": True,
+            "message": message,
+            "user_id": user_id
+        })
+
+    except Exception as e:
+        logger.error(f"❌ Error clearing chart preferences: {e}")
+        return JSONResponse({
+            "success": False,
+            "error": str(e)
+        }, status_code=500)
+
+
+# ============================================================================
+# Legacy Endpoints (Deprecated - kept for backward compatibility)
+# ============================================================================
+# TODO: Remove after frontend migration complete (v2.1.0)
+
+@app.post("/api/save-chart-favorites")
+async def save_chart_favorites_legacy(
+    request_data: Dict[str, Any] = Body(...),
+    session: dict = Depends(require_auth)
+):
+    """
+    DEPRECATED: Use /api/rate-chart instead
+
+    Legacy endpoint maintained for backward compatibility.
+    Will be removed in v2.1.0
+    """
+    logger.warning("⚠️ Legacy endpoint /api/save-chart-favorites called - migrate to /api/rate-chart")
+
+    try:
+        favorites = request_data.get('favorites', [])
+
+        # Convert favorites to new rating format
+        responses = []
+        for fav in favorites:
+            chart_data = {
+                "signature": _chart_signature(fav),
+                "metric": fav.get('metric'),
+                "dimension": fav.get('dimension'),
+                "chart_type": fav.get('chart_type'),
+                "title": fav.get('title'),
+                "reasoning": fav.get('reasoning')
+            }
+
+            # Call new unified endpoint
+            response = await rate_chart(
+                request_data={"chart": chart_data, "rating": "like"},
+                session=session
+            )
+            responses.append(response)
+
+        return JSONResponse({
+            "success": True,
+            "message": f"Saved {len(favorites)} favorites (via legacy endpoint)",
+            "favorites_count": len(favorites),
+            "warning": "This endpoint is deprecated. Please migrate to /api/rate-chart"
+        })
+
+    except Exception as e:
+        logger.error(f"❌ Error in legacy favorites endpoint: {e}")
         return JSONResponse({
             "success": False,
             "error": str(e)
@@ -1190,71 +1545,45 @@ async def save_chart_favorites(
 
 
 @app.post("/api/record-chart-feedback")
-async def record_chart_feedback(
+async def record_chart_feedback_legacy(
     request_data: Dict[str, Any] = Body(...),
     session: dict = Depends(require_auth),
     session_id: Optional[str] = Cookie(None)
 ):
-    """Record per-session feedback for a chart (like/dislike)."""
-    try:
-        if not session_id:
-            return JSONResponse({
-                "success": False,
-                "error": "session_id cookie is required"
-            }, status_code=400)
+    """
+    DEPRECATED: Use /api/rate-chart instead
 
+    Legacy endpoint maintained for backward compatibility.
+    Will be removed in v2.1.0
+    """
+    logger.warning("⚠️ Legacy endpoint /api/record-chart-feedback called - migrate to /api/rate-chart")
+
+    try:
         chart = request_data.get('chart')
         liked = request_data.get('liked')
 
-        if not isinstance(chart, dict) or liked is None:
+        if not chart:
             return JSONResponse({
                 "success": False,
-                "error": "chart (object) and liked (bool) are required"
+                "error": "chart is required"
             }, status_code=400)
 
-        signature = _chart_signature(chart)
-        profile = _get_or_create_session_profile(session_id)
+        # Convert to new rating format
+        rating = "like" if liked else "dislike"
 
-        if liked:
-            if signature not in profile["likes"]:
-                profile["likes"].append(signature)
-            profile["counts"]["chart_type"].update([chart.get('chart_type')])
-            profile["counts"]["metric"].update([chart.get('metric')])
-            profile["counts"]["dimension"].update([chart.get('dimension')])
-        else:
-            if signature not in profile["dislikes"]:
-                profile["dislikes"].append(signature)
-
-        # Persist feedback to JSONL for later analysis
-        feedback_dir = Path("data/user_feedback")
-        feedback_dir.mkdir(parents=True, exist_ok=True)
-        feedback_file = feedback_dir / f"user_{session['user_id']}_session_{session_id}.jsonl"
-
-        payload = {
-            "timestamp": datetime.now().isoformat(),
-            "user_id": session['user_id'],
-            "session_id": session_id,
-            "liked": bool(liked),
-            "chart": chart,
-            "signature": signature
-        }
-
-        with open(feedback_file, 'a') as f:
-            f.write(json.dumps(payload) + "\n")
-
-        return JSONResponse({
-            "success": True,
-            "message": "Feedback recorded",
-            "signature": signature
-        })
+        # Call new unified endpoint
+        return await rate_chart(
+            request_data={"chart": chart, "rating": rating},
+            session=session
+        )
 
     except Exception as e:
-        logger.error(f"❌ Error recording chart feedback: {e}")
-        logger.error(traceback.format_exc())
+        logger.error(f"❌ Error in legacy feedback endpoint: {e}")
         return JSONResponse({
             "success": False,
             "error": str(e)
         }, status_code=500)
+
 
 
 # API: Get current session chart count (for debugging/monitoring)
