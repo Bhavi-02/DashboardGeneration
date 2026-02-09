@@ -36,7 +36,7 @@ router = APIRouter()
 # Chart Management Endpoints
 # ============================================================================
 
-@router.post("/api/add-chart")
+@router.post("/add-chart")
 async def add_chart(
     request_data: Dict[str, Any] = Body(...),
     session: dict = Depends(require_auth)
@@ -93,7 +93,7 @@ async def add_chart(
             "message": f"Error processing query: {str(e)}"
         }, status_code=500)
 
-@router.post("/api/delete-chart")
+@router.post("/delete-chart")
 async def delete_chart(
     request_data: Dict[str, Any] = Body(...),
     session: dict = Depends(require_auth)
@@ -123,7 +123,7 @@ async def delete_chart(
             "message": f"Error deleting chart: {str(e)}"
         }, status_code=500)
 
-@router.post("/api/clear-charts")
+@router.post("/clear-charts")
 async def clear_charts(session: dict = Depends(require_auth)):
     """Clear all charts"""
     try:
@@ -149,7 +149,7 @@ async def clear_charts(session: dict = Depends(require_auth)):
             "message": f"Error clearing charts: {str(e)}"
         }, status_code=500)
 
-@router.get("/api/current-chart-count")
+@router.get("/current-chart-count")
 async def get_current_chart_count(session: dict = Depends(require_auth)):
     """Get the current number of charts in the session (for monitoring)"""
     try:
@@ -178,7 +178,7 @@ async def get_current_chart_count(session: dict = Depends(require_auth)):
 # Smart Dashboard Generation Endpoint
 # ============================================================================
 
-@router.post("/api/generate-smart-dashboard")
+@router.post("/generate-smart-dashboard")
 async def generate_smart_dashboard_api(
     request_data: Dict[str, Any] = Body(...),
     session: dict = Depends(require_auth),
@@ -347,7 +347,7 @@ async def generate_smart_dashboard_api(
 # Single Chart Generation Endpoint
 # ============================================================================
 
-@router.post("/api/generate-single-chart")
+@router.post("/generate-single-chart")
 async def generate_single_chart(
     request_data: Dict[str, Any] = Body(...),
     session: dict = Depends(require_auth)
@@ -546,7 +546,7 @@ async def generate_single_chart(
 # Chart Save Endpoint
 # ============================================================================
 
-@router.post("/api/save-chart")
+@router.post("/save-chart")
 async def save_chart(
     request_data: Dict[str, Any] = Body(...),
     session: dict = Depends(require_auth)
