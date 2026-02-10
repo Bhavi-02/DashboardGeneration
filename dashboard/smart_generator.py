@@ -471,7 +471,7 @@ class SmartChartRecommender:
             else:
                 # Initialize LLM (Claude 3 Haiku for MVP)
                 self.llm = ChatOpenAI(
-                    model="anthropic/claude-3-haiku",
+                    model="anthropic/claude-haiku-4.5",
                     api_key=self.api_key,
                     base_url="https://openrouter.ai/api/v1",
                     temperature=0.45,  # Slightly more diverse recommendations

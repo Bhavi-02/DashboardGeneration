@@ -149,3 +149,117 @@ def generate_chart(self, entities: Dict[str, Any], query: str) -> Figure:
     """
     ...
 ```
+
+## Critical Patterns (Must Know)
+
+### 1. Global Dashboard System Singleton ⚠️ CRITICAL
+
+```python
+# ✅ ALWAYS use this pattern - import from services
+from services.dashboard_service import get_dashboard_system
+dashboard_system = get_dashboard_system()
+
+# ❌ NEVER instantiate directly - causes chart accumulation bugs
+from dashboard.interactive_dashboard import InteractiveDashboard
+dashboard_system = InteractiveDashboard()  # WRONG - creates duplicate instance
+```
+
+**Why this matters**: Charts accumulate in `dashboard_system.dashboard.charts[]` across requests. Multiple instances = lost charts.
+
+**Chart lifecycle pattern**:
+
+```python
+# 1. Get singleton
+dashboard_system = get_dashboard_system()
+
+# 2. Clear previous session charts
+dashboard_system.dashboard.clear_charts()
+
+# 3. Add charts
+dashboard_system.dashboard.add_chart_from_query(query, entities)
+
+# 4. Generate final dashboard
+dashboard_system.dashboard.generate_and_save_dashboard(user_id, title)
+```
+
+### 2. Entity Structure - Lowercase Keys Required ⚠️
+
+```python
+# ✅ CORRECT - flat dict with lowercase string keys
+entities = {
+    'metric': 'sales',               # String value, not list
+    'dimension': 'region',           # Lowercase key
+    'chart_type': 'bar',            # bar, line, pie, area, scatter, heatmap, radar
+    'aggregation': 'sum',           # sum, avg, count, min, max
+    'filters': [],                  # List of filter conditions
+    'group_by': 'category',         # Optional secondary dimension
+    'time_granularity': 'monthly',  # daily, monthly, quarterly, yearly
+    'calculation_type': 'yoy_growth',  # Optional: yoy_growth, mom_change, etc.
+}
+
+# ❌ WRONG - common mistakes
+entities = {
+    'METRIC': 'sales',              # Uppercase keys not recognized
+    'metric': ['sales', 'profit'],  # Lists not supported for entity values
+    'Dimension': 'region',          # Mixed case fails
+}
+```
+
+**Used in**: `ChartGenerator.generate_chart(entities, query)`, `SmartQueryParser.parse_query()`, `ChartRecommendation` model
+
+### 3. Agentic AI System - 4-Component Architecture
+
+**Location**: `dashboard/smart_generator.py` (1254 lines)
+
+```python
+from dashboard.smart_generator import SmartDashboardGenerator
+
+# Orchestrates 4 components automatically:
+generator = SmartDashboardGenerator(data_connector, use_llm=True)
+result = generator.generate_smart_dashboard(
+    user_department="Finance",
+    user_role="Analyst",
+    num_charts=5,
+    custom_prompt="focus on CEO-level KPIs"  # Optional override
+)
+# Returns: {success, recommendations, charts, profile, context, failed_recommendations}
+```
+
+**4 Components** (orchestrated automatically):
+
+1. **DataProfiler** → Analyzes schema, detects industry, identifies semantic columns
+2. **ContextAnalyzer** → Maps department → preferred metrics, role → chart types
+3. **SmartChartRecommender** → LLM-powered (Claude 3 Haiku), validates columns with multi-layer fallback
+4. **SmartDashboardGenerator** → Orchestrates workflow, generates charts, handles failures
+
+### 4. Dual Personalization System
+
+**Tier 1: Session Feedback** (Ephemeral, RAM-based)
+
+- `services/feedback_service.py` → `session_feedback_store[session_id]`
+- Tracks likes/dislikes during active session
+- Cleared on logout/timeout
+- Used for immediate session personalization
+
+**Tier 2: Time-Decay Ratings** (Persistent, JSON file-based)
+
+- File: `data/user_ratings/user_{id}_ratings.json` (v2 schema)
+- Exponential decay: `weight = e^(-0.02 × days_old)` (35-day half-life)
+- Survives across sessions
+- Used for long-term user preference modeling
+
+### 5. Multi-Dataset Architecture
+
+```python
+# DataConnector maintains single active dataset
+data_connector.get_available_datasets()     # List all in data/ subdirs
+data_connector.switch_dataset('healthcare') # Switch active dataset
+data_connector.get_current_dataset()        # Returns 'healthcare'
+
+# Auto-detection (NO hardcoded column names):
+# - Numeric: int64, float64 dtypes
+# - Categorical: object dtype
+# - Date: datetime64 or recognized patterns
+```
+
+**File structure**: `data/{dataset_name}/{tables}.xlsx`

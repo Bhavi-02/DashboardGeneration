@@ -72,16 +72,24 @@ class MetricCalculator:
         
         return result_df
     
-    def calculate_yoy_growth(self, data: pd.DataFrame, metric_col: str, time_col: str) -> pd.DataFrame:
+    def calculate_yoy_growth(self, data: pd.DataFrame, metric_col: str, time_col: str, 
+                            min_base_threshold: float = None) -> pd.DataFrame:
         """
-        Calculate year-over-year growth percentage
+        Calculate year-over-year growth percentage with outlier protection
         
         Formula: YoY Growth % = ((Current Year - Previous Year) / Previous Year) * 100
+        
+        Outlier Protection: When previous value is too small (near zero), the calculated
+        growth percentage can be unrealistically high (e.g., 2,000,000%). This method
+        protects against such outliers by treating small base values as unreliable.
         
         Args:
             data: DataFrame with time-series data (must be sorted by time)
             metric_col: Column containing metric values
             time_col: Column containing time dimension (year, FY, etc.)
+            min_base_threshold: Minimum previous value for reliable growth calculation.
+                               If None, auto-calculated as 1% of median value.
+                               Previous values below this threshold produce NaN growth.
             
         Returns:
             DataFrame with added 'YoY_Growth_Pct' column
@@ -89,6 +97,12 @@ class MetricCalculator:
         Note: Handles both single-series and multi-series (grouped) data
         """
         result_df = data.copy()
+        
+        # Auto-calculate threshold if not provided (1% of median value)
+        if min_base_threshold is None:
+            median_value = result_df[metric_col].median()
+            min_base_threshold = max(median_value * 0.01, 1)  # At least 1
+            logger.info(f"📊 Auto-calculated min_base_threshold: {min_base_threshold:.2f} (1% of median)")
         
         # Check if this is multi-series data (has group_by column)
         group_by_cols = [col for col in result_df.columns if col.startswith('group_by_')]
@@ -104,41 +118,50 @@ class MetricCalculator:
             # Calculate YoY growth within each group
             result_df['Previous_Value'] = result_df.groupby(group_col)[metric_col].shift(1)
             
-            result_df['YoY_Growth_Pct'] = result_df.apply(
-                lambda row: ((row[metric_col] - row['Previous_Value']) / row['Previous_Value'] * 100) 
-                if row['Previous_Value'] != 0 and pd.notna(row['Previous_Value'])
-                else np.nan,
-                axis=1
-            )
+            def safe_yoy_calc(row):
+                prev = row['Previous_Value']
+                curr = row[metric_col]
+                # Protect against division by small numbers (outlier protection)
+                if pd.isna(prev) or prev == 0 or abs(prev) < min_base_threshold:
+                    return np.nan
+                return ((curr - prev) / abs(prev)) * 100
+            
+            result_df['YoY_Growth_Pct'] = result_df.apply(safe_yoy_calc, axis=1)
             
             result_df = result_df.drop('Previous_Value', axis=1)
             
+            # Log outlier detection
+            valid_growth = result_df['YoY_Growth_Pct'].notna().sum()
             logger.info(f"✅ Multi-series YoY Growth calculated for {result_df[group_col].nunique()} groups")
+            logger.info(f"   Valid growth values: {valid_growth}/{len(result_df)} (outliers/unreliable excluded)")
         else:
-            # Single-series: Original logic
+            # Single-series: Original logic with outlier protection
             # Sort by time dimension to ensure correct ordering
             result_df = self._sort_by_time_dimension(result_df, time_col)
             
             # Calculate year-over-year change
             result_df['Previous_Value'] = result_df[metric_col].shift(1)
             
-            # Calculate growth percentage
-            # Handle division by zero: if previous value is 0, set growth to NaN
-            result_df['YoY_Growth_Pct'] = result_df.apply(
-                lambda row: ((row[metric_col] - row['Previous_Value']) / row['Previous_Value'] * 100) 
-                if row['Previous_Value'] != 0 and pd.notna(row['Previous_Value'])
-                else np.nan,
-                axis=1
-            )
+            def safe_yoy_calc(row):
+                prev = row['Previous_Value']
+                curr = row[metric_col]
+                # Protect against division by small numbers (outlier protection)
+                if pd.isna(prev) or prev == 0 or abs(prev) < min_base_threshold:
+                    return np.nan
+                return ((curr - prev) / abs(prev)) * 100
+            
+            result_df['YoY_Growth_Pct'] = result_df.apply(safe_yoy_calc, axis=1)
             
             # Remove intermediate column
             result_df = result_df.drop('Previous_Value', axis=1)
             
-            # Log results
+            # Log results with outlier info
+            valid_growth = result_df['YoY_Growth_Pct'].notna().sum()
             logger.info(f"✅ YoY Growth calculated:")
             logger.info(f"   Years: {result_df[time_col].tolist()}")
             logger.info(f"   Values: {result_df[metric_col].tolist()}")
             logger.info(f"   Growth %: {[f'{x:.1f}%' if pd.notna(x) else 'N/A' for x in result_df['YoY_Growth_Pct'].tolist()]}")
+            logger.info(f"   Valid growth values: {valid_growth}/{len(result_df)} (base < {min_base_threshold:.2f} excluded)")
         
         return result_df
     

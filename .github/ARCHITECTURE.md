@@ -92,3 +92,88 @@ ROLE_PERMISSIONS = {
 
 - `User`: id, username, email, hashed_password, role, department
 - `Dashboard`: id, user_id, title, charts_config (JSON), file_path, visible_to_viewer, allowed_departments
+
+## Tech Stack Summary
+
+| Component       | Technology                                         |
+| --------------- | -------------------------------------------------- |
+| Backend         | FastAPI (async), uvicorn                           |
+| Database        | MySQL + SQLAlchemy ORM (pool_size=5, recycle=3600) |
+| Charts          | Plotly (interactive)                               |
+| NLP Query       | SmartQueryParser (fuzzy + LLM hybrid)              |
+| AI/LLM          | Claude 3 Haiku via OpenRouter                      |
+| RAG             | LangChain + FAISS (vector similarity)              |
+| Auth            | Bcrypt + Session cookies (30-min timeout)          |
+| Personalization | Session store (RAM) + Time-decay (JSON files)      |
+
+## Request Pipeline Detailed
+
+```
+HTTP Request (session_id cookie)
+    ↓
+@Depends(require_auth) → Session validation + RBAC check
+    ↓
+@Depends(get_dashboard_system) → Get singleton instance
+    ↓
+@Depends(get_db) → SQLAlchemy session (connection pool)
+    ↓
+Router handler → Business logic in services/
+    ↓
+JSONResponse or HTMLResponse
+```
+
+## Chart Generation Flow
+
+```
+User Query String
+    ↓
+SmartQueryParser (fuzzy 70-80% success, LLM fallback 20-30%)
+    ↓
+entities dict (lowercase keys, flat structure)
+    ↓
+ChartGenerator.generate_chart(entities, query)
+    ↓
+MetricCalculator (if calculation_type specified)
+    ↓
+Plotly figure generation
+    ↓
+DashboardGenerator.add_chart_from_query()
+    ↓
+Accumulates in dashboard_system.dashboard.charts[]
+```
+
+## Key File Locations (main.py:1-95)
+
+```python
+# Entry point - minimal orchestration only
+/main.py (95 lines)
+
+# Core infrastructure
+/core/config.py      # Logging, CORS
+/core/database.py    # SQLAlchemy pool
+/core/lifespan.py    # Startup/shutdown
+
+# Business logic
+/services/dashboard_service.py  # Singleton management
+/services/auth_service.py       # Password hashing
+/services/feedback_service.py   # Personalization
+
+# API layer (57 endpoints across 9 routers)
+/api/routers/auth.py            # Session management
+/api/routers/dashboards.py      # Dashboard CRUD + RBAC
+/api/routers/charts.py          # Chart generation
+/api/routers/datasets.py        # Data switching
+/api/routers/ratings.py         # User feedback
+/api/routers/explainability.py  # AI insights
+/api/routers/rag.py             # Document Q&A
+
+# AI/ML features
+/dashboard/smart_generator.py   # 4-component agentic system
+/nlu/smart_query_parser.py      # Hybrid NLP (fuzzy + LLM)
+/dashboard/dashboard_explainer.py # AI insights generator
+
+# Data layer
+/charts/data_connector.py       # Multi-dataset loader
+/charts/chart_generator.py      # Plotly chart creation
+/charts/metric_calculator.py    # YoY, MoM, MA calculations
+```

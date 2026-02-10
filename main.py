@@ -68,14 +68,14 @@ logger.info("""
 ╔══════════════════════════════════════════════════════════════╗
 ║                  Gen-Dash Server Ready                       ║
 ║                                                              ║
-║  🌐 Server: http://localhost:8000                           ║
-║  📚 API Docs: http://localhost:8000/docs                    ║
-║  🔧 Admin: http://localhost:8000/home                       ║
+║  🌐 Server: http://localhost:8000                            ║
+║  📚 API Docs: http://localhost:8000/docs                     ║
+║  🔧 Admin: http://localhost:8000/home                        ║
 ║                                                              ║
 ║  Refactored Structure:                                       ║
-║  ├── 3 Core modules (config, database, lifespan)           ║
-║  ├── 4 Service modules (auth, feedback, dashboard, rating)  ║
-║  └── 9 API routers (57 endpoints total)                     ║
+║  ├── 3 Core modules (config, database, lifespan).            ║
+║  ├── 4 Service modules (auth, feedback, dashboard, rating)   ║
+║  └── 9 API routers (57 endpoints total)                      ║
 ╚══════════════════════════════════════════════════════════════╝
 """)
 
